@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, ArrowRight, Trophy } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
 import { JoinFlow } from "./JoinFlow";
 
 type Ctx = { open: () => void; close: () => void };
