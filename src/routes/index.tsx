@@ -280,14 +280,14 @@ function About() {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12 items-center">
         <Reveal className="md:col-span-6">
           <div className="relative rounded-2xl overflow-hidden border border-white/10">
-            <img src={action1} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1400} height={1600} className="w-full h-[520px] object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />
+            <img src={pTeam} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-3">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Главная фигура</div>
-                <div className="font-display text-3xl mt-1">Алексей Левгевич</div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Тренировочный процесс</div>
+                <div className="font-display text-3xl mt-1">Команда FAM</div>
               </div>
-              <div className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-wider font-semibold">FAM</div>
+              <div className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-wider font-semibold">Анапа</div>
             </div>
           </div>
         </Reveal>
