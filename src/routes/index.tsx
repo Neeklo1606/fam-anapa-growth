@@ -271,6 +271,52 @@ function Develop() {
   );
 }
 
+/* ============================ PHOTO STORY ============================ */
+function PhotoStory() {
+  const shots = [
+    { src: pDribble, label: "Ведение", idx: "01" },
+    { src: pCoach, label: "Объяснение", idx: "02" },
+    { src: pBall, label: "Касание", idx: "03" },
+    { src: pCelebrate, label: "Эмоции", idx: "04" },
+  ];
+  return (
+    <section className="relative bg-night text-white py-20 md:py-28 overflow-hidden">
+      <div className="absolute inset-0 pitch-lines opacity-25" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Тренировочный процесс</div>
+              <h2 className="mt-4 font-display text-4xl md:text-6xl tracking-tight">
+                Так выглядит <br /> футбол в FAM
+              </h2>
+            </div>
+            <p className="md:max-w-sm text-white/55">
+              Реальные моменты с тренировок: работа с мячом, объяснение упражнений, эмоции команды.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {shots.map((s, i) => (
+            <Reveal key={s.idx} delay={i * 0.06}>
+              <div className="group relative aspect-[3/4] rounded-2xl overflow-hidden">
+                <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
+                <div className="absolute top-4 left-4 font-display text-xl text-flame">{s.idx}</div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-white/85">{s.label}</span>
+                  <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center text-flame text-xs">→</span>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ============================ ABOUT ============================ */
 function About() {
   return (
