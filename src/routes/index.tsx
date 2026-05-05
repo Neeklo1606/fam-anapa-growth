@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Phone,
@@ -18,12 +19,14 @@ import {
 import hero from "@/assets/hero.jpg";
 
 import pDribble from "@/assets/p-dribble.jpg";
-import pCoach from "@/assets/p-coach.jpg";
-import pTeam from "@/assets/p-team.jpg";
 import pBall from "@/assets/p-ball.jpg";
-import pCelebrate from "@/assets/p-celebrate.jpg";
 import pKick from "@/assets/p-kick.jpg";
-import pGubin from "@/assets/p-gubin.jpg";
+import coachGubin from "@/assets/coach-gubin.jpg";
+import famTeamDiplomas from "@/assets/fam-team-diplomas.jpg";
+import famTraining from "@/assets/fam-training.jpg";
+import famTeamFlag from "@/assets/fam-team-flag.jpg";
+import famCupNight from "@/assets/fam-cup-night.jpg";
+import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { JoinFlow } from "@/components/site/JoinFlow";
 
@@ -271,14 +274,21 @@ function Develop() {
   );
 }
 
-/* ============================ PHOTO STORY ============================ */
+/* ============================ PHOTO STORY (slider) ============================ */
 function PhotoStory() {
   const shots = [
-    { src: pDribble, label: "Ведение", idx: "01" },
-    { src: pCoach, label: "Объяснение", idx: "02" },
-    { src: pBall, label: "Касание", idx: "03" },
-    { src: pCelebrate, label: "Эмоции", idx: "04" },
+    { src: famTraining, label: "Объяснение упражнения", idx: "01", tag: "Процесс" },
+    { src: famTeamFlag, label: "Команда FAM", idx: "02", tag: "Команда" },
+    { src: famCupCelebration, label: "Победа", idx: "03", tag: "Эмоции" },
+    { src: famTeamDiplomas, label: "Награждение", idx: "04", tag: "Достижения" },
+    { src: famCupNight, label: "Кубок", idx: "05", tag: "Турнир" },
   ];
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setActive((a) => (a + 1) % shots.length), 4500);
+    return () => clearInterval(t);
+  }, [shots.length]);
+
   return (
     <section className="relative bg-night text-white py-20 md:py-28 overflow-hidden">
       <div className="absolute inset-0 pitch-lines opacity-25" />
@@ -292,24 +302,94 @@ function PhotoStory() {
               </h2>
             </div>
             <p className="md:max-w-sm text-white/55">
-              Реальные моменты с тренировок: работа с мячом, объяснение упражнений, эмоции команды.
+              Реальные моменты с тренировок и турниров: работа с мячом, объяснение упражнений, победы команды.
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {shots.map((s, i) => (
-            <Reveal key={s.idx} delay={i * 0.06}>
-              <div className="group relative aspect-[3/4] rounded-2xl overflow-hidden">
-                <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-display text-xl text-flame">{s.idx}</div>
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-white/85">{s.label}</span>
-                  <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center text-flame text-xs">→</span>
-                </div>
+        {/* Stage */}
+        <Reveal className="mt-12">
+          <div className="relative rounded-3xl overflow-hidden aspect-[16/10] md:aspect-[21/9] bg-night/60 border border-white/10">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={shots[active].src}
+                src={shots[active].src}
+                alt={shots[active].label}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-night/60 via-transparent to-transparent" />
+
+            <div className="absolute top-5 left-5 flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-[0.2em] font-semibold">
+                {shots[active].tag}
+              </span>
+              <span className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] uppercase tracking-[0.2em] text-white/80">
+                {shots[active].idx} / 0{shots.length}
+              </span>
+            </div>
+
+            <div className="absolute left-5 right-5 bottom-5 flex items-end justify-between gap-4">
+              <div className="font-display text-3xl md:text-5xl tracking-tight max-w-xl">
+                {shots[active].label}
               </div>
-            </Reveal>
+              <div className="hidden sm:flex gap-2">
+                <button
+                  onClick={() => setActive((a) => (a - 1 + shots.length) % shots.length)}
+                  className="h-11 w-11 rounded-full border border-white/20 bg-white/5 backdrop-blur flex items-center justify-center hover:bg-white/15 transition"
+                  aria-label="Previous"
+                >
+                  <ArrowRight className="h-4 w-4 rotate-180" />
+                </button>
+                <button
+                  onClick={() => setActive((a) => (a + 1) % shots.length)}
+                  className="h-11 w-11 rounded-full bg-flame flex items-center justify-center hover:brightness-110 transition shadow-flame"
+                  aria-label="Next"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* progress bars */}
+            <div className="absolute left-5 right-5 top-5 sm:top-auto sm:bottom-24 flex gap-1.5">
+              {shots.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActive(i)}
+                  className="h-0.5 flex-1 bg-white/15 overflow-hidden rounded-full"
+                  aria-label={`Slide ${i + 1}`}
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{ width: i < active ? "100%" : i === active ? "100%" : "0%" }}
+                    transition={{ duration: i === active ? 4.5 : 0.3, ease: "linear" }}
+                    className="h-full bg-flame"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Thumbnails */}
+        <div className="mt-4 grid grid-cols-5 gap-2 md:gap-3">
+          {shots.map((s, i) => (
+            <button
+              key={s.idx}
+              onClick={() => setActive(i)}
+              className={`relative aspect-square md:aspect-[4/3] rounded-xl overflow-hidden border transition ${
+                active === i ? "border-flame ring-2 ring-flame/40" : "border-white/10 opacity-70 hover:opacity-100"
+              }`}
+            >
+              <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
+            </button>
           ))}
         </div>
       </div>
@@ -327,7 +407,7 @@ function About() {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12 items-center">
         <Reveal className="md:col-span-6">
           <div className="relative rounded-2xl overflow-hidden border border-white/10">
-            <img src={pTeam} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
+            <img src={famTeamFlag} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-3">
               <div>
@@ -395,14 +475,14 @@ function Coaches() {
             {/* Photo */}
             <div className="md:col-span-7 relative">
               <img
-                src={pGubin}
+                src={coachGubin}
                 alt="Губин Алексей Олегович — тренер футбольной академии Морева"
                 loading="lazy"
                 width={1080}
                 height={1920}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-night via-night/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-20 mix-blend-overlay" />
               <div className="absolute top-6 left-6 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] uppercase tracking-[0.2em] text-white/85">
                 Тренер · FAM
@@ -474,12 +554,12 @@ function Gallery() {
         </Reveal>
 
         <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
-          <Tile src={pKick} className="col-span-6 md:col-span-3 row-span-2" caption="Удар" />
-          <Tile src={pDribble} className="col-span-3 md:col-span-2" caption="Ведение" />
-          <Tile src={pCoach} className="col-span-3 md:col-span-1" caption="Тренер" />
-          <Tile src={pBall} className="col-span-2 md:col-span-1" caption="Касание" />
-          <Tile src={pTeam} className="col-span-2 md:col-span-1" caption="Команда" />
-          <Tile src={pCelebrate} className="col-span-2 md:col-span-1" caption="Эмоции" />
+          <Tile src={famCupCelebration} className="col-span-6 md:col-span-3 row-span-2" caption="Победа команды" />
+          <Tile src={famTeamFlag} className="col-span-3 md:col-span-2" caption="Команда FAM" />
+          <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренировка" />
+          <Tile src={famCupNight} className="col-span-2 md:col-span-1" caption="Кубок" />
+          <Tile src={famTeamDiplomas} className="col-span-2 md:col-span-1" caption="Награждение" />
+          <Tile src={pKick} className="col-span-2 md:col-span-1" caption="Удар" />
         </div>
       </div>
     </section>
@@ -622,7 +702,7 @@ function FinalCTA() {
   return (
     <section id="cta" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
       <div className="absolute inset-0">
-        <img src={pCelebrate} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <img src={famCupCelebration} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-b from-night via-night/85 to-night" />
       </div>
       <div className="absolute inset-0 pitch-lines opacity-25" />
