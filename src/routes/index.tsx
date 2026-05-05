@@ -52,6 +52,7 @@ function Home() {
       <Intro />
       <WhoFor />
       <Develop />
+      <PhotoStory />
       <About />
       <Coaches />
       <Gallery />
