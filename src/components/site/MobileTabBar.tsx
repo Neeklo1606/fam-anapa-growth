@@ -20,7 +20,7 @@ export function MobileTabBar() {
   return (
     <>
       <nav className="lg:hidden fixed bottom-3 left-3 right-3 z-40">
-        <div className="relative bg-night/90 backdrop-blur-xl border border-white/10 rounded-full shadow-elevated overflow-hidden">
+        <div className="relative bg-night/90 backdrop-blur-xl border border-white/10 rounded-full shadow-elevated">
           <div className="flex items-stretch px-2">
             <Link to="/" className={item} activeProps={{ className: active }} activeOptions={{ exact: true }}>
               <Home className="h-5 w-5" /> Главная
@@ -28,7 +28,7 @@ export function MobileTabBar() {
             <Link to="/contacts" className={item} activeProps={{ className: active }}>
               <Mail className="h-5 w-5" /> Контакты
             </Link>
-            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5">
+            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-end gap-1 pb-2.5">
               <span className="h-12 w-12 -mt-7 rounded-full bg-flame text-white flex items-center justify-center shadow-flame ring-4 ring-night">
                 <Phone className="h-5 w-5" />
               </span>
@@ -37,7 +37,6 @@ export function MobileTabBar() {
             <button onClick={() => setOpen(true)} className={item}>
               <Menu className="h-5 w-5" /> Меню
             </button>
-            <button className="invisible flex-1" aria-hidden />
           </div>
         </div>
       </nav>

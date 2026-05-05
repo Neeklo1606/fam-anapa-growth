@@ -16,16 +16,16 @@ import {
   ChevronRight,
 } from "lucide-react";
 import hero from "@/assets/hero.jpg";
-import action1 from "@/assets/action1.jpg";
-import coach1 from "@/assets/coach1.jpg";
-import g1 from "@/assets/g1.jpg";
-import g2 from "@/assets/g2.jpg";
-import g3 from "@/assets/g3.jpg";
-import g4 from "@/assets/g4.jpg";
-import g5 from "@/assets/g5.jpg";
-import g6 from "@/assets/g6.jpg";
+
+import pDribble from "@/assets/p-dribble.jpg";
+import pCoach from "@/assets/p-coach.jpg";
+import pTeam from "@/assets/p-team.jpg";
+import pBall from "@/assets/p-ball.jpg";
+import pCelebrate from "@/assets/p-celebrate.jpg";
+import pKick from "@/assets/p-kick.jpg";
+import pGubin from "@/assets/p-gubin.jpg";
 import { Reveal } from "@/components/site/Reveal";
-import { ContactForm } from "@/components/site/ContactForm";
+import { JoinFlow } from "@/components/site/JoinFlow";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,6 +52,7 @@ function Home() {
       <Intro />
       <WhoFor />
       <Develop />
+      <PhotoStory />
       <About />
       <Coaches />
       <Gallery />
@@ -68,9 +69,9 @@ function Hero() {
   return (
     <section className="relative min-h-[100svh] bg-night text-white overflow-hidden">
       <div className="absolute inset-0">
-        <img src={hero} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
+        <img src={pKick} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/90 via-night/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/40 to-transparent" />
         <div className="absolute inset-0 pitch-lines opacity-30" />
       </div>
 
@@ -270,6 +271,52 @@ function Develop() {
   );
 }
 
+/* ============================ PHOTO STORY ============================ */
+function PhotoStory() {
+  const shots = [
+    { src: pDribble, label: "Ведение", idx: "01" },
+    { src: pCoach, label: "Объяснение", idx: "02" },
+    { src: pBall, label: "Касание", idx: "03" },
+    { src: pCelebrate, label: "Эмоции", idx: "04" },
+  ];
+  return (
+    <section className="relative bg-night text-white py-20 md:py-28 overflow-hidden">
+      <div className="absolute inset-0 pitch-lines opacity-25" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+        <Reveal>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Тренировочный процесс</div>
+              <h2 className="mt-4 font-display text-4xl md:text-6xl tracking-tight">
+                Так выглядит <br /> футбол в FAM
+              </h2>
+            </div>
+            <p className="md:max-w-sm text-white/55">
+              Реальные моменты с тренировок: работа с мячом, объяснение упражнений, эмоции команды.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {shots.map((s, i) => (
+            <Reveal key={s.idx} delay={i * 0.06}>
+              <div className="group relative aspect-[3/4] rounded-2xl overflow-hidden">
+                <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
+                <div className="absolute top-4 left-4 font-display text-xl text-flame">{s.idx}</div>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-[0.2em] text-white/85">{s.label}</span>
+                  <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center text-flame text-xs">→</span>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ============================ ABOUT ============================ */
 function About() {
   return (
@@ -280,14 +327,14 @@ function About() {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12 items-center">
         <Reveal className="md:col-span-6">
           <div className="relative rounded-2xl overflow-hidden border border-white/10">
-            <img src={action1} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1400} height={1600} className="w-full h-[520px] object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />
+            <img src={pTeam} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-3">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Главная фигура</div>
-                <div className="font-display text-3xl mt-1">Алексей Левгевич</div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-white/60">Тренировочный процесс</div>
+                <div className="font-display text-3xl mt-1">Команда FAM</div>
               </div>
-              <div className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-wider font-semibold">FAM</div>
+              <div className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-wider font-semibold">Анапа</div>
             </div>
           </div>
         </Reveal>
@@ -325,71 +372,87 @@ function About() {
 }
 
 /* ============================ COACHES ============================ */
-const coaches = [
-  {
-    name: "Алексей Левгевич",
-    role: "Главный тренер",
-    desc: "Отвечает за тренировочный процесс, развитие детских групп и индивидуальный подход к каждому ребёнку.",
-    img: coach1,
-    tags: ["Детские группы", "Техника", "Игровое мышление"],
-    big: true,
-  },
-  {
-    name: "Тренер детских групп",
-    role: "Группы 6–10 лет",
-    desc: "Работа с младшими: координация, базовое касание, игровая среда и дисциплина.",
-    img: g6,
-    tags: ["Координация", "База"],
-  },
-  {
-    name: "Тренер по физподготовке",
-    role: "ОФП · Скорость",
-    desc: "Сила, скорость, выносливость и правильная биомеханика движений.",
-    img: g5,
-    tags: ["ОФП", "Скорость"],
-  },
-];
-
 function Coaches() {
   return (
-    <section id="coaches" className="relative py-24 md:py-32 bg-background">
+    <section id="coaches" className="relative py-24 md:py-32 bg-background overflow-hidden">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">05 — Тренеры</div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight">Тренерский <br /> состав</h2>
+              <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">05 — Тренер</div>
+              <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight">
+                Главный тренер <br /> академии
+              </h2>
             </div>
             <p className="md:max-w-sm text-ink/60">
-              С детьми работают тренеры, которые помогают не только освоить футбол, но и почувствовать уверенность на поле.
+              С детьми работает тренер, который помогает не только освоить футбол, но и почувствовать уверенность на поле.
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-12 gap-5">
-          {coaches.map((c, i) => (
-            <Reveal key={c.name} delay={i * 0.06} className={c.big ? "md:col-span-6 md:row-span-2" : "md:col-span-6"}>
-              <div className="group relative h-full rounded-2xl overflow-hidden bg-night text-white">
-                <div className={`relative ${c.big ? "aspect-[4/5]" : "aspect-[16/10]"} overflow-hidden`}>
-                  <img src={c.img} alt={c.name} loading="lazy" width={1024} height={1280} className="w-full h-full object-cover opacity-90 group-hover:scale-[1.04] transition duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-                  <div className="absolute top-5 left-5 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-[10px] uppercase tracking-[0.18em] text-white/85 border border-white/15">
-                    {c.role}
-                  </div>
-                </div>
-                <div className="p-6 lg:p-7">
-                  <div className="font-display text-3xl lg:text-4xl tracking-wide">{c.name}</div>
-                  <p className="mt-3 text-sm text-white/65 leading-relaxed">{c.desc}</p>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {c.tags.map((t) => (
-                      <span key={t} className="px-3 py-1 rounded-full border border-white/15 text-[11px] uppercase tracking-wider text-white/70">{t}</span>
-                    ))}
-                  </div>
-                </div>
+        <Reveal delay={0.1} className="mt-14">
+          <div className="relative rounded-3xl overflow-hidden bg-night text-white grid md:grid-cols-12 min-h-[560px]">
+            {/* Photo */}
+            <div className="md:col-span-7 relative">
+              <img
+                src={pGubin}
+                alt="Губин Алексей Олегович — тренер футбольной академии Морева"
+                loading="lazy"
+                width={1080}
+                height={1920}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-night via-night/40 to-transparent" />
+              <div className="absolute inset-0 pitch-lines opacity-20 mix-blend-overlay" />
+              <div className="absolute top-6 left-6 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] uppercase tracking-[0.2em] text-white/85">
+                Тренер · FAM
               </div>
-            </Reveal>
-          ))}
-        </div>
+              <div className="hidden md:block absolute -right-8 bottom-8 font-display text-[10rem] leading-[0.85] text-white/[0.07] tracking-tighter select-none pointer-events-none">
+                01
+              </div>
+            </div>
+
+            {/* Info */}
+            <div className="md:col-span-5 relative p-8 md:p-12 flex flex-col justify-between gap-10">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Главная фигура академии</div>
+                <h3 className="mt-4 font-display text-4xl md:text-5xl tracking-tight leading-[0.95]">
+                  Губин <br /> Алексей <br /> Олегович
+                </h3>
+                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-flame/15 border border-flame/30 text-flame text-[11px] uppercase tracking-[0.2em] font-semibold">
+                  Тренер
+                </div>
+                <p className="mt-7 text-white/70 leading-relaxed">
+                  Отвечает за тренировочный процесс, развитие детских групп и индивидуальный подход к каждому ребёнку.
+                  Помогает детям полюбить футбол через правильную базу, технику и уверенность в игре.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { k: "Техника", v: "База" },
+                  { k: "Игра", v: "Мышление" },
+                  { k: "Дети", v: "4–14" },
+                ].map((s) => (
+                  <div key={s.k} className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+                    <div className="font-display text-xl tracking-wide">{s.k}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-white/50 mt-1">{s.v}</div>
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href="#cta"
+                className="self-start inline-flex items-center gap-3 pl-6 pr-2 h-13 py-2 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame hover:brightness-110 transition"
+              >
+                Записаться к тренеру
+                <span className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </a>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -411,12 +474,12 @@ function Gallery() {
         </Reveal>
 
         <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
-          <Tile src={action1} className="col-span-6 md:col-span-3 row-span-2" caption="Игровая ситуация" />
-          <Tile src={g1} className="col-span-3 md:col-span-2" caption="Разминка" />
-          <Tile src={g4} className="col-span-3 md:col-span-1" caption="Удар" />
-          <Tile src={g3} className="col-span-2 md:col-span-1" caption="Ведение" />
-          <Tile src={g5} className="col-span-2 md:col-span-1" caption="Команда" />
-          <Tile src={g2} className="col-span-2 md:col-span-1" caption="Эмоции" />
+          <Tile src={pKick} className="col-span-6 md:col-span-3 row-span-2" caption="Удар" />
+          <Tile src={pDribble} className="col-span-3 md:col-span-2" caption="Ведение" />
+          <Tile src={pCoach} className="col-span-3 md:col-span-1" caption="Тренер" />
+          <Tile src={pBall} className="col-span-2 md:col-span-1" caption="Касание" />
+          <Tile src={pTeam} className="col-span-2 md:col-span-1" caption="Команда" />
+          <Tile src={pCelebrate} className="col-span-2 md:col-span-1" caption="Эмоции" />
         </div>
       </div>
     </section>
@@ -558,21 +621,25 @@ function SeoText() {
 function FinalCTA() {
   return (
     <section id="cta" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 pitch-lines opacity-30" />
+      <div className="absolute inset-0">
+        <img src={pCelebrate} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="absolute inset-0 bg-gradient-to-b from-night via-night/85 to-night" />
+      </div>
+      <div className="absolute inset-0 pitch-lines opacity-25" />
       <div className="absolute inset-0 bg-gradient-pitch" />
 
-      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12">
-        <Reveal className="md:col-span-6">
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-10 lg:gap-14">
+        <Reveal className="md:col-span-5">
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">10 — Запись</div>
           <h2 className="mt-4 font-display text-5xl md:text-7xl tracking-tight">
-            Запишите ребёнка <br /> на тренировку
+            Сделайте первый <br /> шаг в команду
           </h2>
           <p className="mt-6 text-white/70 max-w-md leading-relaxed">
-            Оставьте заявку или напишите нам — подскажем подходящую группу, расписание и формат занятий.
+            Несколько простых шагов — и мы подберём подходящую группу, расписание и формат занятий для вашего ребёнка.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame">
+            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 border border-white/15 backdrop-blur text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/15 transition">
               <Phone className="h-4 w-4" /> Позвонить
             </a>
             <a href="https://wa.me/79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/20 bg-white/5 backdrop-blur text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/10 transition">
@@ -583,16 +650,28 @@ function FinalCTA() {
             </a>
           </div>
 
-          <div className="mt-12 flex items-center gap-3 text-sm text-white/50">
+          <div className="mt-12 flex items-center gap-3 text-sm text-white/55">
             <Trophy className="h-5 w-5 text-flame" />
-            Первое занятие — знакомство с тренером и группой.
+            Первое занятие — знакомство с тренером и командой.
           </div>
         </Reveal>
 
-        <Reveal delay={0.1} className="md:col-span-6">
-          <div className="rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur p-6 lg:p-8">
-            <div className="font-display text-2xl tracking-wide mb-5">Заявка</div>
-            <ContactForm dark />
+        <Reveal delay={0.1} className="md:col-span-7">
+          <div className="relative rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl p-6 md:p-9 overflow-hidden">
+            <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full" />
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-flame/40 to-transparent" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-flame font-semibold">Запись · Интерактивно</div>
+                  <div className="font-display text-2xl tracking-wide mt-1">Присоединиться к команде</div>
+                </div>
+                <div className="hidden sm:flex h-10 px-3 items-center rounded-full border border-white/10 bg-white/[0.04] text-[10px] uppercase tracking-[0.2em] text-white/60">
+                  4 шага
+                </div>
+              </div>
+              <JoinFlow />
+            </div>
           </div>
         </Reveal>
       </div>

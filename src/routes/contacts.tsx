@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Phone, MessageCircle, Send, MapPin, Clock } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
-import { ContactForm } from "@/components/site/ContactForm";
+import { JoinFlow } from "@/components/site/JoinFlow";
 
 export const Route = createFileRoute("/contacts")({
   head: () => ({
@@ -92,14 +92,15 @@ function Contacts() {
           </Reveal>
 
           <Reveal delay={0.1} className="md:col-span-6">
-            <div className="rounded-2xl bg-night text-white p-7 lg:p-9 relative overflow-hidden">
+            <div className="rounded-3xl bg-night text-white p-7 lg:p-9 relative overflow-hidden border border-white/5">
               <div className="absolute inset-0 pitch-lines opacity-20" />
+              <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/15 blur-3xl rounded-full" />
               <div className="relative">
                 <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Заявка</div>
-                <h2 className="mt-3 font-display text-3xl md:text-4xl tracking-wide">Записать ребёнка</h2>
-                <p className="mt-3 text-white/65 text-sm">Перезвоним и подскажем подходящую группу.</p>
+                <h2 className="mt-3 font-display text-3xl md:text-4xl tracking-wide">Сделайте первый шаг</h2>
+                <p className="mt-3 text-white/65 text-sm">Несколько шагов — и мы подберём подходящую группу.</p>
                 <div className="mt-7">
-                  <ContactForm dark />
+                  <JoinFlow />
                 </div>
               </div>
             </div>
