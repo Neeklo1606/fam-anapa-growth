@@ -16,7 +16,7 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
-import hero from "@/assets/hero.jpg";
+import hero from "@/assets/hero-kid.jpg";
 
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";
