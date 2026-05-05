@@ -12,10 +12,8 @@ const ldJson = {
   "@type": "SportsActivityLocation",
   name: "Футбольная академия Морева",
   description:
-    "Детская футбольная академия в Анапе. Тренировки по футболу для детей, развитие техники, координации и командной игры.",
+    "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки, развитие техники, координации и уверенности.",
   address: { "@type": "PostalAddress", addressLocality: "Анапа", addressCountry: "RU" },
-  telephone: "+7-900-000-00-00",
-  url: "https://fam-anapa.ru",
   sport: "Football",
   areaServed: "Анапа",
 };
