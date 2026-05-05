@@ -18,12 +18,14 @@ import {
 import hero from "@/assets/hero.jpg";
 
 import pDribble from "@/assets/p-dribble.jpg";
-import pCoach from "@/assets/p-coach.jpg";
-import pTeam from "@/assets/p-team.jpg";
 import pBall from "@/assets/p-ball.jpg";
-import pCelebrate from "@/assets/p-celebrate.jpg";
 import pKick from "@/assets/p-kick.jpg";
-import pGubin from "@/assets/p-gubin.jpg";
+import coachGubin from "@/assets/coach-gubin.jpg";
+import famTeamDiplomas from "@/assets/fam-team-diplomas.jpg";
+import famTraining from "@/assets/fam-training.jpg";
+import famTeamFlag from "@/assets/fam-team-flag.jpg";
+import famCupNight from "@/assets/fam-cup-night.jpg";
+import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { JoinFlow } from "@/components/site/JoinFlow";
 
