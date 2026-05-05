@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import hero from "@/assets/hero.jpg";
-import action1 from "@/assets/action1.jpg";
+
 import pDribble from "@/assets/p-dribble.jpg";
 import pCoach from "@/assets/p-coach.jpg";
 import pTeam from "@/assets/p-team.jpg";
