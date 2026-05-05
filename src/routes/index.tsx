@@ -10,6 +10,7 @@ import {
   MapPin,
 } from "lucide-react";
 import hero from "@/assets/hero-kid.jpg";
+import { HeroVideo } from "@/components/site/HeroVideo";
 
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";

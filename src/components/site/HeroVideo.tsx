@@ -57,8 +57,7 @@ export function HeroVideo({
           loop
           playsInline
           preload="metadata"
-          // @ts-expect-error - iOS attr
-          webkit-playsinline="true"
+          {...({ "webkit-playsinline": "true" } as Record<string, string>)}
           disablePictureInPicture
           disableRemotePlayback
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
