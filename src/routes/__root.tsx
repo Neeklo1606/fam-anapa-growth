@@ -9,28 +9,26 @@ import { Toaster } from "@/components/ui/sonner";
 const ldJson = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
-  name: "Football Academy Morev (FAM)",
-  description: "Детская футбольная академия в Анапе. Бережное развитие через спорт.",
+  name: "Футбольная академия Морева",
+  description:
+    "Детская футбольная академия в Анапе. Тренировки по футболу для детей, развитие техники, координации и командной игры.",
   address: { "@type": "PostalAddress", addressLocality: "Анапа", addressCountry: "RU" },
   telephone: "+7-900-000-00-00",
   url: "https://fam-anapa.ru",
   sport: "Football",
+  areaServed: "Анапа",
 };
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-display font-bold text-brand-deep">404</h1>
-        <h2 className="mt-4 text-xl font-semibold">Страница не найдена</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Возможно, она была перемещена или больше не существует.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-medium text-primary-foreground"
-          >
+    <div className="flex min-h-screen items-center justify-center bg-night text-white px-4 relative overflow-hidden">
+      <div className="absolute inset-0 pitch-lines opacity-30" />
+      <div className="relative max-w-md text-center">
+        <div className="font-display text-[10rem] leading-none text-gradient-brand">404</div>
+        <h2 className="mt-2 font-display text-2xl tracking-wider">Страница не найдена</h2>
+        <p className="mt-3 text-sm text-white/60">Возможно, она была перемещена или больше не существует.</p>
+        <div className="mt-7">
+          <Link to="/" className="inline-flex items-center justify-center rounded-full bg-flame px-6 py-3 text-sm font-semibold uppercase tracking-wider shadow-flame">
             На главную
           </Link>
         </div>
@@ -44,15 +42,20 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "FAM — Детская футбольная академия в Анапе" },
+      { title: "Футбольная академия Морева в Анапе — футбол для детей" },
       {
         name: "description",
         content:
-          "Football Academy Morev — бережное развитие детей через футбол в Анапе. Профессиональные тренеры, безопасная среда, понятная программа.",
+          "Детская футбольная академия Морева в Анапе. Тренировки по футболу для детей, развитие техники, координации, дисциплины и уверенности на поле. Запись на занятия.",
       },
-      { name: "theme-color", content: "#050047" },
-      { property: "og:title", content: "FAM — Детская футбольная академия в Анапе" },
-      { property: "og:description", content: "Где ребёнка понимают и бережно развивают." },
+      {
+        name: "keywords",
+        content:
+          "футбольная академия Анапа, футбол для детей Анапа, футбольная секция Анапа, детский футбольный клуб Анапа, тренировки по футболу для детей Анапа, футбольная школа Анапа",
+      },
+      { name: "theme-color", content: "#0B1020" },
+      { property: "og:title", content: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { property: "og:description", content: "Детская футбольная академия Морева в Анапе. Запись на тренировки." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ru_RU" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -63,12 +66,10 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap",
       },
     ],
-    scripts: [
-      { type: "application/ld+json", children: JSON.stringify(ldJson) },
-    ],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(ldJson) }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -81,7 +82,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-background text-foreground">
         {children}
         <Scripts />
       </body>
@@ -93,7 +94,7 @@ function RootComponent() {
   return (
     <>
       <Header />
-      <main className="pt-16 pb-28 md:pb-0">
+      <main className="pb-32 lg:pb-0">
         <Outlet />
       </main>
       <Footer />
