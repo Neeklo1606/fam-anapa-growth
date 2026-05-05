@@ -39,8 +39,7 @@ export function Header() {
             Контакты
           </Link>
           <ApplyButton className="!h-10 md:!h-11 !pl-4 md:!pl-5 !pr-1.5 !text-[11px] md:!text-xs !py-1">
-            <span className="hidden xs:inline">Записаться</span>
-            <span className="xs:hidden">Запись</span>
+            Записаться
           </ApplyButton>
         </div>
       </div>
