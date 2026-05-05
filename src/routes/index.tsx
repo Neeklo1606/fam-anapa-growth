@@ -17,15 +17,15 @@ import {
 } from "lucide-react";
 import hero from "@/assets/hero.jpg";
 import action1 from "@/assets/action1.jpg";
-import coach1 from "@/assets/coach1.jpg";
-import g1 from "@/assets/g1.jpg";
-import g2 from "@/assets/g2.jpg";
-import g3 from "@/assets/g3.jpg";
-import g4 from "@/assets/g4.jpg";
-import g5 from "@/assets/g5.jpg";
-import g6 from "@/assets/g6.jpg";
+import pDribble from "@/assets/p-dribble.jpg";
+import pCoach from "@/assets/p-coach.jpg";
+import pTeam from "@/assets/p-team.jpg";
+import pBall from "@/assets/p-ball.jpg";
+import pCelebrate from "@/assets/p-celebrate.jpg";
+import pKick from "@/assets/p-kick.jpg";
+import pGubin from "@/assets/p-gubin.jpg";
 import { Reveal } from "@/components/site/Reveal";
-import { ContactForm } from "@/components/site/ContactForm";
+import { JoinFlow } from "@/components/site/JoinFlow";
 
 export const Route = createFileRoute("/")({
   head: () => ({
