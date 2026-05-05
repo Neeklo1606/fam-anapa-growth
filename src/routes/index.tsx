@@ -70,7 +70,7 @@ function Home() {
 /* ============================ HERO ============================ */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] lg:min-h-[100svh] bg-night text-white overflow-hidden flex flex-col">
+    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex flex-col">
       <div className="absolute inset-0">
         <img
           src={hero}
