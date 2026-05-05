@@ -407,7 +407,7 @@ function About() {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12 items-center">
         <Reveal className="md:col-span-6">
           <div className="relative rounded-2xl overflow-hidden border border-white/10">
-            <img src={pTeam} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
+            <img src={famTeamFlag} alt="Тренировка футбольной академии Морева в Анапе" loading="lazy" width={1600} height={1024} className="w-full h-[520px] object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between gap-3">
               <div>
@@ -475,7 +475,7 @@ function Coaches() {
             {/* Photo */}
             <div className="md:col-span-7 relative">
               <img
-                src={pGubin}
+                src={coachGubin}
                 alt="Губин Алексей Олегович — тренер футбольной академии Морева"
                 loading="lazy"
                 width={1080}
@@ -556,10 +556,10 @@ function Gallery() {
         <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
           <Tile src={pKick} className="col-span-6 md:col-span-3 row-span-2" caption="Удар" />
           <Tile src={pDribble} className="col-span-3 md:col-span-2" caption="Ведение" />
-          <Tile src={pCoach} className="col-span-3 md:col-span-1" caption="Тренер" />
+          <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренер" />
           <Tile src={pBall} className="col-span-2 md:col-span-1" caption="Касание" />
-          <Tile src={pTeam} className="col-span-2 md:col-span-1" caption="Команда" />
-          <Tile src={pCelebrate} className="col-span-2 md:col-span-1" caption="Эмоции" />
+          <Tile src={famTeamFlag} className="col-span-2 md:col-span-1" caption="Команда" />
+          <Tile src={famCupCelebration} className="col-span-2 md:col-span-1" caption="Эмоции" />
         </div>
       </div>
     </section>
@@ -702,7 +702,7 @@ function FinalCTA() {
   return (
     <section id="cta" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
       <div className="absolute inset-0">
-        <img src={pCelebrate} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <img src={famCupCelebration} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-b from-night via-night/85 to-night" />
       </div>
       <div className="absolute inset-0 pitch-lines opacity-25" />
