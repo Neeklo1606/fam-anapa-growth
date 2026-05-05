@@ -67,17 +67,12 @@ function Hero() {
   return (
     <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex items-center">
       <div className="absolute inset-0">
-        <AnimatePresence>
-          <motion.img
-            key="hero"
-            src={hero}
-            alt="Футбольная академия Морева в Анапе"
-            initial={{ scale: 1.08 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 8, ease: "easeOut" }}
-            className="absolute inset-0 w-full h-full object-cover object-[70%_center] lg:object-[60%_center] opacity-90"
-          />
-        </AnimatePresence>
+        <HeroVideo
+          videoSrc="/hero.mp4"
+          posterSrc={hero}
+          alt="Футбольная академия Морева в Анапе"
+          objectPosition="65% center"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-night/85 via-night/55 to-night lg:from-night lg:via-night/55 lg:to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-night/80 via-night/30 to-transparent lg:from-night/95 lg:via-night/40" />
         <div className="absolute inset-0 pitch-lines opacity-25" />
