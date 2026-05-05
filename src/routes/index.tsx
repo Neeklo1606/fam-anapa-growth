@@ -70,70 +70,80 @@ function Home() {
 /* ============================ HERO ============================ */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden">
+    <section className="relative min-h-[100svh] lg:min-h-[100svh] bg-night text-white overflow-hidden flex flex-col">
       <div className="absolute inset-0">
-        <img src={pKick} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/40 to-transparent" />
-        <div className="absolute inset-0 pitch-lines opacity-30" />
+        <img
+          src={hero}
+          alt="Юный футболист на поле академии Морева"
+          className="w-full h-full object-cover object-[70%_center] lg:object-[60%_center] opacity-90"
+        />
+        {/* Mobile-friendly readability gradients */}
+        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/75 to-night/20 lg:from-night lg:via-night/60 lg:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/40" />
+        <div className="absolute inset-0 pitch-lines opacity-25" />
       </div>
 
-      {/* huge background type */}
+      {/* huge background type — desktop only */}
       <div className="absolute right-[-2rem] top-24 hidden md:block font-display text-[18rem] xl:text-[24rem] leading-[0.85] text-white/[0.05] tracking-tighter select-none pointer-events-none">
         FAM
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 pt-32 lg:pt-40 pb-24 lg:pb-32">
+      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-24 lg:pt-40 pb-12 lg:pb-32 flex-1 flex flex-col justify-end lg:justify-start">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] uppercase tracking-[0.18em] text-white/80">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[9.5px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.18em] text-white/85">
             <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse" />
-            Детская футбольная академия · Анапа
+            Детская академия · Анапа
           </div>
 
-          <h1 className="mt-6 font-display text-[14vw] sm:text-7xl lg:text-[8.5rem] leading-[0.85] tracking-tight">
+          <h1
+            className="mt-4 lg:mt-6 font-display tracking-tight text-white"
+            style={{
+              fontSize: "clamp(2.6rem, 13vw, 8.5rem)",
+              lineHeight: 0.92,
+            }}
+          >
             Футбольная <br />
             академия <br />
             <span className="text-gradient-brand">Морева</span>
           </h1>
 
-          <p className="mt-7 max-w-xl text-base lg:text-lg text-white/75 leading-relaxed">
-            Футбольные тренировки для детей с акцентом на технику, координацию,
-            игровое мышление и уверенность на поле.
+          <p className="mt-4 lg:mt-7 max-w-[22rem] lg:max-w-xl text-[14px] lg:text-lg text-white/80 leading-snug lg:leading-relaxed">
+            Тренировки для детей с акцентом на технику, координацию и уверенность на поле.
           </p>
 
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div className="mt-6 lg:mt-9 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <a
               href="#cta"
-              className="group inline-flex items-center gap-3 pl-6 pr-2 h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame hover:brightness-110 transition"
+              className="group inline-flex items-center justify-between sm:justify-start gap-3 pl-5 pr-1.5 h-12 lg:h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-[12px] lg:text-sm shadow-flame hover:brightness-110 transition"
             >
               Записать ребёнка
-              <span className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center transition group-hover:translate-x-0.5">
-                <ArrowRight className="h-4 w-4" />
+              <span className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-white/15 flex items-center justify-center transition group-hover:translate-x-0.5">
+                <ArrowRight className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               </span>
             </a>
             <a
               href="#schedule"
-              className="inline-flex items-center gap-2 h-14 px-7 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/10 transition"
+              className="inline-flex items-center justify-center gap-2 h-12 lg:h-14 px-5 lg:px-7 rounded-full border border-white/25 bg-white/5 backdrop-blur-md text-white font-semibold uppercase tracking-wider text-[12px] lg:text-sm hover:bg-white/10 transition"
             >
-              Смотреть расписание
+              Расписание
             </a>
           </div>
 
-          <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4 max-w-3xl">
+          <div className="mt-8 lg:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-3 max-w-3xl">
             {[
               { k: "Анапа", v: "Локация" },
               { k: "4–14", v: "Возраст" },
               { k: "Группы", v: "Детские" },
-              { k: "Техника", v: "Игра · Дисциплина" },
+              { k: "Техника", v: "Игра" },
             ].map((it) => (
-              <div key={it.k} className="border-l border-white/15 pl-4">
-                <div className="font-display text-2xl lg:text-3xl tracking-wide">{it.k}</div>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-white/50 mt-1">{it.v}</div>
+              <div key={it.k} className="border-l border-white/15 pl-3 lg:pl-4">
+                <div className="font-display text-lg lg:text-3xl tracking-wide leading-none">{it.k}</div>
+                <div className="text-[9px] lg:text-[11px] uppercase tracking-[0.16em] text-white/55 mt-1.5">{it.v}</div>
               </div>
             ))}
           </div>
