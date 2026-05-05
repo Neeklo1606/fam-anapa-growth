@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import logo from "@/assets/logo.webp";
 
 const nav = [
-  { to: "/", label: "Главная" },
+  { to: "/", label: "О нас", hash: "#about" },
+  { to: "/", label: "Тренировки", hash: "#training" },
+  { to: "/", label: "Тренеры", hash: "#coaches" },
+  { to: "/", label: "Галерея", hash: "#gallery" },
+  { to: "/", label: "Расписание", hash: "#schedule" },
   { to: "/contacts", label: "Контакты" },
 ] as const;
 
@@ -20,37 +24,46 @@ export function Header() {
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
         scrolled
-          ? "bg-background/85 backdrop-blur-md border-b border-border shadow-soft"
+          ? "bg-night/80 backdrop-blur-xl border-b border-white/10"
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto max-w-6xl px-5 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="FAM" className="h-9 w-9 rounded-full" width={36} height={36} />
+      <div className="mx-auto max-w-7xl px-5 lg:px-8 h-16 md:h-20 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="relative h-10 w-10 rounded-full bg-white/5 ring-1 ring-white/15 overflow-hidden">
+            <img src={logo} alt="FAM" className="h-full w-full object-contain p-1" width={40} height={40} />
+          </div>
           <div className="leading-tight">
-            <div className="font-display font-bold text-[15px] text-brand-deep">FAM</div>
-            <div className="text-[10px] tracking-wider text-muted-foreground uppercase">Football Academy Morev</div>
+            <div className="font-display text-xl tracking-wide text-white">FAM</div>
+            <div className="text-[10px] tracking-[0.18em] text-white/50 uppercase">Академия Морева · Анапа</div>
           </div>
         </Link>
-        <nav className="hidden md:flex items-center gap-1">
+
+        <nav className="hidden lg:flex items-center gap-1">
           {nav.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              className="px-4 py-2 rounded-full text-sm text-foreground/80 hover:text-brand transition"
-              activeProps={{ className: "px-4 py-2 rounded-full text-sm bg-secondary text-brand-deep font-medium" }}
-              activeOptions={{ exact: true }}
+            <a
+              key={n.label}
+              href={n.to === "/" ? n.hash ?? "/" : n.to}
+              className="px-3 py-2 text-[13px] tracking-wide uppercase font-medium text-white/70 hover:text-white transition"
             >
               {n.label}
-            </Link>
+            </a>
           ))}
           <a
-            href="tel:+79000000000"
-            className="ml-2 px-5 py-2.5 rounded-full bg-gradient-brand text-primary-foreground text-sm font-medium shadow-soft hover:opacity-95 transition"
+            href="#cta"
+            className="ml-3 inline-flex items-center gap-2 pl-5 pr-4 h-11 rounded-full bg-flame text-white text-sm font-semibold shadow-flame hover:brightness-110 transition uppercase tracking-wide"
           >
-            Позвонить
+            Записаться
+            <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center">→</span>
           </a>
         </nav>
+
+        <a
+          href="#cta"
+          className="lg:hidden inline-flex items-center h-10 px-4 rounded-full bg-flame text-white text-xs font-semibold uppercase tracking-wide"
+        >
+          Записаться
+        </a>
       </div>
     </header>
   );
