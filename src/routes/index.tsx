@@ -273,14 +273,21 @@ function Develop() {
   );
 }
 
-/* ============================ PHOTO STORY ============================ */
+/* ============================ PHOTO STORY (slider) ============================ */
 function PhotoStory() {
   const shots = [
-    { src: pDribble, label: "Ведение", idx: "01" },
-    { src: pCoach, label: "Объяснение", idx: "02" },
-    { src: pBall, label: "Касание", idx: "03" },
-    { src: pCelebrate, label: "Эмоции", idx: "04" },
+    { src: famTraining, label: "Объяснение упражнения", idx: "01", tag: "Процесс" },
+    { src: famTeamFlag, label: "Команда FAM", idx: "02", tag: "Команда" },
+    { src: famCupCelebration, label: "Победа", idx: "03", tag: "Эмоции" },
+    { src: famTeamDiplomas, label: "Награждение", idx: "04", tag: "Достижения" },
+    { src: famCupNight, label: "Кубок", idx: "05", tag: "Турнир" },
   ];
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setActive((a) => (a + 1) % shots.length), 4500);
+    return () => clearInterval(t);
+  }, [shots.length]);
+
   return (
     <section className="relative bg-night text-white py-20 md:py-28 overflow-hidden">
       <div className="absolute inset-0 pitch-lines opacity-25" />
@@ -294,24 +301,94 @@ function PhotoStory() {
               </h2>
             </div>
             <p className="md:max-w-sm text-white/55">
-              Реальные моменты с тренировок: работа с мячом, объяснение упражнений, эмоции команды.
+              Реальные моменты с тренировок и турниров: работа с мячом, объяснение упражнений, победы команды.
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-          {shots.map((s, i) => (
-            <Reveal key={s.idx} delay={i * 0.06}>
-              <div className="group relative aspect-[3/4] rounded-2xl overflow-hidden">
-                <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700" />
-                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-                <div className="absolute top-4 left-4 font-display text-xl text-flame">{s.idx}</div>
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                  <span className="text-[11px] uppercase tracking-[0.2em] text-white/85">{s.label}</span>
-                  <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center text-flame text-xs">→</span>
-                </div>
+        {/* Stage */}
+        <Reveal className="mt-12">
+          <div className="relative rounded-3xl overflow-hidden aspect-[16/10] md:aspect-[21/9] bg-night/60 border border-white/10">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={shots[active].src}
+                src={shots[active].src}
+                alt={shots[active].label}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-night/60 via-transparent to-transparent" />
+
+            <div className="absolute top-5 left-5 flex items-center gap-2">
+              <span className="px-3 py-1.5 rounded-full bg-flame text-white text-[10px] uppercase tracking-[0.2em] font-semibold">
+                {shots[active].tag}
+              </span>
+              <span className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] uppercase tracking-[0.2em] text-white/80">
+                {shots[active].idx} / 0{shots.length}
+              </span>
+            </div>
+
+            <div className="absolute left-5 right-5 bottom-5 flex items-end justify-between gap-4">
+              <div className="font-display text-3xl md:text-5xl tracking-tight max-w-xl">
+                {shots[active].label}
               </div>
-            </Reveal>
+              <div className="hidden sm:flex gap-2">
+                <button
+                  onClick={() => setActive((a) => (a - 1 + shots.length) % shots.length)}
+                  className="h-11 w-11 rounded-full border border-white/20 bg-white/5 backdrop-blur flex items-center justify-center hover:bg-white/15 transition"
+                  aria-label="Previous"
+                >
+                  <ArrowRight className="h-4 w-4 rotate-180" />
+                </button>
+                <button
+                  onClick={() => setActive((a) => (a + 1) % shots.length)}
+                  className="h-11 w-11 rounded-full bg-flame flex items-center justify-center hover:brightness-110 transition shadow-flame"
+                  aria-label="Next"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* progress bars */}
+            <div className="absolute left-5 right-5 top-5 sm:top-auto sm:bottom-24 flex gap-1.5">
+              {shots.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActive(i)}
+                  className="h-0.5 flex-1 bg-white/15 overflow-hidden rounded-full"
+                  aria-label={`Slide ${i + 1}`}
+                >
+                  <motion.div
+                    initial={false}
+                    animate={{ width: i < active ? "100%" : i === active ? "100%" : "0%" }}
+                    transition={{ duration: i === active ? 4.5 : 0.3, ease: "linear" }}
+                    className="h-full bg-flame"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Thumbnails */}
+        <div className="mt-4 grid grid-cols-5 gap-2 md:gap-3">
+          {shots.map((s, i) => (
+            <button
+              key={s.idx}
+              onClick={() => setActive(i)}
+              className={`relative aspect-square md:aspect-[4/3] rounded-xl overflow-hidden border transition ${
+                active === i ? "border-flame ring-2 ring-flame/40" : "border-white/10 opacity-70 hover:opacity-100"
+              }`}
+            >
+              <img src={s.src} alt={s.label} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-night/70 to-transparent" />
+            </button>
           ))}
         </div>
       </div>
