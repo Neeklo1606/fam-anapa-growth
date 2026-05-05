@@ -5,16 +5,15 @@ import { Header } from "@/components/site/Header";
 import { MobileTabBar } from "@/components/site/MobileTabBar";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { ApplyProvider } from "@/components/site/ApplyModal";
 
 const ldJson = {
   "@context": "https://schema.org",
   "@type": "SportsActivityLocation",
   name: "Футбольная академия Морева",
   description:
-    "Детская футбольная академия в Анапе. Тренировки по футболу для детей, развитие техники, координации и командной игры.",
+    "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки, развитие техники, координации и уверенности.",
   address: { "@type": "PostalAddress", addressLocality: "Анапа", addressCountry: "RU" },
-  telephone: "+7-900-000-00-00",
-  url: "https://fam-anapa.ru",
   sport: "Football",
   areaServed: "Анапа",
 };
@@ -92,7 +91,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <>
+    <ApplyProvider>
       <Header />
       <main className="pb-32 lg:pb-0">
         <Outlet />
@@ -100,6 +99,6 @@ function RootComponent() {
       <Footer />
       <MobileTabBar />
       <Toaster />
-    </>
+    </ApplyProvider>
   );
 }

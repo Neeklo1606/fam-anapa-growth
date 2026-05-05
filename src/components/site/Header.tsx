@@ -1,15 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import logo from "@/assets/logo.webp";
-
-const nav = [
-  { to: "/", label: "О нас", hash: "#about" },
-  { to: "/", label: "Тренировки", hash: "#training" },
-  { to: "/", label: "Тренеры", hash: "#coaches" },
-  { to: "/", label: "Галерея", hash: "#gallery" },
-  { to: "/", label: "Расписание", hash: "#schedule" },
-  { to: "/contacts", label: "Контакты" },
-] as const;
+import { ApplyButton } from "@/components/site/ApplyModal";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -24,48 +16,33 @@ export function Header() {
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
         scrolled
-          ? "bg-night/80 backdrop-blur-xl border-b border-white/10"
+          ? "bg-night/85 backdrop-blur-xl border-b border-white/10"
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 h-14 md:h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2.5 group min-w-0">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 h-14 md:h-16 flex items-center justify-between gap-3">
+        <Link to="/" className="flex items-center gap-2.5 min-w-0">
           <div className="relative h-9 w-9 md:h-10 md:w-10 shrink-0 rounded-full bg-white/5 ring-1 ring-white/15 overflow-hidden">
-            <img src={logo} alt="FAM" className="h-full w-full object-contain p-1" width={40} height={40} />
+            <img src={logo} alt="Академия Морева" className="h-full w-full object-contain p-1" width={40} height={40} />
           </div>
           <div className="leading-tight min-w-0">
-            <div className="font-display text-base md:text-xl tracking-wide text-white">FAM</div>
-            <div className="text-[9px] md:text-[10px] tracking-[0.16em] text-white/55 uppercase truncate">Академия Морева · Анапа</div>
+            <div className="font-display text-[15px] md:text-lg tracking-wide text-white truncate">Академия Морева</div>
+            <div className="text-[9px] md:text-[10px] tracking-[0.2em] text-white/55 uppercase">Анапа</div>
           </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1">
-          {nav.map((n) => (
-            <a
-              key={n.label}
-              href={n.to === "/" ? n.hash ?? "/" : n.to}
-              className="px-3 py-2 text-[13px] tracking-wide uppercase font-medium text-white/70 hover:text-white transition"
-            >
-              {n.label}
-            </a>
-          ))}
-          <a
-            href="#cta"
-            className="ml-3 inline-flex items-center gap-2 pl-5 pr-4 h-11 rounded-full bg-flame text-white text-sm font-semibold shadow-flame hover:brightness-110 transition uppercase tracking-wide"
+        <div className="flex items-center gap-2">
+          <Link
+            to="/contacts"
+            className="hidden md:inline-flex items-center h-10 px-4 text-[12px] uppercase tracking-wider text-white/70 hover:text-white transition"
           >
+            Контакты
+          </Link>
+          <ApplyButton className="!h-10 md:!h-11 !pl-4 md:!pl-5 !pr-1.5 !text-[11px] md:!text-xs !py-1">
             Записаться
-            <span className="h-7 w-7 rounded-full bg-white/15 flex items-center justify-center">→</span>
-          </a>
-        </nav>
-
-        <a
-          href="#cta"
-          className="lg:hidden inline-flex items-center h-9 px-3.5 rounded-full bg-flame text-white text-[11px] font-semibold uppercase tracking-wider shadow-flame"
-        >
-          Записаться
-        </a>
+          </ApplyButton>
+        </div>
       </div>
-
     </header>
   );
 }
