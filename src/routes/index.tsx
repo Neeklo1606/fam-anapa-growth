@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden pb-safe-nav lg:pb-0">
       <Hero />
       <Marquee />
       <Intro />
