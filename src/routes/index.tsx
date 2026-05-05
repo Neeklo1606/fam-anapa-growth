@@ -480,9 +480,9 @@ function Coaches() {
                 loading="lazy"
                 width={1080}
                 height={1920}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover object-[center_20%]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-night via-night/40 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-20 mix-blend-overlay" />
               <div className="absolute top-6 left-6 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] uppercase tracking-[0.2em] text-white/85">
                 Тренер · FAM
