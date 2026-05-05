@@ -93,7 +93,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <>
+    <ApplyProvider>
       <Header />
       <main className="pb-32 lg:pb-0">
         <Outlet />
@@ -101,6 +101,6 @@ function RootComponent() {
       <Footer />
       <MobileTabBar />
       <Toaster />
-    </>
+    </ApplyProvider>
   );
 }
