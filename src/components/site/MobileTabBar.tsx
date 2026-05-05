@@ -1,47 +1,86 @@
 import { Link } from "@tanstack/react-router";
 import { Home, Mail, Phone, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function MobileTabBar() {
   const [open, setOpen] = useState(false);
-  const item = "flex flex-col items-center justify-center gap-0.5 text-[10px] text-muted-foreground py-2 flex-1";
+  const item = "flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-wider text-white/55 py-2.5 flex-1 transition";
+  const active = item + " text-white";
+
+  const menuItems = [
+    { label: "О нас", href: "/#about" },
+    { label: "Тренировки", href: "/#training" },
+    { label: "Тренеры", href: "/#coaches" },
+    { label: "Галерея", href: "/#gallery" },
+    { label: "Расписание", href: "/#schedule" },
+    { label: "Контакты", href: "/contacts" },
+  ];
+
   return (
     <>
-      <nav className="md:hidden fixed bottom-3 left-3 right-3 z-40 bg-background/95 backdrop-blur border border-border rounded-2xl shadow-elevated">
-        <div className="flex items-stretch">
-          <Link to="/" className={item} activeProps={{ className: item + " text-brand" }} activeOptions={{ exact: true }}>
-            <Home className="h-5 w-5" /> Главная
-          </Link>
-          <Link to="/contacts" className={item} activeProps={{ className: item + " text-brand" }}>
-            <Mail className="h-5 w-5" /> Контакты
-          </Link>
-          <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2">
-            <span className="h-10 w-10 -mt-6 rounded-full bg-gradient-brand text-primary-foreground flex items-center justify-center shadow-elevated">
-              <Phone className="h-5 w-5" />
-            </span>
-            <span className="text-[10px] text-brand-deep font-medium">Позвонить</span>
-          </a>
-          <button onClick={() => setOpen(true)} className={item}>
-            <Menu className="h-5 w-5" /> Меню
-          </button>
+      <nav className="lg:hidden fixed bottom-3 left-3 right-3 z-40">
+        <div className="relative bg-night/90 backdrop-blur-xl border border-white/10 rounded-full shadow-elevated overflow-hidden">
+          <div className="flex items-stretch px-2">
+            <Link to="/" className={item} activeProps={{ className: active }} activeOptions={{ exact: true }}>
+              <Home className="h-5 w-5" /> Главная
+            </Link>
+            <Link to="/contacts" className={item} activeProps={{ className: active }}>
+              <Mail className="h-5 w-5" /> Контакты
+            </Link>
+            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5">
+              <span className="h-12 w-12 -mt-7 rounded-full bg-flame text-white flex items-center justify-center shadow-flame ring-4 ring-night">
+                <Phone className="h-5 w-5" />
+              </span>
+              <span className="text-[10px] uppercase tracking-wider text-white font-semibold">Позвонить</span>
+            </a>
+            <button onClick={() => setOpen(true)} className={item}>
+              <Menu className="h-5 w-5" /> Меню
+            </button>
+            <button className="invisible flex-1" aria-hidden />
+          </div>
         </div>
       </nav>
 
-      {open && (
-        <div className="md:hidden fixed inset-0 z-50 bg-brand-deep/95 backdrop-blur-md text-white flex flex-col p-6 animate-in fade-in duration-200">
-          <div className="flex justify-end">
-            <button onClick={() => setOpen(false)} className="p-2 rounded-full bg-white/10">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="mt-12 flex flex-col gap-6">
-            <Link to="/" onClick={() => setOpen(false)} className="text-3xl font-display font-bold">Главная</Link>
-            <Link to="/contacts" onClick={() => setOpen(false)} className="text-3xl font-display font-bold">Контакты</Link>
-            <a href="tel:+79000000000" className="text-3xl font-display font-bold opacity-80">Позвонить</a>
-          </div>
-          <div className="mt-auto text-sm opacity-60">Анапа · FAM</div>
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 z-50 bg-night text-white flex flex-col"
+          >
+            <div className="absolute inset-0 pitch-lines opacity-40" />
+            <div className="absolute inset-x-0 -top-32 h-96 bg-gradient-pitch" />
+            <div className="relative flex justify-between items-center p-5">
+              <div className="font-display text-2xl">FAM</div>
+              <button onClick={() => setOpen(false)} className="h-11 w-11 rounded-full bg-white/10 flex items-center justify-center">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="relative mt-6 flex flex-col gap-1 px-5">
+              {menuItems.map((m, i) => (
+                <motion.a
+                  key={m.label}
+                  href={m.href}
+                  onClick={() => setOpen(false)}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.05 }}
+                  className="group flex items-center justify-between py-5 border-b border-white/10"
+                >
+                  <span className="font-display text-4xl tracking-wide">{m.label}</span>
+                  <span className="text-flame opacity-0 group-hover:opacity-100 transition">→</span>
+                </motion.a>
+              ))}
+            </div>
+            <div className="relative mt-auto p-5 grid grid-cols-2 gap-3">
+              <a href="tel:+79000000000" className="h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center">Позвонить</a>
+              <a href="#cta" onClick={() => setOpen(false)} className="h-14 rounded-full border border-white/20 text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center">Записаться</a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

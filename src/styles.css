@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bebas Neue", "Oswald", "Manrope", ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 2px);
@@ -36,22 +36,28 @@
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
 
-  --color-brand-deep: var(--brand-deep);
-  --color-brand: var(--brand);
-  --color-brand-bright: var(--brand-bright);
-  --color-surface: var(--surface);
   --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-deep: var(--brand-deep);
+  --color-royal: var(--brand);
+  --color-electric: var(--brand-bright);
+  --color-flame: var(--flame);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 0.875rem;
 
   /* Brand */
+  --night: oklch(0.16 0.06 268);        /* #0B1020 */
   --brand-deep: oklch(0.21 0.16 271);   /* #050047 */
   --brand: oklch(0.42 0.21 264);        /* #004AAD */
   --brand-bright: oklch(0.62 0.20 256); /* #1E88FF */
+  --flame: oklch(0.72 0.16 55);         /* #F28A2E */
   --surface: oklch(0.975 0.005 250);    /* #F5F7FB */
-  --ink: oklch(0.205 0.04 265);         /* #0F172A */
+  --ink: oklch(0.18 0.04 265);          /* #0F172A */
+  --line: oklch(0.92 0.01 255);
 
   --background: oklch(1 0 0);
   --foreground: var(--ink);
@@ -69,13 +75,16 @@
   --accent-foreground: var(--brand-deep);
   --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.92 0.01 255);
-  --input: oklch(0.92 0.01 255);
+  --border: var(--line);
+  --input: var(--line);
   --ring: var(--brand-bright);
 
-  --shadow-soft: 0 1px 2px oklch(0.21 0.16 271 / 0.04), 0 8px 24px oklch(0.21 0.16 271 / 0.06);
-  --shadow-elevated: 0 2px 4px oklch(0.21 0.16 271 / 0.05), 0 20px 50px oklch(0.21 0.16 271 / 0.10);
+  --shadow-soft: 0 1px 2px oklch(0.16 0.06 268 / 0.06), 0 8px 24px oklch(0.16 0.06 268 / 0.08);
+  --shadow-elevated: 0 2px 4px oklch(0.16 0.06 268 / 0.08), 0 24px 60px oklch(0.16 0.06 268 / 0.18);
+  --shadow-flame: 0 10px 30px oklch(0.72 0.16 55 / 0.35);
   --gradient-brand: linear-gradient(135deg, var(--brand-deep), var(--brand) 55%, var(--brand-bright));
+  --gradient-night: linear-gradient(180deg, var(--night) 0%, var(--brand-deep) 100%);
+  --gradient-pitch: radial-gradient(ellipse at 50% 100%, oklch(0.42 0.21 264 / 0.45), transparent 60%);
 }
 
 @layer base {
@@ -86,15 +95,41 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
-  h1, h2, h3, h4, h5 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    line-height: 0.95;
+  }
 }
 
 @utility shadow-soft { box-shadow: var(--shadow-soft); }
 @utility shadow-elevated { box-shadow: var(--shadow-elevated); }
+@utility shadow-flame { box-shadow: var(--shadow-flame); }
 @utility bg-gradient-brand { background-image: var(--gradient-brand); }
+@utility bg-gradient-night { background-image: var(--gradient-night); }
+@utility bg-gradient-pitch { background-image: var(--gradient-pitch); }
 @utility text-gradient-brand {
-  background-image: var(--gradient-brand);
+  background-image: linear-gradient(135deg, var(--brand-bright), oklch(1 0 0));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+@utility pitch-lines {
+  background-image:
+    linear-gradient(to right, oklch(1 0 0 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+@utility marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
 }
