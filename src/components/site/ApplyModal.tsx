@@ -76,34 +76,6 @@ function ApplyModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function Field({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type?: string;
-}) {
-  return (
-    <div>
-      <label className="text-[10px] uppercase tracking-[0.18em] text-white/50 font-semibold">
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="mt-1.5 w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/35 text-sm focus:outline-none focus:border-flame transition"
-      />
-    </div>
-  );
-}
 
 /* Reusable trigger button */
 export function ApplyButton({
