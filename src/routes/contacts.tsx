@@ -28,9 +28,9 @@ const cards = [
 
 function Contacts() {
   return (
-    <div>
+    <div className="pb-safe-nav lg:pb-0">
       {/* HERO */}
-      <section className="relative bg-night text-white pt-32 lg:pt-40 pb-24 lg:pb-32 overflow-hidden">
+      <section className="relative bg-night text-white pt-24 lg:pt-40 pb-14 lg:pb-32 overflow-hidden">
         <div className="absolute inset-0 pitch-lines opacity-25" />
         <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[120px] rounded-full" />
         <div className="absolute right-[-2rem] bottom-[-3rem] hidden md:block font-display text-[16rem] leading-[0.85] text-white/[0.05] tracking-tighter select-none pointer-events-none">
@@ -39,12 +39,15 @@ function Contacts() {
 
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
           <Reveal>
-            <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Контакты</div>
-            <h1 className="mt-5 font-display text-5xl md:text-7xl lg:text-8xl tracking-tight max-w-4xl">
-              Контакты футбольной <br /> академии Морева
+            <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-flame font-semibold">Контакты</div>
+            <h1
+              className="mt-4 font-display tracking-tight max-w-4xl"
+              style={{ fontSize: "clamp(2.4rem, 11vw, 6rem)", lineHeight: 0.95 }}
+            >
+              Контакты <br /> академии Морева
             </h1>
-            <p className="mt-7 text-lg text-white/70 max-w-2xl leading-relaxed">
-              Свяжитесь с нами, чтобы уточнить расписание, возрастные группы и записать ребёнка на тренировку.
+            <p className="mt-5 text-[15px] lg:text-lg text-white/75 max-w-2xl leading-snug lg:leading-relaxed">
+              Свяжитесь с нами, чтобы уточнить расписание и записать ребёнка на тренировку.
             </p>
           </Reveal>
         </div>
