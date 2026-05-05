@@ -68,9 +68,9 @@ function Hero() {
   return (
     <section className="relative min-h-[100svh] bg-night text-white overflow-hidden">
       <div className="absolute inset-0">
-        <img src={hero} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
+        <img src={pKick} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/90 via-night/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/40 to-transparent" />
         <div className="absolute inset-0 pitch-lines opacity-30" />
       </div>
 
