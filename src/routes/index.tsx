@@ -88,7 +88,6 @@ function Hero() {
 
       <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-20 lg:pt-40 pb-28 lg:pb-32">
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-20 lg:pt-40 pb-10 lg:pb-32 flex-1 flex flex-col justify-end">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
