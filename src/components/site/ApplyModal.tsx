@@ -138,7 +138,7 @@ function ApplyModal({ onClose }: { onClose: () => void }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 inline-flex items-center justify-between gap-3 pl-5 pr-2 h-13 py-2 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame hover:brightness-110 transition disabled:opacity-60"
+                  className="mt-2 inline-flex items-center justify-between gap-3 pl-5 pr-2 h-12 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame hover:brightness-110 transition disabled:opacity-60"
                 >
                   {loading ? "Отправляем…" : "Отправить заявку"}
                   <span className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center">
@@ -226,7 +226,7 @@ export function ApplyButton({
     "group inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-wider transition";
   const styles =
     variant === "primary"
-      ? "pl-6 pr-2 h-13 py-2 rounded-full bg-flame text-white text-sm shadow-flame hover:brightness-110"
+      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-sm shadow-flame hover:brightness-110"
       : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-sm hover:bg-white/10";
 
   return (
