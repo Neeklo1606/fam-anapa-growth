@@ -28,14 +28,14 @@ export function Header() {
           : "bg-transparent"
       }`}
     >
-      <div className="mx-auto max-w-7xl px-5 lg:px-8 h-16 md:h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-10 w-10 rounded-full bg-white/5 ring-1 ring-white/15 overflow-hidden">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 h-14 md:h-20 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2.5 group min-w-0">
+          <div className="relative h-9 w-9 md:h-10 md:w-10 shrink-0 rounded-full bg-white/5 ring-1 ring-white/15 overflow-hidden">
             <img src={logo} alt="FAM" className="h-full w-full object-contain p-1" width={40} height={40} />
           </div>
-          <div className="leading-tight">
-            <div className="font-display text-xl tracking-wide text-white">FAM</div>
-            <div className="text-[10px] tracking-[0.18em] text-white/50 uppercase">Академия Морева · Анапа</div>
+          <div className="leading-tight min-w-0">
+            <div className="font-display text-base md:text-xl tracking-wide text-white">FAM</div>
+            <div className="text-[9px] md:text-[10px] tracking-[0.16em] text-white/55 uppercase truncate">Академия Морева · Анапа</div>
           </div>
         </Link>
 
@@ -60,11 +60,12 @@ export function Header() {
 
         <a
           href="#cta"
-          className="lg:hidden inline-flex items-center h-10 px-4 rounded-full bg-flame text-white text-xs font-semibold uppercase tracking-wide"
+          className="lg:hidden inline-flex items-center h-9 px-3.5 rounded-full bg-flame text-white text-[11px] font-semibold uppercase tracking-wider shadow-flame"
         >
           Записаться
         </a>
       </div>
+
     </header>
   );
 }
