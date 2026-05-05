@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { MobileTabBar } from "@/components/site/MobileTabBar";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { ApplyProvider } from "@/components/site/ApplyModal";
 
 const ldJson = {
   "@context": "https://schema.org",
