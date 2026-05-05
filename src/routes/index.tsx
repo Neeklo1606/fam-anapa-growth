@@ -574,21 +574,25 @@ function SeoText() {
 function FinalCTA() {
   return (
     <section id="cta" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 pitch-lines opacity-30" />
+      <div className="absolute inset-0">
+        <img src={pCelebrate} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        <div className="absolute inset-0 bg-gradient-to-b from-night via-night/85 to-night" />
+      </div>
+      <div className="absolute inset-0 pitch-lines opacity-25" />
       <div className="absolute inset-0 bg-gradient-pitch" />
 
-      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-12">
-        <Reveal className="md:col-span-6">
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-10 lg:gap-14">
+        <Reveal className="md:col-span-5">
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">10 — Запись</div>
           <h2 className="mt-4 font-display text-5xl md:text-7xl tracking-tight">
-            Запишите ребёнка <br /> на тренировку
+            Сделайте первый <br /> шаг в команду
           </h2>
           <p className="mt-6 text-white/70 max-w-md leading-relaxed">
-            Оставьте заявку или напишите нам — подскажем подходящую группу, расписание и формат занятий.
+            Несколько простых шагов — и мы подберём подходящую группу, расписание и формат занятий для вашего ребёнка.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame">
+            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-white/10 border border-white/15 backdrop-blur text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/15 transition">
               <Phone className="h-4 w-4" /> Позвонить
             </a>
             <a href="https://wa.me/79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-white/20 bg-white/5 backdrop-blur text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/10 transition">
@@ -599,16 +603,28 @@ function FinalCTA() {
             </a>
           </div>
 
-          <div className="mt-12 flex items-center gap-3 text-sm text-white/50">
+          <div className="mt-12 flex items-center gap-3 text-sm text-white/55">
             <Trophy className="h-5 w-5 text-flame" />
-            Первое занятие — знакомство с тренером и группой.
+            Первое занятие — знакомство с тренером и командой.
           </div>
         </Reveal>
 
-        <Reveal delay={0.1} className="md:col-span-6">
-          <div className="rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur p-6 lg:p-8">
-            <div className="font-display text-2xl tracking-wide mb-5">Заявка</div>
-            <ContactForm dark />
+        <Reveal delay={0.1} className="md:col-span-7">
+          <div className="relative rounded-3xl bg-white/[0.04] border border-white/10 backdrop-blur-xl p-6 md:p-9 overflow-hidden">
+            <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full" />
+            <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-flame/40 to-transparent" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-flame font-semibold">Запись · Интерактивно</div>
+                  <div className="font-display text-2xl tracking-wide mt-1">Присоединиться к команде</div>
+                </div>
+                <div className="hidden sm:flex h-10 px-3 items-center rounded-full border border-white/10 bg-white/[0.04] text-[10px] uppercase tracking-[0.2em] text-white/60">
+                  4 шага
+                </div>
+              </div>
+              <JoinFlow />
+            </div>
           </div>
         </Reveal>
       </div>
