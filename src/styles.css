@@ -133,3 +133,17 @@
 @utility animate-marquee {
   animation: marquee 40s linear infinite;
 }
+
+@utility pb-safe-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+}
+@utility pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+
+@layer base {
+  html, body { overflow-x: hidden; }
+  /* Reserve space below content for floating mobile tab bar */
+  @media (max-width: 1023px) {
+    main, body > div { /* harmless fallback */ }
+  }
+}
+

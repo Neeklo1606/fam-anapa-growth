@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function MobileTabBar() {
   const [open, setOpen] = useState(false);
-  const item = "flex flex-col items-center justify-center gap-1 text-[10px] uppercase tracking-wider text-white/55 py-2.5 flex-1 transition";
+  const item = "flex flex-col items-center justify-center gap-0.5 text-[9px] uppercase tracking-wider text-white/60 py-2 flex-1 transition";
   const active = item + " text-white";
 
   const menuItems = [
@@ -19,23 +19,26 @@ export function MobileTabBar() {
 
   return (
     <>
-      <nav className="lg:hidden fixed bottom-3 left-3 right-3 z-40">
-        <div className="relative bg-night/90 backdrop-blur-xl border border-white/10 rounded-full shadow-elevated">
-          <div className="flex items-stretch px-2">
+      <nav
+        className="lg:hidden fixed left-3 right-3 z-40"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 10px)" }}
+      >
+        <div className="relative bg-night/85 backdrop-blur-xl border border-white/10 rounded-full shadow-elevated">
+          <div className="flex items-stretch px-1.5">
             <Link to="/" className={item} activeProps={{ className: active }} activeOptions={{ exact: true }}>
-              <Home className="h-5 w-5" /> Главная
+              <Home className="h-[18px] w-[18px]" /> Главная
             </Link>
             <Link to="/contacts" className={item} activeProps={{ className: active }}>
-              <Mail className="h-5 w-5" /> Контакты
+              <Mail className="h-[18px] w-[18px]" /> Контакты
             </Link>
-            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-end gap-1 pb-2.5">
-              <span className="h-12 w-12 -mt-7 rounded-full bg-flame text-white flex items-center justify-center shadow-flame ring-4 ring-night">
-                <Phone className="h-5 w-5" />
+            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-end gap-0.5 pb-2">
+              <span className="h-11 w-11 -mt-6 rounded-full bg-flame text-white flex items-center justify-center shadow-flame ring-4 ring-night">
+                <Phone className="h-[18px] w-[18px]" />
               </span>
-              <span className="text-[10px] uppercase tracking-wider text-white font-semibold">Позвонить</span>
+              <span className="text-[9px] uppercase tracking-wider text-white font-semibold">Звонок</span>
             </a>
             <button onClick={() => setOpen(true)} className={item}>
-              <Menu className="h-5 w-5" /> Меню
+              <Menu className="h-[18px] w-[18px]" /> Меню
             </button>
           </div>
         </div>

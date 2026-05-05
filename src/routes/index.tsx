@@ -16,7 +16,7 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
-import hero from "@/assets/hero.jpg";
+import hero from "@/assets/hero-kid.jpg";
 
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden pb-safe-nav lg:pb-0">
       <Hero />
       <Marquee />
       <Intro />
@@ -70,70 +70,80 @@ function Home() {
 /* ============================ HERO ============================ */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden">
+    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex flex-col">
       <div className="absolute inset-0">
-        <img src={pKick} alt="Юный футболист на поле академии Морева" className="w-full h-full object-cover opacity-55" />
-        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/95 via-night/40 to-transparent" />
-        <div className="absolute inset-0 pitch-lines opacity-30" />
+        <img
+          src={hero}
+          alt="Юный футболист на поле академии Морева"
+          className="w-full h-full object-cover object-[70%_center] lg:object-[60%_center] opacity-90"
+        />
+        {/* Mobile-friendly readability gradients */}
+        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/75 to-night/20 lg:from-night lg:via-night/60 lg:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/40" />
+        <div className="absolute inset-0 pitch-lines opacity-25" />
       </div>
 
-      {/* huge background type */}
+      {/* huge background type — desktop only */}
       <div className="absolute right-[-2rem] top-24 hidden md:block font-display text-[18rem] xl:text-[24rem] leading-[0.85] text-white/[0.05] tracking-tighter select-none pointer-events-none">
         FAM
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 lg:px-8 pt-32 lg:pt-40 pb-24 lg:pb-32">
+      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-20 lg:pt-40 pb-10 lg:pb-32 flex-1 flex flex-col justify-end">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] uppercase tracking-[0.18em] text-white/80">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[9.5px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.18em] text-white/85">
             <span className="h-1.5 w-1.5 rounded-full bg-flame animate-pulse" />
-            Детская футбольная академия · Анапа
+            Детская академия · Анапа
           </div>
 
-          <h1 className="mt-6 font-display text-[14vw] sm:text-7xl lg:text-[8.5rem] leading-[0.85] tracking-tight">
+          <h1
+            className="mt-4 lg:mt-6 font-display tracking-tight text-white"
+            style={{
+              fontSize: "clamp(2.6rem, 13vw, 8.5rem)",
+              lineHeight: 0.92,
+            }}
+          >
             Футбольная <br />
             академия <br />
             <span className="text-gradient-brand">Морева</span>
           </h1>
 
-          <p className="mt-7 max-w-xl text-base lg:text-lg text-white/75 leading-relaxed">
-            Футбольные тренировки для детей с акцентом на технику, координацию,
-            игровое мышление и уверенность на поле.
+          <p className="mt-4 lg:mt-7 max-w-[22rem] lg:max-w-xl text-[14px] lg:text-lg text-white/80 leading-snug lg:leading-relaxed">
+            Тренировки для детей с акцентом на технику, координацию и уверенность на поле.
           </p>
 
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div className="mt-6 lg:mt-9 flex flex-col sm:flex-row gap-2.5 sm:gap-3">
             <a
               href="#cta"
-              className="group inline-flex items-center gap-3 pl-6 pr-2 h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame hover:brightness-110 transition"
+              className="group inline-flex items-center justify-between sm:justify-start gap-3 pl-5 pr-1.5 h-12 lg:h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-[12px] lg:text-sm shadow-flame hover:brightness-110 transition"
             >
               Записать ребёнка
-              <span className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center transition group-hover:translate-x-0.5">
-                <ArrowRight className="h-4 w-4" />
+              <span className="h-9 w-9 lg:h-10 lg:w-10 rounded-full bg-white/15 flex items-center justify-center transition group-hover:translate-x-0.5">
+                <ArrowRight className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               </span>
             </a>
             <a
               href="#schedule"
-              className="inline-flex items-center gap-2 h-14 px-7 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-white font-semibold uppercase tracking-wider text-sm hover:bg-white/10 transition"
+              className="inline-flex items-center justify-center gap-2 h-12 lg:h-14 px-5 lg:px-7 rounded-full border border-white/25 bg-white/5 backdrop-blur-md text-white font-semibold uppercase tracking-wider text-[12px] lg:text-sm hover:bg-white/10 transition"
             >
-              Смотреть расписание
+              Расписание
             </a>
           </div>
 
-          <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4 max-w-3xl">
+          <div className="mt-8 lg:mt-10 md:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-3 max-w-3xl">
             {[
               { k: "Анапа", v: "Локация" },
               { k: "4–14", v: "Возраст" },
               { k: "Группы", v: "Детские" },
-              { k: "Техника", v: "Игра · Дисциплина" },
+              { k: "Техника", v: "Игра" },
             ].map((it) => (
-              <div key={it.k} className="border-l border-white/15 pl-4">
-                <div className="font-display text-2xl lg:text-3xl tracking-wide">{it.k}</div>
-                <div className="text-[11px] uppercase tracking-[0.18em] text-white/50 mt-1">{it.v}</div>
+              <div key={it.k} className="border-l border-white/15 pl-3 lg:pl-4">
+                <div className="font-display text-lg lg:text-3xl tracking-wide leading-none">{it.k}</div>
+                <div className="text-[9px] lg:text-[11px] uppercase tracking-[0.16em] text-white/55 mt-1.5">{it.v}</div>
               </div>
             ))}
           </div>
@@ -163,11 +173,11 @@ function Marquee() {
 /* ============================ INTRO ============================ */
 function Intro() {
   return (
-    <section className="relative bg-background py-24 md:py-32">
+    <section className="relative bg-background py-16 md:py-32">
       <div className="mx-auto max-w-6xl px-5 lg:px-8 grid md:grid-cols-12 gap-10 items-end">
         <Reveal className="md:col-span-5">
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">01 — Введение</div>
-          <h2 className="mt-4 font-display text-5xl md:text-6xl text-deep tracking-tight">
+          <h2 className="mt-4 font-display text-[2.3rem] sm:text-5xl md:text-6xl text-deep tracking-tight">
             Футбольная секция <br /> для детей в Анапе
           </h2>
         </Reveal>
@@ -193,13 +203,13 @@ const whoFor = [
 
 function WhoFor() {
   return (
-    <section id="training" className="relative bg-surface py-24 md:py-32">
+    <section id="training" className="relative bg-surface py-16 md:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">02 — Для кого</div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight">
+              <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight">
                 Кому подойдут <br /> тренировки
               </h2>
             </div>
@@ -209,10 +219,10 @@ function WhoFor() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-10 md:mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {whoFor.map((c, i) => (
             <Reveal key={c.title} delay={i * 0.06}>
-              <div className="group relative h-full bg-night text-white rounded-2xl p-7 overflow-hidden hover:-translate-y-1 transition duration-300">
+              <div className="group relative h-full bg-night text-white rounded-2xl p-5 md:p-7 overflow-hidden hover:-translate-y-1 transition duration-300">
                 <div className="absolute inset-0 pitch-lines opacity-20" />
                 <div className="absolute -bottom-20 -right-20 h-56 w-56 bg-royal/40 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition duration-500" />
                 <div className="relative">
@@ -240,23 +250,23 @@ const features = [
 
 function Develop() {
   return (
-    <section className="relative py-24 md:py-32 bg-background">
+    <section className="relative py-16 md:py-32 bg-background">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">03 — Программа</div>
-          <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight max-w-4xl">
+          <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight max-w-4xl">
             Что развиваем <br /> на тренировках
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-12 gap-4">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-12 gap-4">
           {features.map((f, i) => (
             <Reveal
               key={f.title}
               delay={i * 0.05}
               className={i % 2 === 0 ? "md:col-span-7" : "md:col-span-5"}
             >
-              <div className="group relative h-full p-8 md:p-10 rounded-2xl border border-line bg-background hover:border-night transition overflow-hidden">
+              <div className="group relative h-full p-5 md:p-10 rounded-2xl border border-line bg-background hover:border-night transition overflow-hidden">
                 <div className="absolute top-6 right-7 font-display text-7xl text-surface group-hover:text-flame/15 transition">{f.n}</div>
                 <div className="relative">
                   <div className="h-14 w-14 rounded-xl bg-night text-flame flex items-center justify-center">
@@ -297,7 +307,7 @@ function PhotoStory() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Тренировочный процесс</div>
-              <h2 className="mt-4 font-display text-4xl md:text-6xl tracking-tight">
+              <h2 className="mt-4 font-display text-[2.1rem] sm:text-4xl md:text-6xl tracking-tight">
                 Так выглядит <br /> футбол в FAM
               </h2>
             </div>
@@ -400,7 +410,7 @@ function PhotoStory() {
 /* ============================ ABOUT ============================ */
 function About() {
   return (
-    <section id="about" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
+    <section id="about" className="relative bg-night text-white py-16 md:py-32 overflow-hidden">
       <div className="absolute inset-0 pitch-lines opacity-25" />
       <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[120px] rounded-full" />
 
@@ -421,7 +431,7 @@ function About() {
 
         <Reveal delay={0.1} className="md:col-span-6">
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">04 — Об академии</div>
-          <h2 className="mt-4 font-display text-5xl md:text-6xl tracking-tight">
+          <h2 className="mt-4 font-display text-[2.3rem] sm:text-5xl md:text-6xl tracking-tight">
             Академия, где футбол <br /> начинается с правильной базы
           </h2>
           <p className="mt-6 text-white/70 leading-relaxed">
@@ -454,13 +464,13 @@ function About() {
 /* ============================ COACHES ============================ */
 function Coaches() {
   return (
-    <section id="coaches" className="relative py-24 md:py-32 bg-background overflow-hidden">
+    <section id="coaches" className="relative py-16 md:py-32 bg-background overflow-hidden">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">05 — Тренер</div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight">
+              <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight">
                 Главный тренер <br /> академии
               </h2>
             </div>
@@ -493,10 +503,10 @@ function Coaches() {
             </div>
 
             {/* Info */}
-            <div className="md:col-span-5 relative p-8 md:p-12 flex flex-col justify-between gap-10">
+            <div className="md:col-span-5 relative p-6 md:p-12 flex flex-col justify-between gap-6 md:gap-10">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Главная фигура академии</div>
-                <h3 className="mt-4 font-display text-4xl md:text-5xl tracking-tight leading-[0.95]">
+                <h3 className="mt-4 font-display text-[2.2rem] md:text-5xl tracking-tight leading-[0.95]">
                   Губин <br /> Алексей <br /> Олегович
                 </h3>
                 <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-flame/15 border border-flame/30 text-flame text-[11px] uppercase tracking-[0.2em] font-semibold">
@@ -541,19 +551,19 @@ function Coaches() {
 /* ============================ GALLERY ============================ */
 function Gallery() {
   return (
-    <section id="gallery" className="relative bg-surface py-24 md:py-32">
+    <section id="gallery" className="relative bg-surface py-16 md:py-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">06 — Галерея</div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight">Моменты <br /> с тренировок</h2>
+              <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight">Моменты <br /> с тренировок</h2>
             </div>
             <p className="md:max-w-sm text-ink/60">Командное фото, работа с мячом, эмоции после тренировок.</p>
           </div>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
+        <div className="mt-10 md:mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-auto md:h-[600px] auto-rows-[150px] md:auto-rows-auto">
           <Tile src={famCupCelebration} className="col-span-6 md:col-span-3 row-span-2" caption="Победа команды" />
           <Tile src={famTeamFlag} className="col-span-3 md:col-span-2" caption="Команда FAM" />
           <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренировка" />
@@ -589,17 +599,17 @@ const principles = [
 
 function Principles() {
   return (
-    <section className="relative py-24 md:py-32 bg-background">
+    <section className="relative py-16 md:py-32 bg-background">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">07 — Принципы</div>
-          <h2 className="mt-4 font-display text-5xl md:text-7xl text-deep tracking-tight max-w-3xl">Наши принципы</h2>
+          <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight max-w-3xl">Наши принципы</h2>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-2 gap-3">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-3">
           {principles.map((p, i) => (
             <Reveal key={p.t} delay={i * 0.05}>
-              <div className="group flex items-start gap-6 p-8 lg:p-10 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition duration-300">
+              <div className="group flex items-start gap-6 p-5 md:p-8 lg:p-10 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition duration-300">
                 <div className="font-display text-5xl lg:text-6xl text-flame/70 group-hover:text-flame transition">{p.n}</div>
                 <div>
                   <div className="font-display text-2xl lg:text-3xl tracking-wide text-deep group-hover:text-white transition">{p.t}</div>
@@ -624,7 +634,7 @@ const groups = [
 
 function Schedule() {
   return (
-    <section id="schedule" className="relative py-24 md:py-32 bg-night text-white overflow-hidden">
+    <section id="schedule" className="relative py-16 md:py-32 bg-night text-white overflow-hidden">
       <div className="absolute inset-0 pitch-lines opacity-25" />
       <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] bg-royal/30 blur-[140px] rounded-full" />
 
@@ -633,7 +643,7 @@ function Schedule() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">08 — Расписание</div>
-              <h2 className="mt-4 font-display text-5xl md:text-7xl tracking-tight">Группы <br /> и расписание</h2>
+              <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl tracking-tight">Группы <br /> и расписание</h2>
             </div>
             <a href="#cta" className="self-start md:self-end inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm shadow-flame">
               Уточнить расписание <ArrowRight className="h-4 w-4" />
@@ -641,10 +651,10 @@ function Schedule() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-2 gap-4">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-4">
           {groups.map((g, i) => (
             <Reveal key={g.name} delay={i * 0.05}>
-              <div className="group relative p-7 lg:p-9 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur hover:border-flame/50 transition overflow-hidden">
+              <div className="group relative p-5 md:p-7 lg:p-9 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur hover:border-flame/50 transition overflow-hidden">
                 <div className="absolute top-6 right-7 font-display text-6xl text-white/[0.06] group-hover:text-flame/20 transition">0{i + 1}</div>
                 <div className="relative">
                   <div className="flex items-center gap-3">
@@ -670,7 +680,7 @@ function Schedule() {
 /* ============================ SEO TEXT ============================ */
 function SeoText() {
   return (
-    <section className="bg-surface py-24 md:py-32">
+    <section className="bg-surface py-16 md:py-32">
       <div className="mx-auto max-w-4xl px-5 lg:px-8">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">09 — Гайд</div>
@@ -700,7 +710,7 @@ function SeoText() {
 /* ============================ FINAL CTA ============================ */
 function FinalCTA() {
   return (
-    <section id="cta" className="relative bg-night text-white py-24 md:py-32 overflow-hidden">
+    <section id="cta" className="relative bg-night text-white py-16 md:py-32 overflow-hidden">
       <div className="absolute inset-0">
         <img src={famCupCelebration} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-25" />
         <div className="absolute inset-0 bg-gradient-to-b from-night via-night/85 to-night" />
@@ -711,7 +721,7 @@ function FinalCTA() {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-10 lg:gap-14">
         <Reveal className="md:col-span-5">
           <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">10 — Запись</div>
-          <h2 className="mt-4 font-display text-5xl md:text-7xl tracking-tight">
+          <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl tracking-tight">
             Сделайте первый <br /> шаг в команду
           </h2>
           <p className="mt-6 text-white/70 max-w-md leading-relaxed">
