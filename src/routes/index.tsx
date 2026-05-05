@@ -70,23 +70,23 @@ function Home() {
 /* ============================ HERO ============================ */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex flex-col">
+    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden">
       <div className="absolute inset-0">
         <img
           src={hero}
           alt="Юный футболист на поле академии Морева"
           className="w-full h-full object-cover object-[70%_center] lg:object-[60%_center] opacity-90"
         />
-        {/* Mobile-friendly readability gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/75 to-night/20 lg:from-night lg:via-night/60 lg:to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-night/85 via-night/55 to-night lg:from-night lg:via-night/60 lg:to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/80 via-night/30 to-transparent lg:from-night/95 lg:via-night/40" />
         <div className="absolute inset-0 pitch-lines opacity-25" />
       </div>
 
-      {/* huge background type — desktop only */}
       <div className="absolute right-[-2rem] top-24 hidden md:block font-display text-[18rem] xl:text-[24rem] leading-[0.85] text-white/[0.05] tracking-tighter select-none pointer-events-none">
         FAM
       </div>
+
+      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-20 lg:pt-40 pb-28 lg:pb-32">
 
       <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-20 lg:pt-40 pb-10 lg:pb-32 flex-1 flex flex-col justify-end">
         <motion.div
