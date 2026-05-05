@@ -54,7 +54,7 @@ function Contacts() {
       </section>
 
       {/* CARDS */}
-      <section className="bg-background py-16 md:py-24">
+      <section className="bg-background py-12 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {cards.map((c, i) => (
@@ -77,10 +77,10 @@ function Contacts() {
       </section>
 
       {/* MAP + FORM */}
-      <section className="bg-surface py-16 md:py-24">
+      <section className="bg-surface py-12 md:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8 grid md:grid-cols-12 gap-6">
           <Reveal className="md:col-span-6">
-            <div id="map" className="relative rounded-2xl overflow-hidden border border-line h-[480px] bg-night">
+            <div id="map" className="relative rounded-2xl overflow-hidden border border-line h-[340px] md:h-[480px] bg-night">
               <iframe
                 title="Карта Анапа"
                 src="https://www.openstreetmap.org/export/embed.html?bbox=37.30%2C44.87%2C37.40%2C44.93&layer=mapnik&marker=44.8946%2C37.3163"
