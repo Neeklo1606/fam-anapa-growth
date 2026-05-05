@@ -554,12 +554,12 @@ function Gallery() {
         </Reveal>
 
         <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
-          <Tile src={pKick} className="col-span-6 md:col-span-3 row-span-2" caption="Удар" />
-          <Tile src={pDribble} className="col-span-3 md:col-span-2" caption="Ведение" />
-          <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренер" />
-          <Tile src={pBall} className="col-span-2 md:col-span-1" caption="Касание" />
-          <Tile src={famTeamFlag} className="col-span-2 md:col-span-1" caption="Команда" />
-          <Tile src={famCupCelebration} className="col-span-2 md:col-span-1" caption="Эмоции" />
+          <Tile src={famCupCelebration} className="col-span-6 md:col-span-3 row-span-2" caption="Победа команды" />
+          <Tile src={famTeamFlag} className="col-span-3 md:col-span-2" caption="Команда FAM" />
+          <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренировка" />
+          <Tile src={famCupNight} className="col-span-2 md:col-span-1" caption="Кубок" />
+          <Tile src={famTeamDiplomas} className="col-span-2 md:col-span-1" caption="Награждение" />
+          <Tile src={pKick} className="col-span-2 md:col-span-1" caption="Удар" />
         </div>
       </div>
     </section>
