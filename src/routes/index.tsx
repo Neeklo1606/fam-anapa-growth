@@ -134,7 +134,7 @@ function Hero() {
             </a>
           </div>
 
-          <div className="mt-8 lg:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-3 max-w-3xl">
+          <div className="mt-8 lg:mt-10 md:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-3 max-w-3xl">
             {[
               { k: "Анапа", v: "Локация" },
               { k: "4–14", v: "Возраст" },
@@ -219,10 +219,10 @@ function WhoFor() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mt-10 md:mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {whoFor.map((c, i) => (
             <Reveal key={c.title} delay={i * 0.06}>
-              <div className="group relative h-full bg-night text-white rounded-2xl p-7 overflow-hidden hover:-translate-y-1 transition duration-300">
+              <div className="group relative h-full bg-night text-white rounded-2xl p-5 md:p-7 overflow-hidden hover:-translate-y-1 transition duration-300">
                 <div className="absolute inset-0 pitch-lines opacity-20" />
                 <div className="absolute -bottom-20 -right-20 h-56 w-56 bg-royal/40 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition duration-500" />
                 <div className="relative">
@@ -259,14 +259,14 @@ function Develop() {
           </h2>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-12 gap-4">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-12 gap-4">
           {features.map((f, i) => (
             <Reveal
               key={f.title}
               delay={i * 0.05}
               className={i % 2 === 0 ? "md:col-span-7" : "md:col-span-5"}
             >
-              <div className="group relative h-full p-8 md:p-10 rounded-2xl border border-line bg-background hover:border-night transition overflow-hidden">
+              <div className="group relative h-full p-5 md:p-10 rounded-2xl border border-line bg-background hover:border-night transition overflow-hidden">
                 <div className="absolute top-6 right-7 font-display text-7xl text-surface group-hover:text-flame/15 transition">{f.n}</div>
                 <div className="relative">
                   <div className="h-14 w-14 rounded-xl bg-night text-flame flex items-center justify-center">
@@ -503,10 +503,10 @@ function Coaches() {
             </div>
 
             {/* Info */}
-            <div className="md:col-span-5 relative p-8 md:p-12 flex flex-col justify-between gap-10">
+            <div className="md:col-span-5 relative p-6 md:p-12 flex flex-col justify-between gap-6 md:gap-10">
               <div>
                 <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Главная фигура академии</div>
-                <h3 className="mt-4 font-display text-4xl md:text-5xl tracking-tight leading-[0.95]">
+                <h3 className="mt-4 font-display text-[2.2rem] md:text-5xl tracking-tight leading-[0.95]">
                   Губин <br /> Алексей <br /> Олегович
                 </h3>
                 <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-flame/15 border border-flame/30 text-flame text-[11px] uppercase tracking-[0.2em] font-semibold">
@@ -563,7 +563,7 @@ function Gallery() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-[680px] md:h-[600px]">
+        <div className="mt-10 md:mt-14 grid grid-cols-6 grid-rows-2 gap-3 md:gap-4 h-auto md:h-[600px] auto-rows-[150px] md:auto-rows-auto">
           <Tile src={famCupCelebration} className="col-span-6 md:col-span-3 row-span-2" caption="Победа команды" />
           <Tile src={famTeamFlag} className="col-span-3 md:col-span-2" caption="Команда FAM" />
           <Tile src={famTraining} className="col-span-3 md:col-span-1" caption="Тренировка" />
@@ -606,10 +606,10 @@ function Principles() {
           <h2 className="mt-4 font-display text-[2.4rem] sm:text-5xl md:text-7xl text-deep tracking-tight max-w-3xl">Наши принципы</h2>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-2 gap-3">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-3">
           {principles.map((p, i) => (
             <Reveal key={p.t} delay={i * 0.05}>
-              <div className="group flex items-start gap-6 p-8 lg:p-10 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition duration-300">
+              <div className="group flex items-start gap-6 p-5 md:p-8 lg:p-10 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition duration-300">
                 <div className="font-display text-5xl lg:text-6xl text-flame/70 group-hover:text-flame transition">{p.n}</div>
                 <div>
                   <div className="font-display text-2xl lg:text-3xl tracking-wide text-deep group-hover:text-white transition">{p.t}</div>
@@ -651,10 +651,10 @@ function Schedule() {
           </div>
         </Reveal>
 
-        <div className="mt-14 grid md:grid-cols-2 gap-4">
+        <div className="mt-10 md:mt-14 grid md:grid-cols-2 gap-4">
           {groups.map((g, i) => (
             <Reveal key={g.name} delay={i * 0.05}>
-              <div className="group relative p-7 lg:p-9 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur hover:border-flame/50 transition overflow-hidden">
+              <div className="group relative p-5 md:p-7 lg:p-9 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur hover:border-flame/50 transition overflow-hidden">
                 <div className="absolute top-6 right-7 font-display text-6xl text-white/[0.06] group-hover:text-flame/20 transition">0{i + 1}</div>
                 <div className="relative">
                   <div className="flex items-center gap-3">
