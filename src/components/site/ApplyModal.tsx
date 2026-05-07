@@ -89,18 +89,19 @@ export function ApplyButton({
 }) {
   const { open } = useApply();
   const base =
-    "group inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-wider transition";
+    "group relative inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-[0.18em] transition-all duration-300 overflow-hidden";
   const styles =
     variant === "primary"
-      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-sm shadow-flame hover:brightness-110"
-      : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-sm hover:bg-white/10";
+      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-110 hover:shadow-[0_14px_40px_rgba(242,138,46,0.55)] active:scale-[0.98]"
+      : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-[11px] hover:bg-white/10 hover:border-white/40 active:scale-[0.98]";
 
   return (
     <button onClick={open} className={`${base} ${styles} ${className}`}>
-      {children ?? "Записать ребёнка"}
+      <span className="relative z-10">{children ?? "Записать ребёнка"}</span>
       {variant === "primary" && (
-        <span className="h-10 w-10 rounded-full bg-white/15 flex items-center justify-center group-hover:translate-x-0.5 transition">
-          <ArrowRight className="h-4 w-4" />
+        <span className="relative z-10 h-9 w-9 rounded-full bg-white/15 flex items-center justify-center overflow-hidden">
+          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-5" />
+          <ArrowRight className="absolute h-4 w-4 -translate-x-5 transition-transform duration-300 group-hover:translate-x-0" />
         </span>
       )}
     </button>
