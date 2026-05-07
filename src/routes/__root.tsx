@@ -7,16 +7,45 @@ import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ApplyProvider } from "@/components/site/ApplyModal";
 
-const ldJson = {
-  "@context": "https://schema.org",
-  "@type": "SportsActivityLocation",
-  name: "Футбольная академия Морева",
-  description:
-    "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки, развитие техники, координации и уверенности.",
-  address: { "@type": "PostalAddress", addressLocality: "Анапа", addressCountry: "RU" },
-  sport: "Football",
-  areaServed: "Анапа",
-};
+const SITE_URL = "https://fam-anapa-growth.lovable.app";
+
+const ldJson = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SportsActivityLocation",
+    name: "Футбольная академия Морева",
+    alternateName: "Академия Морева",
+    description:
+      "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки по футболу, школа вратарей, развитие техники, координации и уверенности на поле.",
+    url: SITE_URL,
+    image: `${SITE_URL}/og-image.jpg`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Анапа",
+      addressRegion: "Краснодарский край",
+      addressCountry: "RU",
+    },
+    areaServed: { "@type": "City", name: "Анапа" },
+    sport: "Football",
+    telephone: "+7 (918) 000-00-00",
+    sameAs: ["https://wa.me/79180000000", "https://t.me/fam_anapa"],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Футбольная академия Морева",
+    url: SITE_URL,
+    logo: `${SITE_URL}/favicon.ico`,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Футбольная академия Морева в Анапе",
+    url: SITE_URL,
+    inLanguage: "ru-RU",
+  },
+];
+
 
 function NotFoundComponent() {
   return (
@@ -66,6 +95,9 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "canonical", href: SITE_URL },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/favicon.ico" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {

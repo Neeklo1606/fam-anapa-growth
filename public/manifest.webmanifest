@@ -1,0 +1,13 @@
+{
+  "name": "Футбольная академия Морева в Анапе",
+  "short_name": "FAM Anapa",
+  "description": "Футбольная школа в Анапе для детей от 4 до 14 лет.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B1020",
+  "theme_color": "#0B1020",
+  "lang": "ru",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}
