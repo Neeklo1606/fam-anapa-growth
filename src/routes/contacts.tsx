@@ -20,10 +20,10 @@ export const Route = createFileRoute("/contacts")({
 });
 
 const cards = [
-  { icon: Phone, label: "Телефон", value: "Скоро", href: "tel:+79000000000" },
-  { icon: MessageCircle, label: "WhatsApp", value: "Написать", href: "https://wa.me/79000000000" },
-  { icon: Send, label: "Telegram", value: "Написать", href: "https://t.me/" },
-  { icon: MapPin, label: "Адрес", value: "Анапа", href: "#map" },
+  { icon: Phone, label: "Телефон", value: "+7 (918) 000-00-00", href: "tel:+79180000000" },
+  { icon: MessageCircle, label: "WhatsApp", value: "Написать", href: "https://wa.me/79180000000", external: true },
+  { icon: Send, label: "Telegram", value: "Написать", href: "https://t.me/fam_anapa", external: true },
+  { icon: MapPin, label: "Адрес", value: "Анапа · Карта", href: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак", external: true },
 ];
 
 function Contacts() {
