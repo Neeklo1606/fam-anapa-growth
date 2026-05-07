@@ -19,6 +19,7 @@ import { HeroVideo } from "@/components/site/HeroVideo";
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";
 import pKick from "@/assets/p-kick.jpg";
+import pBallwork from "@/assets/p-ballwork.jpg";
 import coachGubin from "@/assets/coach-gubin.jpg";
 import famTeamDiplomas from "@/assets/fam-team-diplomas.jpg";
 import famTraining from "@/assets/fam-training.jpg";
@@ -27,6 +28,16 @@ import famCupNight from "@/assets/fam-cup-night.jpg";
 import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton } from "@/components/site/ApplyModal";
+
+/* Real contact endpoints — replace with final values when ready */
+export const CONTACTS = {
+  phone: "+79180000000",
+  phoneDisplay: "+7 (918) 000-00-00",
+  whatsapp: "https://wa.me/79180000000",
+  telegram: "https://t.me/fam_anapa",
+  yandexMaps: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак",
+  address: "Анапа, Краснодарский край",
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
