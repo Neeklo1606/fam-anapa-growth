@@ -677,35 +677,35 @@ function Contacts() {
       <div className="absolute inset-0 pitch-lines opacity-20" />
       <div className="absolute inset-0 bg-gradient-pitch" />
 
-      <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-          <div className="lg:col-span-5">
+      <div className="relative mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+          <div className="lg:col-span-5 min-w-0">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
                 06 · Запись
               </div>
               <h2
                 className="mt-4 font-display tracking-tight"
-                style={{ fontSize: "clamp(2rem, 5.4vw, 4.25rem)", lineHeight: 0.95, letterSpacing: "-0.025em" }}
+                style={{ fontSize: "clamp(2rem, 4.2vw, 3.5rem)", lineHeight: 1, letterSpacing: "-0.02em" }}
               >
-                Записаться на <br />
-                <span className="text-gradient-brand">тренировку</span>
+                Записаться <br className="hidden sm:block" />
+                на <span className="text-gradient-brand">тренировку</span>
               </h2>
               <p className="mt-6 text-white/70 max-w-md text-base md:text-lg leading-relaxed">
                 Оставьте заявку — мы подберём подходящую группу по возрасту и уровню подготовки ребёнка.
               </p>
 
-              <div className="mt-8 grid sm:grid-cols-2 gap-3">
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
                 <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
                 <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
-                <ContactCard icon={MapPin} label="Адрес" value="Анапа · Карта" href={CONTACTS.yandexMaps} external />
+                <ContactCard icon={MapPin} label="Адрес" value="Анапа" href={CONTACTS.yandexMaps} external />
               </div>
             </Reveal>
           </div>
 
-          <Reveal y={20} delay={0.1} className="lg:col-span-7">
-            <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-5 sm:p-7 md:p-8 overflow-hidden shadow-elevated">
+          <Reveal y={20} delay={0.1} className="lg:col-span-7 min-w-0 w-full">
+            <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-5 sm:p-7 md:p-8 overflow-hidden shadow-elevated w-full max-w-full">
               <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
               <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full pointer-events-none" />
               <div className="relative">
@@ -744,16 +744,16 @@ function ContactCard({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.07] hover:border-flame/40 transition active:scale-[0.99]"
+      className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 min-h-[68px] hover:bg-white/[0.07] hover:border-flame/40 transition active:scale-[0.99]"
     >
-      <span className="h-11 w-11 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
+      <span className="h-10 w-10 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
         <Icon className="h-5 w-5" />
       </span>
       <span className="flex-1 min-w-0">
-        <span className="block text-[10px] uppercase tracking-[0.25em] text-white/45">{label}</span>
-        <span className="block font-display text-lg tracking-wide group-hover:text-flame transition truncate">{value}</span>
+        <span className="block text-[10px] uppercase tracking-[0.2em] text-white/45">{label}</span>
+        <span className="block font-display text-[15px] leading-tight tracking-wide group-hover:text-flame transition whitespace-nowrap">{value}</span>
       </span>
-      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame group-hover:translate-x-0.5 transition" />
+      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame group-hover:translate-x-0.5 transition shrink-0" />
     </a>
   );
 }
