@@ -676,37 +676,50 @@ function Contacts() {
       <div className="absolute inset-0 pitch-lines opacity-20" />
       <div className="absolute inset-0 bg-gradient-pitch" />
 
-      <div className="relative mx-auto max-w-5xl px-5 lg:px-8 text-center">
-        <Reveal>
-          <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            06 · Запись
-          </div>
-          <h2
-            className="mt-4 font-display tracking-tight"
-            style={{ fontSize: "clamp(2.2rem, 7vw, 5.5rem)", lineHeight: 0.95 }}
-          >
-            Записаться на <br />
-            <span className="text-gradient-brand">тренировку</span>
-          </h2>
-          <p className="mt-6 text-white/65 max-w-xl mx-auto text-base md:text-lg">
-            Оставьте заявку · поможем подобрать группу и подскажем расписание.
-          </p>
-        </Reveal>
+      <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          <div className="lg:col-span-5">
+            <Reveal>
+              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
+                06 · Запись
+              </div>
+              <h2
+                className="mt-4 font-display tracking-tight"
+                style={{ fontSize: "clamp(2rem, 5.4vw, 4.25rem)", lineHeight: 0.95, letterSpacing: "-0.025em" }}
+              >
+                Записаться на <br />
+                <span className="text-gradient-brand">тренировку</span>
+              </h2>
+              <p className="mt-6 text-white/70 max-w-md text-base md:text-lg leading-relaxed">
+                Оставьте заявку — мы подберём подходящую группу по возрасту и уровню подготовки ребёнка.
+              </p>
 
-        <Reveal delay={0.1}>
-          <div className="mt-8 flex justify-center">
-            <ApplyButton>Записать ребёнка</ApplyButton>
+              <div className="mt-8 grid sm:grid-cols-2 gap-3">
+                <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
+                <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
+                <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
+                <ContactCard icon={MapPin} label="Адрес" value="Анапа · Карта" href={CONTACTS.yandexMaps} external />
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
 
-        <Reveal delay={0.15}>
-          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-            <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
-            <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
-            <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
-            <ContactCard icon={MapPin} label="Адрес" value="Анапа · Карта" href={CONTACTS.yandexMaps} external />
-          </div>
-        </Reveal>
+          <Reveal y={20} delay={0.1} className="lg:col-span-7">
+            <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-5 sm:p-7 md:p-8 overflow-hidden shadow-elevated">
+              <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+              <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full pointer-events-none" />
+              <div className="relative">
+                <JoinFlow />
+                <p className="mt-5 text-[11px] text-white/45 leading-relaxed">
+                  Нажимая кнопку, вы соглашаетесь с{" "}
+                  <Link to="/legal/consent" className="underline decoration-white/30 hover:text-flame transition">
+                    политикой обработки персональных данных
+                  </Link>
+                  .
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
