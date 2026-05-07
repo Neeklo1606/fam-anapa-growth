@@ -244,8 +244,8 @@ function GoalkeeperSchool() {
                 02 · Направление
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-white"
-                style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
+                className="mt-4 font-display tracking-tight text-white break-words"
+                style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 0.98, letterSpacing: "-0.025em" }}
               >
                 Школа <br />
                 <span className="text-gradient-brand">вратарей</span>
