@@ -715,25 +715,29 @@ function ContactCard({
   label,
   value,
   href,
+  external,
 }: {
   icon: any;
   label: string;
   value: string;
   href: string;
+  external?: boolean;
 }) {
   return (
     <a
       href={href}
-      className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.07] hover:border-white/20 transition"
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.07] hover:border-flame/40 transition active:scale-[0.99]"
     >
-      <span className="h-11 w-11 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0">
+      <span className="h-11 w-11 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
         <Icon className="h-5 w-5" />
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[10px] uppercase tracking-[0.25em] text-white/45">{label}</span>
-        <span className="block font-display text-lg tracking-wide group-hover:text-flame transition">{value}</span>
+        <span className="block font-display text-lg tracking-wide group-hover:text-flame transition truncate">{value}</span>
       </span>
-      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame transition" />
+      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame group-hover:translate-x-0.5 transition" />
     </a>
   );
 }
