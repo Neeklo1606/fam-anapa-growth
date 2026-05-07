@@ -31,7 +31,7 @@ export function MobileTabBar() {
             <Link to="/contacts" className={item} activeProps={{ className: active }}>
               <Mail className="h-[18px] w-[18px]" /> Контакты
             </Link>
-            <a href="tel:+79000000000" className="flex-1 flex flex-col items-center justify-end gap-0.5 pb-2">
+            <a href="tel:+79180000000" className="flex-1 flex flex-col items-center justify-end gap-0.5 pb-2">
               <span className="h-11 w-11 -mt-6 rounded-full bg-flame text-white flex items-center justify-center shadow-flame ring-4 ring-night">
                 <Phone className="h-[18px] w-[18px]" />
               </span>
@@ -77,8 +77,8 @@ export function MobileTabBar() {
               ))}
             </div>
             <div className="relative mt-auto p-5 grid grid-cols-2 gap-3">
-              <a href="tel:+79000000000" className="h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center">Позвонить</a>
-              <a href="#cta" onClick={() => setOpen(false)} className="h-14 rounded-full border border-white/20 text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center">Записаться</a>
+              <a href="tel:+79180000000" className="h-14 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center shadow-flame">Позвонить</a>
+              <a href="https://wa.me/79180000000" target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className="h-14 rounded-full border border-white/20 text-white font-semibold uppercase tracking-wider text-sm flex items-center justify-center">WhatsApp</a>
             </div>
           </motion.div>
         )}

@@ -1,6 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import logo from "@/assets/logo.webp";
 
+const legal = [
+  { to: "/legal/privacy", label: "Конфиденциальность" },
+  { to: "/legal/terms", label: "Соглашение" },
+  { to: "/legal/offer", label: "Оферта" },
+  { to: "/legal/consent", label: "Согласие на обработку" },
+] as const;
+
 export function Footer() {
   return (
     <footer className="relative bg-night text-white overflow-hidden">
@@ -37,18 +44,27 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-4">
-            <div className="text-[11px] uppercase tracking-[0.2em] text-white/40">Контакты</div>
+            <div className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-mono-pro">Контакты</div>
             <ul className="mt-5 space-y-3 text-sm text-white/80">
               <li>Анапа, Краснодарский край</li>
-              <li><a href="tel:+79000000000" className="hover:text-flame transition">+7 (900) 000-00-00</a></li>
-              <li><a href="mailto:hello@fam-anapa.ru" className="hover:text-flame transition">hello@fam-anapa.ru</a></li>
+              <li><a href="tel:+79180000000" className="hover:text-flame transition">+7 (918) 000-00-00</a></li>
+              <li><a href="https://wa.me/79180000000" target="_blank" rel="noreferrer" className="hover:text-flame transition">WhatsApp</a> · <a href="https://t.me/fam_anapa" target="_blank" rel="noreferrer" className="hover:text-flame transition">Telegram</a></li>
+              <li><a href="https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак" target="_blank" rel="noreferrer" className="hover:text-flame transition">Открыть на Яндекс.Картах</a></li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 pt-6 border-t border-white/10 flex flex-wrap gap-3 justify-between text-xs text-white/40">
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-white/45">
+          {legal.map((l) => (
+            <Link key={l.to} to={l.to} className="hover:text-flame transition uppercase tracking-wider">
+              {l.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3 justify-between text-xs text-white/40">
           <span>© {new Date().getFullYear()} Футбольная академия Морева</span>
-          <span className="uppercase tracking-wider">FAM · Anapa · Russia</span>
+          <span className="uppercase tracking-wider font-mono-pro">FAM · Anapa · Russia</span>
         </div>
       </div>
     </footer>
