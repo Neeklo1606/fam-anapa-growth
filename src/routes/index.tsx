@@ -538,7 +538,7 @@ function Location() {
   }, [embla]);
 
   return (
-    <section className="relative bg-surface py-16 md:py-28">
+    <section id="location" className="relative bg-surface py-16 md:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
