@@ -1,7 +1,19 @@
 import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { JoinFlow } from "./JoinFlow";
+
+function BallIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9.25" />
+      <path d="M12 4.5l3.05 2.25-1.15 3.6-3.8 0-1.15-3.6z" />
+      <path d="M13.9 10.35l3.35 2.45-1.25 3.85-3.6 0" />
+      <path d="M10.1 10.35L6.75 12.8l1.25 3.85 3.6 0" />
+      <path d="M12 4.5V2.6M3.4 9.55l-1.7-.45M20.6 9.55l1.7-.45M8 20.65l-.7 1.6M16 20.65l.7 1.6" />
+    </svg>
+  );
+}
 
 type Ctx = { open: () => void; close: () => void };
 const ApplyCtx = createContext<Ctx>({ open: () => {}, close: () => {} });
