@@ -463,7 +463,7 @@ function Coaches() {
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
-                Тренерский <br className="md:hidden" /> <span className="text-gradient-brand">штаб</span>
+                Тренерский <br className="md:hidden" /> <span className="text-gradient-brand-dark">штаб</span>
               </h2>
               <p className="mt-4 text-ink/65 max-w-md text-base md:text-lg">
                 Тренеры академии работают с детскими группами и помогают каждому ребёнку расти на поле.
@@ -564,7 +564,7 @@ function Location() {
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
                 Где мы <br />
-                <span className="text-gradient-brand">тренируемся</span>
+                <span className="text-gradient-brand-dark">тренируемся</span>
               </h2>
               <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
                 Тренировки проходят в Анапе на профессиональном футбольном поле с искусственным
