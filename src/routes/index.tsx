@@ -267,7 +267,7 @@ function GoalkeeperSchool() {
               <video
                 ref={videoRef}
                 src="/hero.mp4"
-                poster={famCupNight}
+                poster={pBallwork}
                 playsInline
                 loop
                 preload="metadata"
@@ -570,8 +570,8 @@ function Location() {
               </p>
 
               <div className="mt-7 space-y-3 max-w-md">
-                <InfoRow icon={MapPin} label="Адрес" value="Анапа, Краснодарский край" />
-                <InfoRow icon={Phone} label="Связь" value="WhatsApp · Telegram" />
+                <InfoRow icon={MapPin} label="Адрес" value={CONTACTS.address} href={CONTACTS.yandexMaps} external />
+                <InfoRow icon={Phone} label="Связь" value="WhatsApp · Telegram" href={CONTACTS.whatsapp} external />
               </div>
 
               <div className="mt-7">
