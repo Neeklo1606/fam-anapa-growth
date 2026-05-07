@@ -233,8 +233,10 @@ function GoalkeeperSchool() {
   };
 
   return (
-    <section className="relative bg-background py-16 md:py-28 overflow-hidden">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+    <section className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5">
+      <div className="absolute inset-0 pitch-lines opacity-15" />
+      <div className="absolute -top-40 -left-32 h-[420px] w-[420px] bg-royal/25 blur-[140px] rounded-full pointer-events-none" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
             <Reveal>
@@ -242,13 +244,13 @@ function GoalkeeperSchool() {
                 02 · Направление
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-deep"
+                className="mt-4 font-display tracking-tight text-white"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
                 Школа <br />
                 <span className="text-gradient-brand">вратарей</span>
               </h2>
-              <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
+              <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
                 Отдельная программа для детей, которые хотят занимать место в воротах. Техника игры,
                 реакция, работа с мячом и уверенность под планкой.
               </p>
