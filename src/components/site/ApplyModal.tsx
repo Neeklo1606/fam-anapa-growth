@@ -2,17 +2,10 @@ import { useEffect, useState, createContext, useContext, ReactNode, useCallback 
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { JoinFlow } from "./JoinFlow";
+import ballUrl from "@/assets/ball.svg";
 
 function BallIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9.25" />
-      <path d="M12 4.5l3.05 2.25-1.15 3.6-3.8 0-1.15-3.6z" />
-      <path d="M13.9 10.35l3.35 2.45-1.25 3.85-3.6 0" />
-      <path d="M10.1 10.35L6.75 12.8l1.25 3.85 3.6 0" />
-      <path d="M12 4.5V2.6M3.4 9.55l-1.7-.45M20.6 9.55l1.7-.45M8 20.65l-.7 1.6M16 20.65l.7 1.6" />
-    </svg>
-  );
+  return <img src={ballUrl} alt="" className={className} aria-hidden="true" />;
 }
 
 type Ctx = { open: () => void; close: () => void };
@@ -112,7 +105,7 @@ export function ApplyButton({
       <span className="relative z-10">{children ?? "Записать ребёнка"}</span>
       {variant === "primary" && (
         <span className="relative z-10 h-8 w-8 rounded-full bg-white/15 flex items-center justify-center">
-          <BallIcon className="h-[18px] w-[18px] text-white transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
+          <BallIcon className="h-[18px] w-[18px] invert brightness-200 transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
         </span>
       )}
     </button>
