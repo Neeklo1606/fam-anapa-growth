@@ -56,15 +56,15 @@ function Contacts() {
           <div className="grid sm:grid-cols-2 gap-3">
             {cards.map((c, i) => (
               <Reveal key={c.label} delay={i * 0.05}>
-                <a href={c.href} className="group flex items-center gap-4 p-5 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition">
+                <a href={c.href} target={(c as any).external ? "_blank" : undefined} rel={(c as any).external ? "noreferrer" : undefined} className="group flex items-center gap-4 p-5 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white hover:border-night transition active:scale-[0.99]">
                   <span className="h-12 w-12 rounded-xl bg-night/5 group-hover:bg-white/10 flex items-center justify-center text-flame shrink-0">
                     <c.icon className="h-5 w-5" />
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[10px] uppercase tracking-[0.2em] opacity-60">{c.label}</span>
-                    <span className="block font-display text-xl tracking-wide">{c.value}</span>
+                    <span className="block font-display text-xl tracking-wide truncate">{c.value}</span>
                   </span>
-                  <ArrowRight className="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:text-flame transition" />
+                  <ArrowRight className="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:text-flame group-hover:translate-x-0.5 transition" />
                 </a>
               </Reveal>
             ))}
