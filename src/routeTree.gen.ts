@@ -9,9 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as ContactsRouteImport } from './routes/contacts'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as LegalOfferRouteImport } from './routes/legal.offer'
+import { Route as LegalConsentRouteImport } from './routes/legal.consent'
 
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactsRoute = ContactsRouteImport.update({
   id: '/contacts',
   path: '/contacts',
@@ -22,35 +32,100 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => LegalRoute,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => LegalRoute,
+} as any)
+const LegalOfferRoute = LegalOfferRouteImport.update({
+  id: '/offer',
+  path: '/offer',
+  getParentRoute: () => LegalRoute,
+} as any)
+const LegalConsentRoute = LegalConsentRouteImport.update({
+  id: '/consent',
+  path: '/consent',
+  getParentRoute: () => LegalRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/legal/consent': typeof LegalConsentRoute
+  '/legal/offer': typeof LegalOfferRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/legal/consent': typeof LegalConsentRoute
+  '/legal/offer': typeof LegalOfferRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contacts': typeof ContactsRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/legal/consent': typeof LegalConsentRoute
+  '/legal/offer': typeof LegalOfferRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contacts'
+  fullPaths:
+    | '/'
+    | '/contacts'
+    | '/legal'
+    | '/legal/consent'
+    | '/legal/offer'
+    | '/legal/privacy'
+    | '/legal/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contacts'
-  id: '__root__' | '/' | '/contacts'
+  to:
+    | '/'
+    | '/contacts'
+    | '/legal'
+    | '/legal/consent'
+    | '/legal/offer'
+    | '/legal/privacy'
+    | '/legal/terms'
+  id:
+    | '__root__'
+    | '/'
+    | '/contacts'
+    | '/legal'
+    | '/legal/consent'
+    | '/legal/offer'
+    | '/legal/privacy'
+    | '/legal/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactsRoute: typeof ContactsRoute
+  LegalRoute: typeof LegalRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contacts': {
       id: '/contacts'
       path: '/contacts'
@@ -65,12 +140,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/offer': {
+      id: '/legal/offer'
+      path: '/offer'
+      fullPath: '/legal/offer'
+      preLoaderRoute: typeof LegalOfferRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/consent': {
+      id: '/legal/consent'
+      path: '/consent'
+      fullPath: '/legal/consent'
+      preLoaderRoute: typeof LegalConsentRouteImport
+      parentRoute: typeof LegalRoute
+    }
   }
 }
+
+interface LegalRouteChildren {
+  LegalConsentRoute: typeof LegalConsentRoute
+  LegalOfferRoute: typeof LegalOfferRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalTermsRoute: typeof LegalTermsRoute
+}
+
+const LegalRouteChildren: LegalRouteChildren = {
+  LegalConsentRoute: LegalConsentRoute,
+  LegalOfferRoute: LegalOfferRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalTermsRoute: LegalTermsRoute,
+}
+
+const LegalRouteWithChildren = LegalRoute._addFileChildren(LegalRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactsRoute: ContactsRoute,
+  LegalRoute: LegalRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

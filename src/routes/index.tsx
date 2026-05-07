@@ -19,6 +19,7 @@ import { HeroVideo } from "@/components/site/HeroVideo";
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";
 import pKick from "@/assets/p-kick.jpg";
+import pBallwork from "@/assets/p-ballwork.jpg";
 import coachGubin from "@/assets/coach-gubin.jpg";
 import famTeamDiplomas from "@/assets/fam-team-diplomas.jpg";
 import famTraining from "@/assets/fam-training.jpg";
@@ -28,10 +29,20 @@ import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton } from "@/components/site/ApplyModal";
 
+/* Real contact endpoints · replace with final values when ready */
+export const CONTACTS = {
+  phone: "+79180000000",
+  phoneDisplay: "+7 (918) 000-00-00",
+  whatsapp: "https://wa.me/79180000000",
+  telegram: "https://t.me/fam_anapa",
+  yandexMaps: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак",
+  address: "Анапа, Краснодарский край",
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { title: "Футбольная академия Морева в Анапе · футбол для детей" },
       {
         name: "description",
         content:
@@ -172,7 +183,7 @@ function About() {
           <div className="lg:col-span-6 order-1 lg:order-2">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                01 — Об академии
+                01 · Об академии
               </div>
               <h2
                 className="mt-4 font-display tracking-tight"
@@ -183,7 +194,7 @@ function About() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-6 text-white/75 text-base md:text-lg leading-relaxed max-w-xl">
-                Футбольная академия Морева — детская футбольная среда в Анапе, где тренировки строятся
+                Футбольная академия Морева · детская футбольная среда в Анапе, где тренировки строятся
                 вокруг интереса к игре, дисциплины, командной атмосферы и постепенного развития ребёнка.
               </p>
               <p className="mt-4 text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
@@ -222,22 +233,24 @@ function GoalkeeperSchool() {
   };
 
   return (
-    <section className="relative bg-background py-16 md:py-28 overflow-hidden">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+    <section className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5">
+      <div className="absolute inset-0 pitch-lines opacity-15" />
+      <div className="absolute -top-40 -left-32 h-[420px] w-[420px] bg-royal/25 blur-[140px] rounded-full pointer-events-none" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                02 — Направление
+                02 · Направление
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-deep"
+                className="mt-4 font-display tracking-tight text-white"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
                 Школа <br />
                 <span className="text-gradient-brand">вратарей</span>
               </h2>
-              <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
+              <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
                 Отдельная программа для детей, которые хотят занимать место в воротах. Техника игры,
                 реакция, работа с мячом и уверенность под планкой.
               </p>
@@ -256,7 +269,7 @@ function GoalkeeperSchool() {
               <video
                 ref={videoRef}
                 src="/hero.mp4"
-                poster={famCupNight}
+                poster={pBallwork}
                 playsInline
                 loop
                 preload="metadata"
@@ -304,7 +317,7 @@ const principles = [
   {
     n: "02",
     title: "Техника",
-    text: "Базовая работа с мячом — приём, передача, ведение и удар — основа любой игры на поле.",
+    text: "Базовая работа с мячом · приём, передача, ведение и удар · основа любой игры на поле.",
   },
   {
     n: "03",
@@ -319,7 +332,7 @@ const principles = [
   {
     n: "05",
     title: "Радость от футбола",
-    text: "Главное — чтобы ребёнок ждал тренировку и приходил на поле с интересом.",
+    text: "Главное · чтобы ребёнок ждал тренировку и приходил на поле с интересом.",
   },
 ];
 
@@ -333,7 +346,7 @@ function Principles() {
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            03 — Принципы
+            03 · Принципы
           </div>
           <h2
             className="mt-4 font-display tracking-tight"
@@ -444,7 +457,7 @@ function Coaches() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                04 — Тренеры
+                04 · Тренеры
               </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
@@ -544,7 +557,7 @@ function Location() {
           <div className="lg:col-span-5">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                05 — Локация
+                05 · Локация
               </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
@@ -559,8 +572,8 @@ function Location() {
               </p>
 
               <div className="mt-7 space-y-3 max-w-md">
-                <InfoRow icon={MapPin} label="Адрес" value="Анапа, Краснодарский край" />
-                <InfoRow icon={Phone} label="Связь" value="WhatsApp · Telegram" />
+                <InfoRow icon={MapPin} label="Адрес" value={CONTACTS.address} href={CONTACTS.yandexMaps} external />
+                <InfoRow icon={Phone} label="Связь" value="WhatsApp · Telegram" href={CONTACTS.whatsapp} external />
               </div>
 
               <div className="mt-7">
@@ -631,18 +644,26 @@ function Location() {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span className="h-11 w-11 rounded-xl bg-ink/5 flex items-center justify-center text-flame shrink-0">
+function InfoRow({ icon: Icon, label, value, href, external }: { icon: any; label: string; value: string; href?: string; external?: boolean }) {
+  const inner = (
+    <>
+      <span className="h-11 w-11 rounded-xl bg-ink/5 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
         <Icon className="h-5 w-5" />
       </span>
       <div className="min-w-0">
         <div className="text-[10px] uppercase tracking-[0.25em] text-ink/45">{label}</div>
         <div className="font-display text-lg tracking-wide text-deep">{value}</div>
       </div>
-    </div>
+    </>
   );
+  if (href) {
+    return (
+      <a href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined} className="group flex items-center gap-4 -mx-2 px-2 py-1 rounded-xl hover:bg-ink/[0.03] transition">
+        {inner}
+      </a>
+    );
+  }
+  return <div className="flex items-center gap-4">{inner}</div>;
 }
 
 /* ============================ CONTACTS ============================ */
@@ -658,7 +679,7 @@ function Contacts() {
       <div className="relative mx-auto max-w-5xl px-5 lg:px-8 text-center">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            06 — Запись
+            06 · Запись
           </div>
           <h2
             className="mt-4 font-display tracking-tight"
@@ -668,7 +689,7 @@ function Contacts() {
             <span className="text-gradient-brand">тренировку</span>
           </h2>
           <p className="mt-6 text-white/65 max-w-xl mx-auto text-base md:text-lg">
-            Оставьте заявку — поможем подобрать группу и подскажем расписание.
+            Оставьте заявку · поможем подобрать группу и подскажем расписание.
           </p>
         </Reveal>
 
@@ -680,10 +701,10 @@ function Contacts() {
 
         <Reveal delay={0.15}>
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-            <ContactCard icon={Phone} label="Телефон" value="Скоро" href="#" />
-            <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href="https://wa.me/79000000000" />
-            <ContactCard icon={Send} label="Telegram" value="Написать" href="https://t.me/" />
-            <ContactCard icon={MapPin} label="Адрес" value="Анапа" href="#map" />
+            <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
+            <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
+            <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
+            <ContactCard icon={MapPin} label="Адрес" value="Анапа · Карта" href={CONTACTS.yandexMaps} external />
           </div>
         </Reveal>
       </div>
@@ -696,25 +717,29 @@ function ContactCard({
   label,
   value,
   href,
+  external,
 }: {
   icon: any;
   label: string;
   value: string;
   href: string;
+  external?: boolean;
 }) {
   return (
     <a
       href={href}
-      className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.07] hover:border-white/20 transition"
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+      className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.07] hover:border-flame/40 transition active:scale-[0.99]"
     >
-      <span className="h-11 w-11 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0">
+      <span className="h-11 w-11 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
         <Icon className="h-5 w-5" />
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-[10px] uppercase tracking-[0.25em] text-white/45">{label}</span>
-        <span className="block font-display text-lg tracking-wide group-hover:text-flame transition">{value}</span>
+        <span className="block font-display text-lg tracking-wide group-hover:text-flame transition truncate">{value}</span>
       </span>
-      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame transition" />
+      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame group-hover:translate-x-0.5 transition" />
     </a>
   );
 }

@@ -41,7 +41,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { title: "Футбольная академия Морева в Анапе · футбол для детей" },
       {
         name: "description",
         content:
@@ -53,14 +53,14 @@ export const Route = createRootRoute({
           "футбольная академия Анапа, футбол для детей Анапа, футбольная секция Анапа, детский футбольный клуб Анапа, тренировки по футболу для детей Анапа, футбольная школа Анапа",
       },
       { name: "theme-color", content: "#0B1020" },
-      { property: "og:title", content: "Футбольная академия Морева в Анапе — футбол для детей" },
-      { property: "og:description", content: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { property: "og:title", content: "Футбольная академия Морева в Анапе · футбол для детей" },
+      { property: "og:description", content: "Футбольная академия Морева в Анапе · футбол для детей" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "ru_RU" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Футбольная академия Морева в Анапе — футбол для детей" },
-      { name: "description", content: "Футбольная академия Морева в Анапе — футбол для детей" },
-      { name: "twitter:description", content: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { name: "twitter:title", content: "Футбольная академия Морева в Анапе · футбол для детей" },
+      { name: "description", content: "Футбольная академия Морева в Анапе · футбол для детей" },
+      { name: "twitter:description", content: "Футбольная академия Морева в Анапе · футбол для детей" },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/NZpVXzCaDIPWux8GeV6RCwGGFe32/social-images/social-1778015302193-ЛОГО.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/NZpVXzCaDIPWux8GeV6RCwGGFe32/social-images/social-1778015302193-ЛОГО.webp" },
     ],

@@ -6,13 +6,13 @@ import { ApplyButton } from "@/components/site/ApplyModal";
 export const Route = createFileRoute("/contacts")({
   head: () => ({
     meta: [
-      { title: "Контакты — Футбольная академия Морева в Анапе" },
+      { title: "Контакты · Футбольная академия Морева в Анапе" },
       {
         name: "description",
         content:
           "Контакты футбольной академии Морева в Анапе. Запись ребёнка на футбольные тренировки, WhatsApp, Telegram, телефон.",
       },
-      { property: "og:title", content: "Контакты — Футбольная академия Морева" },
+      { property: "og:title", content: "Контакты · Футбольная академия Морева" },
       { property: "og:description", content: "Свяжитесь с нами для записи ребёнка." },
     ],
   }),
@@ -20,10 +20,10 @@ export const Route = createFileRoute("/contacts")({
 });
 
 const cards = [
-  { icon: Phone, label: "Телефон", value: "Скоро", href: "tel:+79000000000" },
-  { icon: MessageCircle, label: "WhatsApp", value: "Написать", href: "https://wa.me/79000000000" },
-  { icon: Send, label: "Telegram", value: "Написать", href: "https://t.me/" },
-  { icon: MapPin, label: "Адрес", value: "Анапа", href: "#map" },
+  { icon: Phone, label: "Телефон", value: "+7 (918) 000-00-00", href: "tel:+79180000000" },
+  { icon: MessageCircle, label: "WhatsApp", value: "Написать", href: "https://wa.me/79180000000", external: true },
+  { icon: Send, label: "Telegram", value: "Написать", href: "https://t.me/fam_anapa", external: true },
+  { icon: MapPin, label: "Адрес", value: "Анапа · Карта", href: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак", external: true },
 ];
 
 function Contacts() {
@@ -56,28 +56,28 @@ function Contacts() {
           <div className="grid sm:grid-cols-2 gap-3">
             {cards.map((c, i) => (
               <Reveal key={c.label} delay={i * 0.05}>
-                <a href={c.href} className="group flex items-center gap-4 p-5 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white transition">
+                <a href={c.href} target={(c as any).external ? "_blank" : undefined} rel={(c as any).external ? "noreferrer" : undefined} className="group flex items-center gap-4 p-5 rounded-2xl border border-line bg-surface hover:bg-night hover:text-white hover:border-night transition active:scale-[0.99]">
                   <span className="h-12 w-12 rounded-xl bg-night/5 group-hover:bg-white/10 flex items-center justify-center text-flame shrink-0">
                     <c.icon className="h-5 w-5" />
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[10px] uppercase tracking-[0.2em] opacity-60">{c.label}</span>
-                    <span className="block font-display text-xl tracking-wide">{c.value}</span>
+                    <span className="block font-display text-xl tracking-wide truncate">{c.value}</span>
                   </span>
-                  <ArrowRight className="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:text-flame transition" />
+                  <ArrowRight className="h-4 w-4 opacity-40 group-hover:opacity-100 group-hover:text-flame group-hover:translate-x-0.5 transition" />
                 </a>
               </Reveal>
             ))}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-xs shadow-flame">
+            <a href="tel:+79180000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-xs shadow-flame hover:brightness-105 transition">
               <Phone className="h-4 w-4" /> Позвонить
             </a>
-            <a href="https://wa.me/79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
+            <a href="https://wa.me/79180000000" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
               <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
-            <a href="https://t.me/" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
+            <a href="https://t.me/fam_anapa" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
               <Send className="h-4 w-4" /> Telegram
             </a>
           </div>
@@ -103,7 +103,7 @@ function Contacts() {
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Заявка</div>
               <h2 className="mt-3 font-display text-3xl md:text-4xl tracking-tight">Записать ребёнка</h2>
               <p className="mt-3 text-white/65 text-sm">
-                Оставьте заявку — подберём подходящую группу и расписание.
+                Оставьте заявку · подберём подходящую группу и расписание.
               </p>
             </div>
             <div className="relative">

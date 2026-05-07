@@ -1,7 +1,19 @@
 import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { JoinFlow } from "./JoinFlow";
+
+function BallIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9.25" />
+      <path d="M12 4.5l3.05 2.25-1.15 3.6-3.8 0-1.15-3.6z" />
+      <path d="M13.9 10.35l3.35 2.45-1.25 3.85-3.6 0" />
+      <path d="M10.1 10.35L6.75 12.8l1.25 3.85 3.6 0" />
+      <path d="M12 4.5V2.6M3.4 9.55l-1.7-.45M20.6 9.55l1.7-.45M8 20.65l-.7 1.6M16 20.65l.7 1.6" />
+    </svg>
+  );
+}
 
 type Ctx = { open: () => void; close: () => void };
 const ApplyCtx = createContext<Ctx>({ open: () => {}, close: () => {} });
@@ -89,19 +101,18 @@ export function ApplyButton({
 }) {
   const { open } = useApply();
   const base =
-    "group relative inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-[0.18em] transition-all duration-300 overflow-hidden";
+    "group relative inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-[0.18em] transition-all duration-300";
   const styles =
     variant === "primary"
-      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-110 hover:shadow-[0_14px_40px_rgba(242,138,46,0.55)] active:scale-[0.98]"
+      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-[1.05] hover:shadow-[0_10px_30px_rgba(242,138,46,0.32)] active:scale-[0.98]"
       : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-[11px] hover:bg-white/10 hover:border-white/40 active:scale-[0.98]";
 
   return (
     <button onClick={open} className={`${base} ${styles} ${className}`}>
       <span className="relative z-10">{children ?? "Записать ребёнка"}</span>
       {variant === "primary" && (
-        <span className="relative z-10 h-9 w-9 rounded-full bg-white/15 flex items-center justify-center overflow-hidden">
-          <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-5" />
-          <ArrowRight className="absolute h-4 w-4 -translate-x-5 transition-transform duration-300 group-hover:translate-x-0" />
+        <span className="relative z-10 h-8 w-8 rounded-full bg-white/15 flex items-center justify-center">
+          <BallIcon className="h-[18px] w-[18px] text-white transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
         </span>
       )}
     </button>
