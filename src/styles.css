@@ -118,18 +118,18 @@
 @utility bg-gradient-pitch { background-image: var(--gradient-pitch); }
 @utility text-gradient-brand {
   background-image: linear-gradient(120deg,
-    oklch(0.99 0.005 250) 0%,
-    oklch(0.92 0.04 250) 40%,
-    oklch(0.78 0.12 254) 100%);
+    oklch(1 0 0) 0%,
+    oklch(0.88 0.08 252) 45%,
+    oklch(0.68 0.18 254) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 40px oklch(0.62 0.20 256 / 0.15);
+  text-shadow: 0 0 30px oklch(0.62 0.20 256 / 0.18);
 }
 @utility text-gradient-brand-dark {
   background-image: linear-gradient(120deg,
-    oklch(0.42 0.21 264) 0%,
-    oklch(0.50 0.22 260) 50%,
+    oklch(0.32 0.18 268) 0%,
+    oklch(0.45 0.22 262) 50%,
     oklch(0.62 0.20 256) 100%);
   -webkit-background-clip: text;
   background-clip: text;
