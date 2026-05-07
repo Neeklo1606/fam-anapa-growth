@@ -82,27 +82,38 @@ function Hero() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
-          <div className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-flame font-semibold mb-4">
-            FAM · Анапа
+          <div className="flex items-center gap-3 mb-5">
+            <span className="h-px w-8 bg-flame" />
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-flame font-mono-pro font-medium">
+              FAM · Anapa · Football School
+            </span>
           </div>
           <h1
-            className="font-display tracking-tight text-white"
-            style={{ fontSize: "clamp(2.4rem, 11vw, 7.5rem)", lineHeight: 0.92 }}
+            className="font-display text-white text-balance"
+            style={{ fontSize: "clamp(2.6rem, 11vw, 8rem)", lineHeight: 0.88, letterSpacing: "-0.035em", fontWeight: 700 }}
           >
-            Футбольная <br />
-            академия <br />
-            <span className="text-gradient-brand">Морева</span>
+            Футбольная<br />
+            академия<br />
+            <span className="relative inline-block">
+              <span className="text-gradient-brand italic">Морева</span>
+              <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-flame to-transparent" />
+            </span>
           </h1>
 
-          <p className="mt-5 max-w-[22rem] lg:max-w-xl text-[15px] lg:text-xl text-white/85 leading-snug">
-            Футбольная школа в Анапе для детей от 4 до 14 лет.
-          </p>
-          <p className="mt-2 max-w-[22rem] lg:max-w-xl text-[13px] lg:text-base text-white/55 leading-snug">
+          <div className="mt-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-white/40 font-mono-pro">
+            <span>4–14 лет</span>
+            <span className="h-px w-6 bg-white/20" />
+            <span>Анапа</span>
+            <span className="h-px w-6 bg-white/20" />
+            <span>с 2024</span>
+          </div>
+
+          <p className="mt-6 max-w-[24rem] lg:max-w-xl text-[15px] lg:text-lg text-white/80 leading-relaxed">
             Тренировки, команда, дисциплина и уверенность через футбол.
           </p>
 
-          <div className="mt-7 lg:mt-9">
-            <ApplyButton>Записаться на тренировку</ApplyButton>
+          <div className="mt-8 lg:mt-10 flex flex-wrap items-center gap-3">
+            <ApplyButton>Записать ребёнка</ApplyButton>
           </div>
         </motion.div>
       </div>
@@ -114,7 +125,7 @@ function Hero() {
         transition={{ delay: 1.2 }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40"
       >
-        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+        <span className="text-[10px] uppercase tracking-[0.3em] font-mono-pro">Scroll</span>
         <motion.span
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.6, repeat: Infinity }}
