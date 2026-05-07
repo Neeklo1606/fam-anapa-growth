@@ -105,7 +105,7 @@ export function ApplyButton({
       <span className="relative z-10">{children ?? "Записать ребёнка"}</span>
       {variant === "primary" && (
         <span className="relative z-10 h-8 w-8 rounded-full bg-white/15 flex items-center justify-center">
-          <BallIcon className="h-[18px] w-[18px] text-white transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
+          <BallIcon className="h-[18px] w-[18px] invert brightness-200 transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
         </span>
       )}
     </button>
