@@ -71,13 +71,13 @@ function Contacts() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <a href="tel:+79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-xs shadow-flame">
+            <a href="tel:+79180000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full bg-flame text-white font-semibold uppercase tracking-wider text-xs shadow-flame hover:brightness-105 transition">
               <Phone className="h-4 w-4" /> Позвонить
             </a>
-            <a href="https://wa.me/79000000000" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
+            <a href="https://wa.me/79180000000" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
               <MessageCircle className="h-4 w-4" /> WhatsApp
             </a>
-            <a href="https://t.me/" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
+            <a href="https://t.me/fam_anapa" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-line text-deep font-semibold uppercase tracking-wider text-xs hover:bg-surface transition">
               <Send className="h-4 w-4" /> Telegram
             </a>
           </div>
