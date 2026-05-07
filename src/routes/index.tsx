@@ -29,7 +29,7 @@ import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton } from "@/components/site/ApplyModal";
 
-/* Real contact endpoints — replace with final values when ready */
+/* Real contact endpoints · replace with final values when ready */
 export const CONTACTS = {
   phone: "+79180000000",
   phoneDisplay: "+7 (918) 000-00-00",
@@ -42,7 +42,7 @@ export const CONTACTS = {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Футбольная академия Морева в Анапе — футбол для детей" },
+      { title: "Футбольная академия Морева в Анапе · футбол для детей" },
       {
         name: "description",
         content:
@@ -183,7 +183,7 @@ function About() {
           <div className="lg:col-span-6 order-1 lg:order-2">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                01 — Об академии
+                01 · Об академии
               </div>
               <h2
                 className="mt-4 font-display tracking-tight"
@@ -194,7 +194,7 @@ function About() {
             </Reveal>
             <Reveal delay={0.1}>
               <p className="mt-6 text-white/75 text-base md:text-lg leading-relaxed max-w-xl">
-                Футбольная академия Морева — детская футбольная среда в Анапе, где тренировки строятся
+                Футбольная академия Морева · детская футбольная среда в Анапе, где тренировки строятся
                 вокруг интереса к игре, дисциплины, командной атмосферы и постепенного развития ребёнка.
               </p>
               <p className="mt-4 text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
@@ -239,7 +239,7 @@ function GoalkeeperSchool() {
           <div className="lg:col-span-5">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                02 — Направление
+                02 · Направление
               </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
@@ -315,7 +315,7 @@ const principles = [
   {
     n: "02",
     title: "Техника",
-    text: "Базовая работа с мячом — приём, передача, ведение и удар — основа любой игры на поле.",
+    text: "Базовая работа с мячом · приём, передача, ведение и удар · основа любой игры на поле.",
   },
   {
     n: "03",
@@ -330,7 +330,7 @@ const principles = [
   {
     n: "05",
     title: "Радость от футбола",
-    text: "Главное — чтобы ребёнок ждал тренировку и приходил на поле с интересом.",
+    text: "Главное · чтобы ребёнок ждал тренировку и приходил на поле с интересом.",
   },
 ];
 
@@ -344,7 +344,7 @@ function Principles() {
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            03 — Принципы
+            03 · Принципы
           </div>
           <h2
             className="mt-4 font-display tracking-tight"
@@ -455,7 +455,7 @@ function Coaches() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                04 — Тренеры
+                04 · Тренеры
               </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
@@ -555,7 +555,7 @@ function Location() {
           <div className="lg:col-span-5">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                05 — Локация
+                05 · Локация
               </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
@@ -669,7 +669,7 @@ function Contacts() {
       <div className="relative mx-auto max-w-5xl px-5 lg:px-8 text-center">
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            06 — Запись
+            06 · Запись
           </div>
           <h2
             className="mt-4 font-display tracking-tight"
@@ -679,7 +679,7 @@ function Contacts() {
             <span className="text-gradient-brand">тренировку</span>
           </h2>
           <p className="mt-6 text-white/65 max-w-xl mx-auto text-base md:text-lg">
-            Оставьте заявку — поможем подобрать группу и подскажем расписание.
+            Оставьте заявку · поможем подобрать группу и подскажем расписание.
           </p>
         </Reveal>
 

@@ -143,7 +143,7 @@ export function JoinFlow() {
             )}
             {step === 3 && (
               <Stage title="Контактные данные" hint="Перезвоним и подтвердим запись" badge="Шаг 04 · Контакты">
-                {/* Live summary — like a team sheet */}
+                {/* Live summary · like a team sheet */}
                 <div className="mb-5 grid grid-cols-3 gap-2">
                   {[
                     { k: "Возраст", v: data.age },
@@ -152,7 +152,7 @@ export function JoinFlow() {
                   ].map((s) => (
                     <div key={s.k} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
                       <div className="text-[9px] uppercase tracking-[0.2em] text-flame">{s.k}</div>
-                      <div className="mt-1 text-sm font-semibold text-white truncate">{s.v || "—"}</div>
+                      <div className="mt-1 text-sm font-semibold text-white truncate">{s.v || "·"}</div>
                     </div>
                   ))}
                 </div>

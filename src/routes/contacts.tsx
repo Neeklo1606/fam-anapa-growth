@@ -6,13 +6,13 @@ import { ApplyButton } from "@/components/site/ApplyModal";
 export const Route = createFileRoute("/contacts")({
   head: () => ({
     meta: [
-      { title: "Контакты — Футбольная академия Морева в Анапе" },
+      { title: "Контакты · Футбольная академия Морева в Анапе" },
       {
         name: "description",
         content:
           "Контакты футбольной академии Морева в Анапе. Запись ребёнка на футбольные тренировки, WhatsApp, Telegram, телефон.",
       },
-      { property: "og:title", content: "Контакты — Футбольная академия Морева" },
+      { property: "og:title", content: "Контакты · Футбольная академия Морева" },
       { property: "og:description", content: "Свяжитесь с нами для записи ребёнка." },
     ],
   }),
@@ -103,7 +103,7 @@ function Contacts() {
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">Заявка</div>
               <h2 className="mt-3 font-display text-3xl md:text-4xl tracking-tight">Записать ребёнка</h2>
               <p className="mt-3 text-white/65 text-sm">
-                Оставьте заявку — подберём подходящую группу и расписание.
+                Оставьте заявку · подберём подходящую группу и расписание.
               </p>
             </div>
             <div className="relative">
