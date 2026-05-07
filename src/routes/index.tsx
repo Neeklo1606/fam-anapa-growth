@@ -642,18 +642,26 @@ function Location() {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span className="h-11 w-11 rounded-xl bg-ink/5 flex items-center justify-center text-flame shrink-0">
+function InfoRow({ icon: Icon, label, value, href, external }: { icon: any; label: string; value: string; href?: string; external?: boolean }) {
+  const inner = (
+    <>
+      <span className="h-11 w-11 rounded-xl bg-ink/5 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
         <Icon className="h-5 w-5" />
       </span>
       <div className="min-w-0">
         <div className="text-[10px] uppercase tracking-[0.25em] text-ink/45">{label}</div>
         <div className="font-display text-lg tracking-wide text-deep">{value}</div>
       </div>
-    </div>
+    </>
   );
+  if (href) {
+    return (
+      <a href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined} className="group flex items-center gap-4 -mx-2 px-2 py-1 rounded-xl hover:bg-ink/[0.03] transition">
+        {inner}
+      </a>
+    );
+  }
+  return <div className="flex items-center gap-4">{inner}</div>;
 }
 
 /* ============================ CONTACTS ============================ */
