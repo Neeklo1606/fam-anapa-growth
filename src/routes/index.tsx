@@ -560,8 +560,8 @@ function Location() {
                 05 · Локация
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-deep break-words"
-                style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 0.98, letterSpacing: "-0.025em" }}
+                className="mt-4 font-display tracking-tight text-deep"
+                style={{ fontSize: "clamp(1.6rem, 3.6vw, 3rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
               >
                 Где мы <br />
                 <span className="text-gradient-brand-dark">тренируемся</span>
