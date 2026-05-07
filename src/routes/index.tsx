@@ -699,10 +699,10 @@ function Contacts() {
 
         <Reveal delay={0.15}>
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-            <ContactCard icon={Phone} label="Телефон" value="Скоро" href="#" />
-            <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href="https://wa.me/79000000000" />
-            <ContactCard icon={Send} label="Telegram" value="Написать" href="https://t.me/" />
-            <ContactCard icon={MapPin} label="Адрес" value="Анапа" href="#map" />
+            <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
+            <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
+            <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
+            <ContactCard icon={MapPin} label="Адрес" value="Анапа · Карта" href={CONTACTS.yandexMaps} external />
           </div>
         </Reveal>
       </div>
