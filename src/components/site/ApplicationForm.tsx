@@ -122,7 +122,17 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
       </Field>
 
       <Field label="Опыт занятий в спортивных школах">
-        <div className="grid grid-cols-2 gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Опыт занятий"
+          className="relative grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10"
+        >
+          <motion.div
+            aria-hidden
+            className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-flame shadow-flame"
+            animate={{ left: data.experience === "none" ? 4 : "calc(50% + 0px)" }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+          />
           {([
             { v: "none", label: "Нет опыта" },
             { v: "yes", label: "Есть опыт" },
@@ -132,12 +142,12 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
               <button
                 key={opt.v}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => update("experience", opt.v)}
                 className={cn(
-                  "h-11 rounded-xl border text-sm transition",
-                  active
-                    ? "bg-flame border-flame text-white shadow-flame"
-                    : "bg-white/5 border-white/10 text-white/75 hover:bg-white/[0.08]"
+                  "relative z-10 h-10 rounded-lg text-sm font-medium transition-colors",
+                  active ? "text-white" : "text-white/65 hover:text-white"
                 )}
               >
                 {opt.label}
