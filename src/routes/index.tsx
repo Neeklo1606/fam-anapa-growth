@@ -1,12 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect } from "react";
-import { JoinFlow } from "@/components/site/JoinFlow";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Phone,
   MessageCircle,
-  Send,
   Play,
   MapPin,
   Plus,
@@ -20,25 +18,24 @@ import { HeroVideo } from "@/components/site/HeroVideo";
 import pDribble from "@/assets/p-dribble.jpg";
 import pBall from "@/assets/p-ball.jpg";
 import pKick from "@/assets/p-kick.jpg";
-import pBallwork from "@/assets/p-ballwork.jpg";
-import coachGubin from "@/assets/coach-gubin.jpg";
 import famTeamDiplomas from "@/assets/fam-team-diplomas.jpg";
 import famTraining from "@/assets/fam-training.jpg";
-import famTeamFlag from "@/assets/fam-team-flag.jpg";
 import famCupNight from "@/assets/fam-cup-night.jpg";
 import famCupCelebration from "@/assets/fam-cup-celebration.jpg";
 import { Reveal } from "@/components/site/Reveal";
-import { ApplyButton } from "@/components/site/ApplyModal";
+import { ApplyButton, useApply } from "@/components/site/ApplyModal";
+import {
+  HERO,
+  ABOUT,
+  GOALKEEPER,
+  PRINCIPLES,
+  COACHES,
+  LOCATION,
+  CONTACTS,
+} from "@/content/site";
 
-/* Real contact endpoints · replace with final values when ready */
-export const CONTACTS = {
-  phone: "+79180000000",
-  phoneDisplay: "+7 (918) 000-00-00",
-  whatsapp: "https://wa.me/79180000000",
-  telegram: "https://t.me/fam_anapa",
-  yandexMaps: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак",
-  address: "Анапа, Краснодарский край",
-};
+/* Re-export so other routes (contacts.tsx etc.) keep working */
+export { CONTACTS };
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -47,10 +44,10 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки, команда, дисциплина и уверенность через футбол. Школа вратарей и тренерский штаб академии Морева.",
+          "Футбольная школа в Анапе для детей от 6 до 14 лет. Тренировки, школа вратарей, опытные тренеры. Записать ребёнка в Академию Морева.",
       },
       { property: "og:title", content: "Футбольная академия Морева в Анапе" },
-      { property: "og:description", content: "Футбольная школа в Анапе для детей от 4 до 14 лет." },
+      { property: "og:description", content: "Футбольная школа в Анапе для детей от 6 до 14 лет." },
       { property: "og:image", content: hero },
     ],
   }),
@@ -59,14 +56,14 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="overflow-hidden pb-safe-nav lg:pb-0">
+    <div className="overflow-hidden">
       <Hero />
       <About />
       <GoalkeeperSchool />
       <Principles />
       <Coaches />
       <Location />
-      <Contacts />
+      <ApplySection />
     </div>
   );
 }
@@ -77,17 +74,18 @@ function Hero() {
     <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex items-center">
       <div className="absolute inset-0">
         <HeroVideo
-          videoSrc="/hero.mp4"
-          posterSrc={hero}
+          videoSrc={HERO.media.src}
+          posterSrc={HERO.media.poster}
           alt="Футбольная академия Морева в Анапе"
           objectPosition="65% center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-night/85 via-night/50 to-night lg:from-night/90 lg:via-night/40 lg:to-night/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/80 via-night/20 to-transparent lg:from-night/95 lg:via-night/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/30" />
         <div className="absolute inset-0 pitch-lines opacity-25" />
+        <div className="absolute inset-0 club-stripes opacity-50" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-24 lg:pt-32 pb-24 lg:pb-28">
+      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-24 lg:pt-32 pb-16 lg:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -97,7 +95,7 @@ function Hero() {
           <div className="flex items-center gap-3 mb-5">
             <span className="h-px w-8 bg-flame" />
             <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-flame font-mono-pro font-medium">
-              FAM · Anapa · Football School
+              Футбольная школа · Анапа
             </span>
           </div>
           <h1
@@ -112,19 +110,17 @@ function Hero() {
             </span>
           </h1>
 
-          <div className="mt-6 flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-white/40 font-mono-pro">
-            <span>4–14 лет</span>
-            <span className="h-px w-6 bg-white/20" />
-            <span>Анапа</span>
-            <span className="h-px w-6 bg-white/20" />
-            <span>с 2024</span>
+          {/* Single, clean meta strip */}
+          <div className="mt-7 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white/60 font-mono-pro">
+            {HERO.metaLine.map((m, i) => (
+              <span key={m} className="flex items-center gap-3 sm:gap-4">
+                {i > 0 && <span className="h-px w-5 sm:w-6 bg-white/25" />}
+                <span>{m}</span>
+              </span>
+            ))}
           </div>
 
-          <p className="mt-6 max-w-[24rem] lg:max-w-xl text-[15px] lg:text-lg text-white/80 leading-relaxed">
-            Тренировки, команда, дисциплина и уверенность через футбол.
-          </p>
-
-          <div className="mt-8 lg:mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-9 lg:mt-10">
             <ApplyButton>Записать ребёнка</ApplyButton>
           </div>
         </motion.div>
@@ -148,39 +144,36 @@ function Hero() {
   );
 }
 
-/* ============================ ABOUT ============================ */
+/* ============================ ABOUT (dark) ============================ */
 function About() {
   return (
     <section
       id="about"
-      className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5"
+      className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-20" />
+      <div className="absolute inset-0 pitch-lines opacity-15" />
+      <div className="absolute inset-0 club-stripes opacity-40" />
       <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          {/* Visual */}
           <Reveal y={20} className="lg:col-span-6 order-2 lg:order-1">
             <div className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
               <img
-                src={famTeamFlag}
+                src={ABOUT.image}
                 alt="Команда футбольной академии Морева в Анапе"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay" />
-              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.25em] text-flame">FAM · Команда</div>
-                  <div className="font-display text-2xl md:text-3xl mt-1">Анапа · Россия</div>
-                </div>
+              <div className="absolute bottom-5 left-5 right-5">
+                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">FAM · Команда</div>
+                <div className="font-display text-2xl md:text-3xl mt-1">Анапа · Россия</div>
               </div>
             </div>
           </Reveal>
 
-          {/* Text */}
           <div className="lg:col-span-6 order-1 lg:order-2">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
@@ -194,18 +187,18 @@ function About() {
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <p className="mt-6 text-white/75 text-base md:text-lg leading-relaxed max-w-xl">
-                Футбольная академия Морева · детская футбольная среда в Анапе, где тренировки строятся
-                вокруг интереса к игре, дисциплины, командной атмосферы и постепенного развития ребёнка.
-              </p>
-              <p className="mt-4 text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
-                Название академии сохраняет память и уважение к Мореву. Сегодня команда продолжает развивать
-                футбольное дело и создавать место, куда дети приходят с интересом.
-              </p>
+              {ABOUT.body.map((p, i) => (
+                <p
+                  key={i}
+                  className={`mt-${i === 0 ? "6" : "4"} ${i === 0 ? "text-white/80 text-base md:text-lg" : "text-white/55 text-sm md:text-base"} leading-relaxed max-w-xl`}
+                >
+                  {p}
+                </p>
+              ))}
             </Reveal>
             <Reveal delay={0.2}>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <ApplyButton>Оставить заявку</ApplyButton>
+              <div className="mt-8">
+                <ApplyButton>Записать ребёнка</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -215,7 +208,7 @@ function About() {
   );
 }
 
-/* ============================ GOALKEEPER SCHOOL ============================ */
+/* ============================ GOALKEEPER (white) ============================ */
 function GoalkeeperSchool() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -234,29 +227,26 @@ function GoalkeeperSchool() {
   };
 
   return (
-    <section className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5">
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute -top-40 -left-32 h-[420px] w-[420px] bg-royal/25 blur-[140px] rounded-full pointer-events-none" />
+    <section id="goalkeeper" className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20">
+      <div className="absolute inset-0 club-stripes-dark opacity-60" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
             <Reveal>
               <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                02 · Направление
+                02 · Программа
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-white break-words"
-                style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 0.98, letterSpacing: "-0.025em" }}
+                className="mt-4 font-display tracking-tight text-deep"
+                style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
               >
-                Школа <br />
-                <span className="text-gradient-brand">вратарей</span>
+                {GOALKEEPER.title}
               </h2>
-              <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
-                Отдельная программа для детей, которые хотят занимать место в воротах. Техника игры,
-                реакция, работа с мячом и уверенность под планкой.
+              <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
+                {GOALKEEPER.body}
               </p>
               <div className="mt-7">
-                <ApplyButton>Записаться на тренировку</ApplyButton>
+                <ApplyButton>Оставить заявку</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -265,12 +255,12 @@ function GoalkeeperSchool() {
             <button
               type="button"
               onClick={togglePlay}
-              className="group relative block w-full aspect-video rounded-3xl overflow-hidden border border-white/10 bg-night shadow-elevated"
+              className="group relative block w-full aspect-video rounded-3xl overflow-hidden border border-ink/10 bg-night shadow-elevated"
             >
               <video
                 ref={videoRef}
-                src="/hero.mp4"
-                poster={pBallwork}
+                src={GOALKEEPER.video.src}
+                poster={GOALKEEPER.video.poster}
                 playsInline
                 loop
                 preload="metadata"
@@ -294,11 +284,9 @@ function GoalkeeperSchool() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3">
-                <div>
-                  <div className="text-[10px] uppercase tracking-[0.25em] text-white/70">FAM · Goalkeeper</div>
-                  <div className="font-display text-xl md:text-2xl mt-1 text-white">Школа вратарей</div>
-                </div>
+              <div className="absolute bottom-5 left-5 right-5">
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/70">FAM · Goalkeeper</div>
+                <div className="font-display text-xl md:text-2xl mt-1 text-white">Школа вратарей</div>
               </div>
             </button>
           </Reveal>
@@ -308,40 +296,13 @@ function GoalkeeperSchool() {
   );
 }
 
-/* ============================ PRINCIPLES ============================ */
-const principles = [
-  {
-    n: "01",
-    title: "Дисциплина",
-    text: "Каждое занятие выстроено вокруг внимания, режима и уважения к команде, тренеру и сопернику.",
-  },
-  {
-    n: "02",
-    title: "Техника",
-    text: "Базовая работа с мячом · приём, передача, ведение и удар · основа любой игры на поле.",
-  },
-  {
-    n: "03",
-    title: "Командная игра",
-    text: "Учимся видеть партнёра, понимать движение и принимать решения вместе.",
-  },
-  {
-    n: "04",
-    title: "Характер",
-    text: "Игра помогает становиться увереннее, держать борьбу и не сдаваться при ошибках.",
-  },
-  {
-    n: "05",
-    title: "Радость от футбола",
-    text: "Главное · чтобы ребёнок ждал тренировку и приходил на поле с интересом.",
-  },
-];
-
+/* ============================ PRINCIPLES (dark) ============================ */
 function Principles() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5">
+    <section id="principles" className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20">
       <div className="absolute inset-0 pitch-lines opacity-15" />
+      <div className="absolute inset-0 club-stripes opacity-40" />
       <div className="absolute top-1/2 -left-32 h-[400px] w-[400px] bg-flame/15 blur-[140px] rounded-full -translate-y-1/2 pointer-events-none" />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
@@ -361,7 +322,7 @@ function Principles() {
         </Reveal>
 
         <div className="mt-10 md:mt-14 divide-y divide-white/10 border-y border-white/10">
-          {principles.map((p, i) => {
+          {PRINCIPLES.map((p, i) => {
             const isOpen = open === i;
             return (
               <Reveal key={p.title} delay={i * 0.04}>
@@ -370,7 +331,7 @@ function Principles() {
                   onClick={() => setOpen(isOpen ? null : i)}
                   className="w-full text-left py-6 md:py-8 flex items-center gap-4 md:gap-8 group"
                 >
-                  <div className={`text-[11px] md:text-sm font-mono tracking-wider transition ${isOpen ? "text-flame" : "text-white/35"}`}>
+                  <div className={`text-[11px] md:text-sm font-mono-pro tracking-wider transition ${isOpen ? "text-flame" : "text-white/35"}`}>
                     {p.n}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -413,28 +374,7 @@ function Principles() {
   );
 }
 
-/* ============================ COACHES ============================ */
-const coachList = [
-  {
-    name: "Губин Алексей Олегович",
-    role: "Главный тренер",
-    info: "Тренер футбольной академии Морева. Работает с детскими группами, развивает технику и игровое мышление.",
-    img: coachGubin,
-  },
-  {
-    name: "Тренерский состав",
-    role: "Полевые тренеры",
-    info: "Команда тренеров академии работает с детскими группами от 4 до 14 лет.",
-    img: famTraining,
-  },
-  {
-    name: "Школа вратарей",
-    role: "Goalkeeper coach",
-    info: "Отдельная программа подготовки вратарей под руководством профильного тренера.",
-    img: famCupCelebration,
-  },
-];
-
+/* ============================ COACHES (white) ============================ */
 function Coaches() {
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false, dragFree: false });
   const [canPrev, setCanPrev] = useState(false);
@@ -452,8 +392,9 @@ function Coaches() {
   }, [embla]);
 
   return (
-    <section className="relative bg-background py-16 md:py-28">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+    <section id="coaches" className="relative bg-background py-16 md:py-28 scroll-mt-20">
+      <div className="absolute inset-0 club-stripes-dark opacity-50 pointer-events-none" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
@@ -494,7 +435,7 @@ function Coaches() {
         <div className="mt-10 md:mt-14 -mx-5 lg:mx-0">
           <div className="overflow-hidden px-5 lg:px-0" ref={emblaRef}>
             <div className="flex gap-4 md:gap-6">
-              {coachList.map((c, i) => (
+              {COACHES.map((c, i) => (
                 <div
                   key={c.name}
                   className="shrink-0 w-[78%] sm:w-[55%] md:w-[42%] lg:w-[32%]"
@@ -510,7 +451,7 @@ function Coaches() {
                       src={c.img}
                       alt={c.name}
                       loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover object-[center_15%] opacity-85 group-hover:opacity-100 group-hover:scale-105 transition duration-700"
+                      className="absolute inset-0 w-full h-full object-cover object-[center_15%] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
@@ -529,7 +470,7 @@ function Coaches() {
   );
 }
 
-/* ============================ LOCATION ============================ */
+/* ============================ LOCATION (dark · ONLY place with address) ============================ */
 const fieldShots = [
   { src: famTraining, label: "Тренировочное поле" },
   { src: famCupNight, label: "Вечерние занятия" },
@@ -552,8 +493,10 @@ function Location() {
   }, [embla]);
 
   return (
-    <section id="location" className="relative bg-surface py-16 md:py-28">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
+    <section id="location" className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20">
+      <div className="absolute inset-0 pitch-lines opacity-15" />
+      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
             <Reveal>
@@ -561,30 +504,44 @@ function Location() {
                 05 · Локация
               </div>
               <h2
-                className="mt-4 font-display tracking-tight text-deep"
-                style={{ fontSize: "clamp(1.6rem, 3.6vw, 3rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
+                className="mt-4 font-display tracking-tight text-white"
+                style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.5rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
               >
-                Где мы <br />
-                <span className="text-gradient-brand-dark">тренируемся</span>
+                {LOCATION.title}
               </h2>
-              <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
-                Тренировки проходят в Анапе на профессиональном футбольном поле с искусственным
-                покрытием, всё необходимое для занятий рядом.
+              <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
+                {LOCATION.body}
               </p>
 
-              <div className="mt-7 space-y-3 max-w-md">
-                <InfoRow icon={MapPin} label="Адрес" value={CONTACTS.address} href={CONTACTS.yandexMaps} external />
-                <InfoRow icon={Phone} label="Связь" value="WhatsApp · Telegram" href={CONTACTS.whatsapp} external />
+              {/* Single, canonical address row */}
+              <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md">
+                <div className="flex items-start gap-4">
+                  <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
+                    <MapPin className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
+                    <div className="mt-1 font-display text-lg tracking-wide text-white">{LOCATION.address}</div>
+                    <a
+                      href={LOCATION.mapUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
+                    >
+                      Открыть на Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                </div>
               </div>
 
               <div className="mt-7">
-                <ApplyButton>Записаться</ApplyButton>
+                <ApplyButton>Оставить заявку</ApplyButton>
               </div>
             </Reveal>
           </div>
 
           <Reveal y={20} delay={0.1} className="lg:col-span-7">
-            <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-ink/10">
+            <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
               <div className="overflow-hidden" ref={emblaRef}>
                 <div className="flex">
                   {fieldShots.map((s) => (
@@ -629,11 +586,11 @@ function Location() {
               </div>
             </div>
 
-            {/* Map */}
-            <div className="mt-4 relative rounded-3xl overflow-hidden border border-ink/10 h-[260px] md:h-[300px] bg-night">
+            {/* Inline map */}
+            <div className="mt-4 relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
               <iframe
                 title="Карта · Анапа"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=37.30%2C44.87%2C37.40%2C44.93&layer=mapnik&marker=44.8946%2C37.3163"
+                src={LOCATION.embedSrc}
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
               />
@@ -645,115 +602,98 @@ function Location() {
   );
 }
 
-function InfoRow({ icon: Icon, label, value, href, external }: { icon: any; label: string; value: string; href?: string; external?: boolean }) {
-  const inner = (
-    <>
-      <span className="h-11 w-11 rounded-xl bg-ink/5 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div className="min-w-0">
-        <div className="text-[10px] uppercase tracking-[0.25em] text-ink/45">{label}</div>
-        <div className="font-display text-lg tracking-wide text-deep">{value}</div>
-      </div>
-    </>
-  );
-  if (href) {
-    return (
-      <a href={href} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined} className="group flex items-center gap-4 -mx-2 px-2 py-1 rounded-xl hover:bg-ink/[0.03] transition">
-        {inner}
-      </a>
-    );
-  }
-  return <div className="flex items-center gap-4">{inner}</div>;
-}
-
-/* ============================ CONTACTS ============================ */
-function Contacts() {
+/* ============================ APPLY (white · single CTA, modal-driven) ============================ */
+function ApplySection() {
+  const { open } = useApply();
   return (
-    <section
-      id="contacts"
-      className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5"
-    >
-      <div className="absolute inset-0 pitch-lines opacity-20" />
-      <div className="absolute inset-0 bg-gradient-pitch" />
-
-      <div className="relative mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          <div className="lg:col-span-5 min-w-0">
-            <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                06 · Запись
-              </div>
-              <h2
-                className="mt-4 font-display tracking-tight"
-                style={{ fontSize: "clamp(2rem, 4.2vw, 3.5rem)", lineHeight: 1, letterSpacing: "-0.02em" }}
-              >
-                Записаться <br className="hidden sm:block" />
-                на <span className="text-gradient-brand">тренировку</span>
-              </h2>
-              <p className="mt-6 text-white/70 max-w-md text-base md:text-lg leading-relaxed">
-                Оставьте заявку — мы подберём подходящую группу по возрасту и уровню подготовки ребёнка.
-              </p>
-
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <ContactCard icon={Phone} label="Телефон" value={CONTACTS.phoneDisplay} href={`tel:${CONTACTS.phone}`} />
-                <ContactCard icon={MessageCircle} label="WhatsApp" value="Написать" href={CONTACTS.whatsapp} external />
-                <ContactCard icon={Send} label="Telegram" value="Написать" href={CONTACTS.telegram} external />
-                <ContactCard icon={MapPin} label="Адрес" value="Анапа" href={CONTACTS.yandexMaps} external />
-              </div>
-            </Reveal>
-          </div>
-
-          <Reveal y={20} delay={0.1} className="lg:col-span-7 min-w-0 w-full">
-            <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-5 sm:p-7 md:p-8 overflow-hidden shadow-elevated w-full max-w-full">
-              <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
-              <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full pointer-events-none" />
-              <div className="relative">
-                <JoinFlow />
-                <p className="mt-5 text-[11px] text-white/45 leading-relaxed">
-                  Нажимая кнопку, вы соглашаетесь с{" "}
-                  <Link to="/legal/consent" className="underline decoration-white/30 hover:text-flame transition">
-                    политикой обработки персональных данных
-                  </Link>
-                  .
-                </p>
-              </div>
+    <section id="contacts" className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20">
+      <div className="absolute inset-0 club-stripes-dark opacity-60" />
+      <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <Reveal>
+            <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
+              06 · Запись
             </div>
+            <h2
+              className="mt-4 font-display tracking-tight text-deep"
+              style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", lineHeight: 1, letterSpacing: "-0.02em" }}
+            >
+              Записать <span className="text-gradient-brand-dark">ребёнка</span>
+            </h2>
+            <p className="mt-5 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
+              Оставьте заявку — подберём подходящую группу по возрасту и подготовке. Свяжемся с вами в течение дня.
+            </p>
+
+            <ul className="mt-7 space-y-3 max-w-md">
+              {[
+                "Простая анкета — займёт меньше минуты",
+                "Подбор группы по возрасту и уровню",
+                "Перезвоним и подскажем расписание",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-3 text-ink/75 text-[15px]">
+                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-flame shrink-0" />
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <ApplyButton>Оставить заявку</ApplyButton>
+              <a
+                href={CONTACTS.whatsapp}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-full border border-deep/15 text-deep text-[11px] font-semibold uppercase tracking-[0.18em] hover:bg-deep hover:text-white transition"
+              >
+                <MessageCircle className="h-4 w-4" /> WhatsApp
+              </a>
+            </div>
+          </Reveal>
+
+          <Reveal y={20} delay={0.1}>
+            <button
+              type="button"
+              onClick={open}
+              className="group block w-full text-left rounded-3xl border border-deep/10 bg-white p-6 md:p-8 shadow-soft hover:shadow-elevated transition relative overflow-hidden"
+            >
+              <div className="absolute inset-0 club-stripes-dark opacity-50 pointer-events-none" />
+              <div className="absolute -top-24 -right-24 h-56 w-56 bg-flame/15 blur-3xl rounded-full pointer-events-none" />
+              <div className="relative">
+                <div className="text-[10px] uppercase tracking-[0.3em] text-flame font-semibold">
+                  Анкета записи
+                </div>
+                <div className="mt-3 font-display text-2xl md:text-3xl tracking-wide text-deep">
+                  Открыть форму
+                </div>
+                <p className="mt-3 text-ink/60 text-sm leading-relaxed">
+                  Направление · ФИО ребёнка · Дата рождения · Контакты родителя
+                </p>
+
+                <div className="mt-6 flex items-center justify-between gap-4">
+                  <a
+                    href={`tel:${CONTACTS.phone}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 text-deep text-sm font-semibold hover:text-flame transition"
+                  >
+                    <Phone className="h-4 w-4" /> {CONTACTS.phoneDisplay}
+                  </a>
+                  <span className="h-12 w-12 rounded-full bg-flame text-white flex items-center justify-center shadow-flame group-hover:scale-105 transition">
+                    <ArrowRight className="h-5 w-5" />
+                  </span>
+                </div>
+              </div>
+            </button>
+
+            <p className="mt-4 text-[11px] text-ink/50 leading-relaxed text-center">
+              Нажимая кнопку, вы соглашаетесь с{" "}
+              <Link to="/legal/consent" className="underline decoration-ink/30 hover:text-flame transition">
+                политикой обработки персональных данных
+              </Link>
+              .
+            </p>
           </Reveal>
         </div>
       </div>
     </section>
-  );
-}
-
-function ContactCard({
-  icon: Icon,
-  label,
-  value,
-  href,
-  external,
-}: {
-  icon: any;
-  label: string;
-  value: string;
-  href: string;
-  external?: boolean;
-}) {
-  return (
-    <a
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
-      className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 min-h-[68px] hover:bg-white/[0.07] hover:border-flame/40 transition active:scale-[0.99]"
-    >
-      <span className="h-10 w-10 rounded-xl bg-white/8 flex items-center justify-center text-flame shrink-0 transition group-hover:bg-flame group-hover:text-white">
-        <Icon className="h-5 w-5" />
-      </span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-[10px] uppercase tracking-[0.2em] text-white/45">{label}</span>
-        <span className="block font-display text-[15px] leading-tight tracking-wide group-hover:text-flame transition whitespace-nowrap">{value}</span>
-      </span>
-      <ArrowRight className="h-4 w-4 text-white/30 group-hover:text-flame group-hover:translate-x-0.5 transition shrink-0" />
-    </a>
   );
 }
