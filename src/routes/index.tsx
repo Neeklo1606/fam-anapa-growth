@@ -640,12 +640,12 @@ function ApplySection() {
             <div className="mt-8 flex flex-wrap gap-3">
               <ApplyButton>Оставить заявку</ApplyButton>
               <a
-                href={CONTACTS.whatsapp}
+                href={CONTACTS.max}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-full border border-deep/15 text-deep text-[11px] font-semibold uppercase tracking-[0.18em] hover:bg-deep hover:text-white transition"
               >
-                <MessageCircle className="h-4 w-4" /> WhatsApp
+                <MessageCircle className="h-4 w-4" /> MAX
               </a>
             </div>
           </Reveal>
