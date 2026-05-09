@@ -259,13 +259,16 @@ function GoalkeeperSchool() {
             >
               <video
                 ref={videoRef}
-                src={GOALKEEPER.video.src}
                 poster={GOALKEEPER.video.poster}
                 playsInline
                 loop
-                preload="metadata"
+                muted
+                preload="none"
                 className="absolute inset-0 w-full h-full object-cover"
-              />
+              >
+                <source src="/hero-720.webm" type="video/webm" />
+                <source src={GOALKEEPER.video.src} type="video/mp4" />
+              </video>
               <div className={`absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent transition-opacity duration-500 ${playing ? "opacity-30" : "opacity-100"}`} />
               <AnimatePresence>
                 {!playing && (
