@@ -54,8 +54,9 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     if (!data.parentName.trim()) e.parentName = "Укажите ФИО опекуна";
     if (!data.childName.trim()) e.childName = "Укажите ФИО ученика";
     if (!data.birthDate) e.birthDate = "Выберите дату рождения";
-    if (!data.phone.trim() || data.phone.replace(/\D/g, "").length < 10)
-      e.phone = "Укажите контактный телефон";
+    const digits = data.phone.replace(/\D/g, "");
+    if (digits.length !== 11 || !/^[78]/.test(digits))
+      e.phone = "Введите телефон в формате +7 (___) ___-__-__";
     if (data.email && !/^\S+@\S+\.\S+$/.test(data.email)) e.email = "Проверьте email";
     if (!data.consent) e.consent = "Необходимо согласие на обработку данных";
     setErrors(e);
@@ -122,7 +123,17 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
       </Field>
 
       <Field label="Опыт занятий в спортивных школах">
-        <div className="grid grid-cols-2 gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Опыт занятий"
+          className="relative grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10"
+        >
+          <motion.div
+            aria-hidden
+            className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-flame shadow-flame"
+            animate={{ left: data.experience === "none" ? 4 : "calc(50% + 0px)" }}
+            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+          />
           {([
             { v: "none", label: "Нет опыта" },
             { v: "yes", label: "Есть опыт" },
@@ -132,12 +143,12 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
               <button
                 key={opt.v}
                 type="button"
+                role="radio"
+                aria-checked={active}
                 onClick={() => update("experience", opt.v)}
                 className={cn(
-                  "h-11 rounded-xl border text-sm transition",
-                  active
-                    ? "bg-flame border-flame text-white shadow-flame"
-                    : "bg-white/5 border-white/10 text-white/75 hover:bg-white/[0.08]"
+                  "relative z-10 h-10 rounded-lg text-sm font-medium transition-colors",
+                  active ? "text-white" : "text-white/65 hover:text-white"
                 )}
               >
                 {opt.label}
@@ -207,10 +218,18 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           <input
             type="tel"
             value={data.phone}
-            onChange={(e) => update("phone", e.target.value)}
+            onChange={(e) => update("phone", formatRuPhone(e.target.value))}
+            onFocus={(e) => {
+              if (!e.target.value) update("phone", "+7 ");
+            }}
+            onBlur={(e) => {
+              if (e.target.value.replace(/\D/g, "").length <= 1) update("phone", "");
+            }}
             className={inputCls(!!errors.phone)}
             placeholder="+7 (___) ___-__-__"
             inputMode="tel"
+            maxLength={18}
+            autoComplete="tel"
           />
         </Field>
         <Field label="Email" error={errors.email}>
@@ -317,4 +336,22 @@ function Field({
       {error && <span className="block mt-1 text-[11px] text-red-300">{error}</span>}
     </label>
   );
+}
+
+function formatRuPhone(input: string): string {
+  let digits = input.replace(/\D/g, "");
+  if (digits.startsWith("8")) digits = "7" + digits.slice(1);
+  if (!digits.startsWith("7")) digits = "7" + digits;
+  digits = digits.slice(0, 11);
+  const d = digits.slice(1);
+  let out = "+7";
+  if (d.length === 0) return out + " ";
+  out += " (" + d.slice(0, 3);
+  if (d.length < 3) return out;
+  out += ") " + d.slice(3, 6);
+  if (d.length < 6) return out;
+  out += "-" + d.slice(6, 8);
+  if (d.length < 8) return out;
+  out += "-" + d.slice(8, 10);
+  return out;
 }
