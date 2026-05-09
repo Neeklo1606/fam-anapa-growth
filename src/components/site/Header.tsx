@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import logo from "@/assets/logo.webp";
+import { MobileMenu } from "@/components/site/MobileMenu";
 import { ApplyButton } from "@/components/site/ApplyModal";
+import { NAV_LINKS } from "@/content/site";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -16,32 +18,47 @@ export function Header() {
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
         scrolled
-          ? "bg-night/80 backdrop-blur-2xl border-b border-white/10"
-          : "bg-gradient-to-b from-night/40 to-transparent"
+          ? "bg-night/85 backdrop-blur-2xl border-b border-white/10"
+          : "bg-gradient-to-b from-night/55 to-transparent"
       }`}
     >
-      <div className="mx-auto max-w-7xl px-4 lg:px-8 h-14 md:h-[68px] flex items-center justify-between gap-3">
-        <Link to="/" className="flex items-center gap-2.5 min-w-0 group">
-          <div className="relative h-9 w-9 md:h-10 md:w-10 shrink-0 rounded-full bg-white/5 ring-1 ring-white/15 overflow-hidden transition group-hover:ring-flame/60">
-            <img src={logo} alt="Академия Морева" className="h-full w-full object-contain p-1" width={40} height={40} />
-          </div>
-          <div className="leading-tight min-w-0">
-            <div className="font-display text-[14px] md:text-[16px] tracking-[0.02em] text-white truncate font-bold uppercase">Академия Морева</div>
-            <div className="text-[9px] md:text-[10px] tracking-[0.32em] text-flame/90 uppercase font-mono-pro">FAM · Анапа</div>
-          </div>
+      <div className="mx-auto max-w-7xl px-4 lg:px-8 h-16 md:h-[72px] flex items-center justify-between gap-3">
+        {/* Clean logo · no white box, no extra labels */}
+        <Link to="/" className="flex items-center gap-2 min-w-0 group" aria-label="Академия Морева">
+          <img
+            src={logo}
+            alt="Академия Морева"
+            width={48}
+            height={48}
+            className="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition group-hover:scale-105"
+          />
+          <span className="hidden sm:block leading-none">
+            <span className="block font-display text-[14px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase">
+              Академия Морева
+            </span>
+          </span>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-7 text-[11px] uppercase tracking-[0.22em] text-white/65 font-medium">
-          <a href="/#about" className="relative hover:text-white transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-flame after:transition-all hover:after:w-full">Академия</a>
-          <a href="/#coaches" className="relative hover:text-white transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-flame after:transition-all hover:after:w-full">Тренеры</a>
-          <a href="/#location" className="relative hover:text-white transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-flame after:transition-all hover:after:w-full">Локация</a>
-          <Link to="/contacts" className="relative hover:text-white transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-flame after:transition-all hover:after:w-full">Контакты</Link>
+          {NAV_LINKS.slice(0, 5).map((l) => (
+            <a
+              key={l.href}
+              href={`/${l.href}`}
+              className="relative hover:text-white transition after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-flame after:transition-all hover:after:w-full"
+            >
+              {l.label}
+            </a>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <ApplyButton className="!h-10 md:!h-11 !pl-4 md:!pl-5 !pr-1.5 !text-[10px] md:!text-[11px] !py-1">
+          <ApplyButton className="hidden lg:inline-flex !h-11 !pl-5 !pr-1.5 !text-[11px]">
             Записаться
           </ApplyButton>
+          <div className="lg:hidden">
+            <MobileMenu />
+          </div>
         </div>
       </div>
     </header>
