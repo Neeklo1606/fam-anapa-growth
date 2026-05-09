@@ -164,6 +164,7 @@ function About() {
                 alt="Команда футбольной академии Морева в Анапе"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay" />
@@ -454,6 +455,7 @@ function Coaches() {
                       src={c.img}
                       alt={c.name}
                       loading="lazy"
+                decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-[center_15%] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/40 to-transparent" />
@@ -596,6 +598,7 @@ function Location() {
                 src={LOCATION.embedSrc}
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
+                decoding="async"
               />
             </div>
           </Reveal>
