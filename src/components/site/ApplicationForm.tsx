@@ -218,10 +218,18 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           <input
             type="tel"
             value={data.phone}
-            onChange={(e) => update("phone", e.target.value)}
+            onChange={(e) => update("phone", formatRuPhone(e.target.value))}
+            onFocus={(e) => {
+              if (!e.target.value) update("phone", "+7 ");
+            }}
+            onBlur={(e) => {
+              if (e.target.value.replace(/\D/g, "").length <= 1) update("phone", "");
+            }}
             className={inputCls(!!errors.phone)}
             placeholder="+7 (___) ___-__-__"
             inputMode="tel"
+            maxLength={18}
+            autoComplete="tel"
           />
         </Field>
         <Field label="Email" error={errors.email}>
