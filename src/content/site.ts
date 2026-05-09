@@ -16,6 +16,7 @@ export const CONTACTS = {
   phoneDisplay: "+7 (918) 000-00-00",
   whatsapp: "https://wa.me/79180000000",
   telegram: "https://t.me/fam_anapa",
+  max: "https://max.ru/fam_anapa",
   email: "info@fam-anapa.ru",
   yandexMaps: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак",
   address: "Анапа, Краснодарский край",
