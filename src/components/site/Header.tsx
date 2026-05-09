@@ -53,9 +53,11 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ApplyButton className="hidden lg:inline-flex !h-11 !pl-5 !pr-1.5 !text-[11px]">
-            Записаться
-          </ApplyButton>
+          <div className="hidden lg:block">
+            <ApplyButton className="!h-11 !pl-5 !pr-1.5 !text-[11px]">
+              Записаться
+            </ApplyButton>
+          </div>
           <div className="lg:hidden">
             <MobileMenu />
           </div>
