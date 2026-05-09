@@ -50,7 +50,6 @@ export function HeroVideo({
       {!failed && (
         <video
           ref={videoRef}
-          src={videoSrc}
           poster={posterSrc}
           autoPlay
           muted
@@ -64,7 +63,10 @@ export function HeroVideo({
             ready ? "opacity-100" : "opacity-0"
           }`}
           style={{ objectPosition }}
-        />
+        >
+          <source src="/hero-720.webm" type="video/webm" />
+          <source src={videoSrc} type="video/mp4" />
+        </video>
       )}
     </div>
   );
