@@ -164,6 +164,7 @@ function About() {
                 alt="Команда футбольной академии Морева в Анапе"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay" />
@@ -259,13 +260,16 @@ function GoalkeeperSchool() {
             >
               <video
                 ref={videoRef}
-                src={GOALKEEPER.video.src}
                 poster={GOALKEEPER.video.poster}
                 playsInline
                 loop
-                preload="metadata"
+                muted
+                preload="none"
                 className="absolute inset-0 w-full h-full object-cover"
-              />
+              >
+                <source src="/hero-720.webm" type="video/webm" />
+                <source src={GOALKEEPER.video.src} type="video/mp4" />
+              </video>
               <div className={`absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent transition-opacity duration-500 ${playing ? "opacity-30" : "opacity-100"}`} />
               <AnimatePresence>
                 {!playing && (
@@ -451,6 +455,7 @@ function Coaches() {
                       src={c.img}
                       alt={c.name}
                       loading="lazy"
+                decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-[center_15%] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/40 to-transparent" />
@@ -593,6 +598,7 @@ function Location() {
                 src={LOCATION.embedSrc}
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
+                decoding="async"
               />
             </div>
           </Reveal>
