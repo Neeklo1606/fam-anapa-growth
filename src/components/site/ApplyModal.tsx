@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { JoinFlow } from "./JoinFlow";
+import { ApplicationForm } from "./ApplicationForm";
 import ballUrl from "@/assets/ball.svg";
 
 function BallIcon({ className = "" }: { className?: string }) {
@@ -34,18 +34,21 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   return (
     <ApplyCtx.Provider value={{ open, close }}>
       {children}
-      <AnimatePresence>{isOpen && <ApplyModal onClose={close} />}</AnimatePresence>
+      <AnimatePresence>{isOpen && <ApplyDialog onClose={close} />}</AnimatePresence>
     </ApplyCtx.Provider>
   );
 }
 
-function ApplyModal({ onClose }: { onClose: () => void }) {
+function ApplyDialog({ onClose }: { onClose: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Запись в академию"
     >
       <motion.div
         initial={{ opacity: 0 }}
@@ -58,29 +61,36 @@ function ApplyModal({ onClose }: { onClose: () => void }) {
         initial={{ y: "100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0 }}
-        transition={{ type: "spring", damping: 28, stiffness: 280 }}
-        className="relative w-full sm:max-w-lg bg-night text-white sm:rounded-3xl rounded-t-3xl border border-white/10 overflow-hidden shadow-elevated max-h-[92svh] flex flex-col"
+        transition={{ type: "spring", damping: 30, stiffness: 280 }}
+        className="relative w-full sm:max-w-lg bg-night text-white sm:rounded-3xl rounded-t-3xl border border-white/10 overflow-hidden shadow-elevated max-h-[94svh] flex flex-col"
       >
-        <div className="absolute inset-0 pitch-lines opacity-20 pointer-events-none" />
-        <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/25 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+        <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full pointer-events-none" />
 
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
-          aria-label="Закрыть"
-        >
-          <X className="h-5 w-5" />
-        </button>
+        <div className="relative flex items-center justify-between px-5 pt-5 pb-2 shrink-0">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-flame font-semibold">
+              FAM · Запись
+            </div>
+            <h3 className="mt-1 font-display text-xl tracking-wide">Записать ребёнка</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition"
+            aria-label="Закрыть"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
-        <div className="relative p-5 sm:p-7 overflow-y-auto">
+        <div className="relative px-5 pb-6 pt-2 overflow-y-auto" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 24px)" }}>
           <div className="sm:hidden mx-auto -mt-2 mb-3 h-1 w-10 rounded-full bg-white/20" />
-          <JoinFlow />
+          <ApplicationForm onClose={onClose} />
         </div>
       </motion.div>
     </motion.div>
   );
 }
-
 
 /* Reusable trigger button */
 export function ApplyButton({
@@ -97,7 +107,7 @@ export function ApplyButton({
     "group relative inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-[0.18em] transition-all duration-300";
   const styles =
     variant === "primary"
-      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-[1.05] hover:shadow-[0_10px_30px_rgba(242,138,46,0.32)] active:scale-[0.98]"
+      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-[1.05] active:scale-[0.98]"
       : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-[11px] hover:bg-white/10 hover:border-white/40 active:scale-[0.98]";
 
   return (
