@@ -2,7 +2,6 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
-import { MobileTabBar } from "@/components/site/MobileTabBar";
 import { Footer } from "@/components/site/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ApplyProvider } from "@/components/site/ApplyModal";
@@ -130,11 +129,10 @@ function RootComponent() {
   return (
     <ApplyProvider>
       <Header />
-      <main className="pb-32 lg:pb-0">
+      <main>
         <Outlet />
       </main>
       <Footer />
-      <MobileTabBar />
       <Toaster />
     </ApplyProvider>
   );

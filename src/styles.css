@@ -141,6 +141,21 @@
     linear-gradient(to bottom, oklch(1 0 0 / 0.06) 1px, transparent 1px);
   background-size: 64px 64px;
 }
+/* Club vertical-stripe motif from the emblem · subtle, decorative */
+@utility club-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    oklch(1 0 0 / 0.04) 0 2px,
+    transparent 2px 14px
+  );
+}
+@utility club-stripes-dark {
+  background-image: repeating-linear-gradient(
+    90deg,
+    oklch(0.21 0.16 271 / 0.07) 0 2px,
+    transparent 2px 14px
+  );
+}
 @utility marquee-mask {
   -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
