@@ -54,8 +54,9 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     if (!data.parentName.trim()) e.parentName = "Укажите ФИО опекуна";
     if (!data.childName.trim()) e.childName = "Укажите ФИО ученика";
     if (!data.birthDate) e.birthDate = "Выберите дату рождения";
-    if (!data.phone.trim() || data.phone.replace(/\D/g, "").length < 10)
-      e.phone = "Укажите контактный телефон";
+    const digits = data.phone.replace(/\D/g, "");
+    if (digits.length !== 11 || !/^[78]/.test(digits))
+      e.phone = "Введите телефон в формате +7 (___) ___-__-__";
     if (data.email && !/^\S+@\S+\.\S+$/.test(data.email)) e.email = "Проверьте email";
     if (!data.consent) e.consent = "Необходимо согласие на обработку данных";
     setErrors(e);
