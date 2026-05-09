@@ -1,30 +1,41 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { CheckCircle2, Send } from "lucide-react";
+import { CalendarIcon, CheckCircle2, Send } from "lucide-react";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
 import { FORM_DIRECTIONS } from "@/content/site";
 import { Link } from "@tanstack/react-router";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+
+type Experience = "none" | "yes";
 
 type FormState = {
   direction: string;
+  experience: Experience;
   childName: string;
-  birthDate: string;
+  birthDate?: Date;
   parentName: string;
   email: string;
   phone: string;
   telegram: string;
   comment: string;
+  consent: boolean;
 };
 
 const initial: FormState = {
   direction: FORM_DIRECTIONS[0],
+  experience: "none",
   childName: "",
-  birthDate: "",
+  birthDate: undefined,
   parentName: "",
   email: "",
   phone: "",
   telegram: "",
   comment: "",
+  consent: false,
 };
 
 export function ApplicationForm({ onClose }: { onClose?: () => void }) {
@@ -40,11 +51,13 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!data.childName.trim()) e.childName = "Укажите ФИО ребёнка";
-    if (!data.parentName.trim()) e.parentName = "Укажите ФИО родителя";
+    if (!data.parentName.trim()) e.parentName = "Укажите ФИО опекуна";
+    if (!data.childName.trim()) e.childName = "Укажите ФИО ученика";
+    if (!data.birthDate) e.birthDate = "Выберите дату рождения";
     if (!data.phone.trim() || data.phone.replace(/\D/g, "").length < 10)
       e.phone = "Укажите контактный телефон";
     if (data.email && !/^\S+@\S+\.\S+$/.test(data.email)) e.email = "Проверьте email";
+    if (!data.consent) e.consent = "Необходимо согласие на обработку данных";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -54,7 +67,6 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      // Stub submission — replace with real endpoint when backend is ready.
       await new Promise((r) => setTimeout(r, 700));
       setDone(true);
       toast.success("Заявка отправлена", {
@@ -75,7 +87,9 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         <div className="mx-auto h-16 w-16 rounded-full bg-flame text-white flex items-center justify-center shadow-flame">
           <CheckCircle2 className="h-8 w-8" />
         </div>
-        <h3 className="mt-5 font-display text-2xl text-white">Спасибо, {data.parentName.split(" ")[0] || "заявка получена"}!</h3>
+        <h3 className="mt-5 font-display text-2xl text-white">
+          Спасибо, {data.parentName.split(" ")[0] || "заявка получена"}!
+        </h3>
         <p className="mt-2 text-white/65 text-sm max-w-sm mx-auto">
           Мы получили заявку и свяжемся с вами в течение дня, чтобы подобрать подходящую группу.
         </p>
@@ -107,32 +121,85 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         </select>
       </Field>
 
-      <div className="grid sm:grid-cols-2 gap-3">
-        <Field label="ФИО ребёнка *" error={errors.childName}>
-          <input
-            value={data.childName}
-            onChange={(e) => update("childName", e.target.value)}
-            className={inputCls(!!errors.childName)}
-            placeholder="Иванов Иван"
-          />
-        </Field>
-        <Field label="Дата рождения">
-          <input
-            type="date"
-            value={data.birthDate}
-            onChange={(e) => update("birthDate", e.target.value)}
-            className={inputCls(false)}
-          />
-        </Field>
-      </div>
+      <Field label="Опыт занятий в спортивных школах">
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { v: "none", label: "Нет опыта" },
+            { v: "yes", label: "Есть опыт" },
+          ] as const).map((opt) => {
+            const active = data.experience === opt.v;
+            return (
+              <button
+                key={opt.v}
+                type="button"
+                onClick={() => update("experience", opt.v)}
+                className={cn(
+                  "h-11 rounded-xl border text-sm transition",
+                  active
+                    ? "bg-flame border-flame text-white shadow-flame"
+                    : "bg-white/5 border-white/10 text-white/75 hover:bg-white/[0.08]"
+                )}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </Field>
 
-      <Field label="ФИО родителя *" error={errors.parentName}>
+      <Field label="ФИО опекуна *" error={errors.parentName}>
         <input
           value={data.parentName}
           onChange={(e) => update("parentName", e.target.value)}
           className={inputCls(!!errors.parentName)}
-          placeholder="Иванова Анна"
+          placeholder="Иванова Анна Сергеевна"
         />
+      </Field>
+
+      <Field label="ФИО ученика *" error={errors.childName}>
+        <input
+          value={data.childName}
+          onChange={(e) => update("childName", e.target.value)}
+          className={inputCls(!!errors.childName)}
+          placeholder="Иванов Иван Иванович"
+        />
+      </Field>
+
+      <Field label="Дата рождения *" error={errors.birthDate}>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                inputCls(!!errors.birthDate),
+                "flex items-center justify-between text-left",
+                !data.birthDate && "text-white/40"
+              )}
+            >
+              <span>
+                {data.birthDate
+                  ? format(data.birthDate, "d MMMM yyyy", { locale: ru })
+                  : "Выберите дату"}
+              </span>
+              <CalendarIcon className="h-4 w-4 opacity-60" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={data.birthDate}
+              onSelect={(d) => update("birthDate", d)}
+              captionLayout="dropdown"
+              fromYear={2005}
+              toYear={new Date().getFullYear()}
+              defaultMonth={data.birthDate ?? new Date(2015, 0)}
+              disabled={(date) => date > new Date() || date < new Date("2005-01-01")}
+              initialFocus
+              locale={ru}
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </Field>
 
       <div className="grid sm:grid-cols-2 gap-3">
@@ -177,10 +244,41 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         />
       </Field>
 
+      <label className="flex items-start gap-3 mt-1 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={data.consent}
+          onChange={(e) => update("consent", e.target.checked)}
+          className="mt-1 h-4 w-4 rounded border-white/20 bg-white/5 accent-flame shrink-0"
+        />
+        <span className="text-[12px] leading-relaxed text-white/70">
+          Даю{" "}
+          <Link
+            to="/legal/consent"
+            target="_blank"
+            className="text-white underline decoration-white/40 hover:text-flame transition"
+          >
+            согласие на обработку персональных данных
+          </Link>{" "}
+          и принимаю{" "}
+          <Link
+            to="/legal/privacy"
+            target="_blank"
+            className="text-white underline decoration-white/40 hover:text-flame transition"
+          >
+            политику обработки персональных данных
+          </Link>
+          .
+        </span>
+      </label>
+      {errors.consent && (
+        <span className="text-[11px] text-red-300 -mt-1">{errors.consent}</span>
+      )}
+
       <button
         type="submit"
         disabled={loading}
-        className="mt-1 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-flame text-white text-[12px] font-semibold uppercase tracking-[0.18em] shadow-flame hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
+        className="mt-2 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-flame text-white text-[12px] font-semibold uppercase tracking-[0.18em] shadow-flame hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
       >
         {loading ? "Отправляем…" : (
           <>
@@ -189,14 +287,6 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           </>
         )}
       </button>
-
-      <p className="text-[11px] text-white/45 leading-relaxed text-center">
-        Нажимая кнопку, вы соглашаетесь с{" "}
-        <Link to="/legal/consent" className="underline decoration-white/30 hover:text-flame transition">
-          политикой обработки персональных данных
-        </Link>
-        .
-      </p>
     </form>
   );
 }
