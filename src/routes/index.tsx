@@ -92,12 +92,6 @@ function Hero() {
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
-          <div className="flex items-center gap-3 mb-5">
-            <span className="h-px w-8 bg-flame" />
-            <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-flame font-mono-pro font-medium">
-              Футбольная школа · Анапа
-            </span>
-          </div>
           <h1
             className="font-display text-white text-balance"
             style={{ fontSize: "clamp(2.6rem, 11vw, 8rem)", lineHeight: 0.88, letterSpacing: "-0.035em", fontWeight: 700 }}
@@ -109,16 +103,6 @@ function Hero() {
               <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-flame to-transparent" />
             </span>
           </h1>
-
-          {/* Single, clean meta strip */}
-          <div className="mt-7 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white/60 font-mono-pro">
-            {HERO.metaLine.map((m, i) => (
-              <span key={m} className="flex items-center gap-3 sm:gap-4">
-                {i > 0 && <span className="h-px w-5 sm:w-6 bg-white/25" />}
-                <span>{m}</span>
-              </span>
-            ))}
-          </div>
 
           <div className="mt-9 lg:mt-10">
             <ApplyButton>Записать ребёнка</ApplyButton>
