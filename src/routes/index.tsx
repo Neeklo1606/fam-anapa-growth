@@ -104,16 +104,6 @@ function Hero() {
             </span>
           </h1>
 
-          {/* Single, clean meta strip */}
-          <div className="mt-7 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white/60 font-mono-pro">
-            {HERO.metaLine.map((m, i) => (
-              <span key={m} className="flex items-center gap-3 sm:gap-4">
-                {i > 0 && <span className="h-px w-5 sm:w-6 bg-white/25" />}
-                <span>{m}</span>
-              </span>
-            ))}
-          </div>
-
           <div className="mt-9 lg:mt-10">
             <ApplyButton>Записать ребёнка</ApplyButton>
           </div>
