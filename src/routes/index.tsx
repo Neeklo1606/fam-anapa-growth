@@ -161,9 +161,6 @@ function About() {
 
           <div className="lg:col-span-6 order-1 lg:order-2">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                01 · Об академии
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -218,9 +215,6 @@ function GoalkeeperSchool() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                02 · Программа
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
@@ -231,7 +225,7 @@ function GoalkeeperSchool() {
                 {GOALKEEPER.body}
               </p>
               <div className="mt-7">
-                <ApplyButton>Оставить заявку</ApplyButton>
+                <ApplyButton>Записать ребёнка</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -295,9 +289,6 @@ function Principles() {
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <Reveal>
-          <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            03 · Принципы
-          </div>
           <h2
             className="mt-4 font-display tracking-tight"
             style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -386,9 +377,6 @@ function Coaches() {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                04 · Тренеры
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -489,9 +477,6 @@ function Location() {
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                05 · Локация
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-white"
                 style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.5rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
@@ -524,7 +509,7 @@ function Location() {
               </div>
 
               <div className="mt-7">
-                <ApplyButton>Оставить заявку</ApplyButton>
+                <ApplyButton>Записать ребёнка</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -600,9 +585,6 @@ function ApplySection() {
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <Reveal>
-            <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-              06 · Запись
-            </div>
             <h2
               className="mt-4 font-display tracking-tight text-deep"
               style={{ fontSize: "clamp(2rem, 5.5vw, 4rem)", lineHeight: 1, letterSpacing: "-0.02em" }}
@@ -627,7 +609,6 @@ function ApplySection() {
             </ul>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <ApplyButton>Оставить заявку</ApplyButton>
               <a
                 href={CONTACTS.max}
                 target="_blank"
