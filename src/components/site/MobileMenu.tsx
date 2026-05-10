@@ -99,12 +99,12 @@ export function MobileMenu() {
                     Позвонить
                   </a>
                   <a
-                    href={CONTACTS.whatsapp}
+                    href={CONTACTS.max}
                     target="_blank"
                     rel="noreferrer"
                     className="h-11 rounded-full border border-white/15 bg-white/5 text-white text-[11px] font-semibold uppercase tracking-[0.18em] flex items-center justify-center hover:bg-white/10 transition"
                   >
-                    WhatsApp
+                    MAX
                   </a>
                 </div>
                 <div className="text-center text-[10px] uppercase tracking-[0.25em] text-white/40 pt-1">
