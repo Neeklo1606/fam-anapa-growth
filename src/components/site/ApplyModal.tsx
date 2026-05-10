@@ -21,7 +21,10 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   const close = useCallback(() => setIsOpen(false), []);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
     document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
     window.addEventListener("keydown", onKey);
@@ -30,6 +33,9 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", onKey);
     };
   }, [isOpen, close]);
+
+  // Safety: always reset overflow on unmount
+  useEffect(() => () => { document.body.style.overflow = ""; }, []);
 
   return (
     <ApplyCtx.Provider value={{ open, close }}>

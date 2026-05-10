@@ -14,6 +14,9 @@ export function MobileMenu() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Safety: always reset overflow on unmount
+  useEffect(() => () => { document.body.style.overflow = ""; }, []);
+
   return (
     <>
       <button
