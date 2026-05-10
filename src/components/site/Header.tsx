@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import logo from "@/assets/logo.webp";
+import logo from "@/assets/logo.png";
 import { MobileMenu } from "@/components/site/MobileMenu";
 import { ApplyButton } from "@/components/site/ApplyModal";
 import { NAV_LINKS } from "@/content/site";
@@ -28,9 +28,9 @@ export function Header() {
           <img
             src={logo}
             alt="Академия Морева"
-            width={48}
-            height={48}
-            className="h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition group-hover:scale-105"
+            width={64}
+            height={64}
+            className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition group-hover:scale-105"
           />
           <span className="hidden sm:block leading-none">
             <span className="block font-display text-[14px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase">

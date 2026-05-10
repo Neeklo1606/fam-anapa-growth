@@ -598,7 +598,6 @@ function Location() {
                 src={LOCATION.embedSrc}
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
-                decoding="async"
               />
             </div>
           </Reveal>

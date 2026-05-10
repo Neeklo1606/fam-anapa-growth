@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/logo.webp";
+import logo from "@/assets/logo.png";
 import { CONTACTS } from "@/content/site";
 
 const legal = [
@@ -28,7 +28,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="Академия Морева" className="h-12 w-12 object-contain" width={48} height={48} />
+              <img src={logo} alt="Академия Морева" className="h-16 w-16 object-contain" width={64} height={64} />
               <div className="leading-tight">
                 <div className="font-display text-xl tracking-wide uppercase">Академия Морева</div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/45 font-mono-pro">FAM · Анапа</div>
