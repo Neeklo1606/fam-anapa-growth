@@ -89,7 +89,7 @@ export function MobileMenu() {
                   }}
                   className="w-full h-12 rounded-full bg-flame text-white text-[12px] font-semibold uppercase tracking-[0.2em] shadow-flame hover:brightness-105 transition"
                 >
-                  Оставить заявку
+                  Записать ребёнка
                 </button>
                 <div className="grid grid-cols-2 gap-2">
                   <a
