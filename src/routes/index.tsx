@@ -145,8 +145,8 @@ function About() {
       id="about"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
@@ -161,7 +161,7 @@ function About() {
                 decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-              <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay" />
+              <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay pointer-events-none" />
               <div className="absolute bottom-5 left-5 right-5">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-flame">FAM · Команда</div>
                 <div className="font-display text-2xl md:text-3xl mt-1">Анапа · Россия</div>
@@ -220,7 +220,7 @@ function GoalkeeperSchool() {
 
   return (
     <section id="goalkeeper" className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20">
-      <div className="absolute inset-0 club-stripes-dark opacity-60" />
+      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
@@ -293,8 +293,8 @@ function Principles() {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section id="principles" className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20">
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute top-1/2 -left-32 h-[400px] w-[400px] bg-flame/15 blur-[140px] rounded-full -translate-y-1/2 pointer-events-none" />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
@@ -481,8 +481,8 @@ function Location() {
 
   return (
     <section id="location" className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20">
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
@@ -591,7 +591,7 @@ function ApplySection() {
   const { open } = useApply();
   return (
     <section id="contacts" className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20">
-      <div className="absolute inset-0 club-stripes-dark opacity-60" />
+      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <Reveal>
