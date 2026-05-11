@@ -16,24 +16,35 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-40 transition-all duration-500 ${
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
         scrolled
           ? "bg-night/85 backdrop-blur-2xl border-b border-white/10"
           : "bg-gradient-to-b from-night/55 to-transparent"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8 h-16 md:h-[72px] flex items-center justify-between gap-3">
-        {/* Clean logo · no white box, no extra labels */}
-        <Link to="/" className="flex items-center gap-2 min-w-0 group" aria-label="Академия Морева">
-          <img
-            src={logo}
-            alt="Академия Морева"
-            width={64}
-            height={64}
-            className="h-14 w-14 md:h-16 md:w-16 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition group-hover:scale-105"
-          />
-          <span className="hidden sm:block leading-none">
-            <span className="block font-display text-[14px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase">
+        {/* Logo with subtle premium glass backdrop for contrast on dark hero */}
+        <Link to="/" className="flex items-center gap-2.5 min-w-0 group" aria-label="Академия Морева">
+          <span className="relative inline-flex items-center justify-center h-12 w-12 md:h-14 md:w-14 shrink-0">
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/25 shadow-[0_4px_18px_rgba(0,0,0,0.35)]"
+            />
+            <span
+              aria-hidden="true"
+              className="absolute -inset-1 rounded-full bg-white/5 blur-md opacity-70"
+            />
+            <img
+              src={logo}
+              alt="Академия Морева"
+              width={56}
+              height={56}
+              className="relative h-10 w-10 md:h-12 md:w-12 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)] transition group-hover:scale-105"
+            />
+          </span>
+          <span className="hidden sm:block leading-none min-w-0">
+            <span className="block font-display text-[13px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase truncate">
               Академия Морева
             </span>
           </span>
