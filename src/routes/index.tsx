@@ -71,8 +71,11 @@ function Home() {
 /* ============================ HERO ============================ */
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex items-center">
-      <div className="absolute inset-0">
+    <section
+      className="relative bg-night text-white overflow-hidden flex items-center"
+      style={{ minHeight: "min(820px, 86svh)" }}
+    >
+      <div className="absolute inset-0 pointer-events-none">
         <HeroVideo
           videoSrc={HERO.media.src}
           posterSrc={HERO.media.poster}
@@ -85,7 +88,15 @@ function Hero() {
         <div className="absolute inset-0 club-stripes opacity-50" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-24 lg:pt-32 pb-16 lg:pb-24">
+      <div
+        className="relative mx-auto w-full max-w-7xl"
+        style={{
+          paddingLeft: "clamp(1.25rem, 5vw, 2rem)",
+          paddingRight: "clamp(1.25rem, 5vw, 2rem)",
+          paddingTop: "clamp(5.5rem, 14vw, 8rem)",
+          paddingBottom: "clamp(2.5rem, 7vw, 6rem)",
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -94,7 +105,7 @@ function Hero() {
         >
           <h1
             className="font-display text-white text-balance"
-            style={{ fontSize: "clamp(2.6rem, 11vw, 8rem)", lineHeight: 0.88, letterSpacing: "-0.035em", fontWeight: 700 }}
+            style={{ fontSize: "clamp(2.4rem, 10.5vw, 8rem)", lineHeight: 0.9, letterSpacing: "-0.035em", fontWeight: 700 }}
           >
             Футбольная<br />
             академия<br />
@@ -104,18 +115,17 @@ function Hero() {
             </span>
           </h1>
 
-          <div className="mt-9 lg:mt-10">
+          <div className="mt-7 lg:mt-10">
             <ApplyButton>Записать ребёнка</ApplyButton>
           </div>
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40 pointer-events-none"
       >
         <span className="text-[10px] uppercase tracking-[0.3em] font-mono-pro">Scroll</span>
         <motion.span
