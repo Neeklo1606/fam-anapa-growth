@@ -8,7 +8,7 @@ Skeleton for the production backend.
 - AuthModule: JWT + Refresh + RBAC guards
 - Public API: `/api/site`, `/api/home`, `/api/coaches`, `/api/gallery`, `/api/videos`, `/api/location`, `/api/seo/:page`, `POST /api/leads`, `POST /api/events`
 - Admin API: CRUD over all entities
-- LeadsModule (Этап 4), NotificationModule + BullMQ + Redis (Этап 5)
+- LeadsModule + **очередь BullMQ** при `POST /api/leads` → Telegram + опциональный webhook (Этап 5, без отдельного email/MAX worker)
 - MediaModule (Этап 6), AnalyticsModule (Этап 7), AIModule (Этап 8)
 
 Run locally:

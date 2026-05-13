@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import type { Lead, LeadStatus, Prisma } from "@prisma/client";
 
+import { NotificationsQueueService } from "../notifications/notifications-queue.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateLeadDto } from "./dto/create-lead.dto";
 
@@ -23,7 +24,10 @@ export type LeadListFilters = {
 export class LeadsService {
   private readonly logger = new Logger(LeadsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsQueue: NotificationsQueueService,
+  ) {}
 
   async create(
     dto: CreateLeadDto,
@@ -65,6 +69,11 @@ export class LeadsService {
     this.logger.log(
       `Lead created id=${lead.id} parent=${lead.parentName} phone=${lead.phone} source=${lead.source}`,
     );
+
+    void this.notificationsQueue.enqueueLeadCreated(lead.id).catch((err: Error) => {
+      this.logger.warn(`Очередь уведомлений по заявке ${lead.id}: ${err.message}`);
+    });
+
     return lead;
   }
 

@@ -12,6 +12,8 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
   const logger = new Logger("Bootstrap");
 
+  app.enableShutdownHooks();
+
   app.set("trust proxy", true);
   app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
   app.use(cookieParser());
