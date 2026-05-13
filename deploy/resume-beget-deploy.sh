@@ -27,7 +27,6 @@ source "${REPO}/apps/api/.env"
 set +a
 
 cd "${REPO}/apps/api"
-pnpm exec prisma migrate resolve --rolled-back "20260512204608_add_coach_photo_url" 2>/dev/null || true
 pnpm exec prisma migrate deploy
 
 set -a
@@ -63,8 +62,9 @@ if [[ ! -f "/etc/letsencrypt/live/${DOMAIN_PRIMARY}/fullchain.pem" ]]; then
   mkdir -p /etc/letsencrypt /var/www/certbot
   [[ -f /etc/letsencrypt/ssl-dhparams.pem ]] || openssl dhparam -dsaparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
   if [[ ! -f /etc/letsencrypt/options-ssl-nginx.conf ]]; then
-    curl -fsSL "https://raw.githubusercontent.com/certbot/certbot/main/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf" \
-      -o /etc/letsencrypt/options-ssl-nginx.conf
+    PY_CONF="/usr/lib/python3/dist-packages/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf"
+    mkdir -p /etc/letsencrypt
+    cp "${PY_CONF}" /etc/letsencrypt/options-ssl-nginx.conf
   fi
   certbot certonly --webroot -w /var/www/certbot \
     -d "${DOMAIN_PRIMARY}" -d "${WWW_HOST}" \

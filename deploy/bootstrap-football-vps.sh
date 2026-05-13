@@ -163,9 +163,9 @@ if [[ ! -f /etc/letsencrypt/live/${DOMAIN_PRIMARY}/fullchain.pem ]]; then
     openssl dhparam -dsaparam -out /etc/letsencrypt/ssl-dhparams.pem 2048
   fi
   if [[ ! -f /etc/letsencrypt/options-ssl-nginx.conf ]]; then
+    PY_CONF="/usr/lib/python3/dist-packages/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf"
     mkdir -p /etc/letsencrypt
-    curl -fsSL "https://raw.githubusercontent.com/certbot/certbot/main/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf" \
-      -o /etc/letsencrypt/options-ssl-nginx.conf
+    cp "${PY_CONF}" /etc/letsencrypt/options-ssl-nginx.conf
   fi
   certbot certonly --webroot -w /var/www/certbot \
     -d "${DOMAIN_PRIMARY}" -d "${WWW_HOST}" \
