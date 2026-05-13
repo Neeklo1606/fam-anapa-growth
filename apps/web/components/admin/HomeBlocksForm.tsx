@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
@@ -75,27 +75,39 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
   const [form, setForm] = useState<HomePageContent>(initial);
-  const [pending, startTransition] = useTransition();
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
 
-  const persist = () => {
-    startTransition(async () => {
+  const persist = async () => {
+    if (saving) return;
+    setSaving(true);
+    const toastLoadingId = "home-settings-save";
+    try {
       const mediaErrs = validateHomeMedia(form);
-      if (mediaErrs.length) {
-        toast.error("Сохранение отменено: выберите медиа в «Медиатеке»", {
-          description: mediaErrs.slice(0, 4).join(" "),
+      if (mediaErrs.length > 0) {
+        toast.error("Сохранение отменено: проверьте медиа", {
+          description: mediaErrs.slice(0, 6).join(" · "),
+          duration: 14_000,
         });
         return;
       }
+
+      toast.loading("Сохранение на сервер…", { id: toastLoadingId, duration: 60_000 });
       const payload = JSON.parse(JSON.stringify(form)) as Record<string, unknown>;
       const r = await updateHomePageContentAction(payload);
+      toast.dismiss(toastLoadingId);
       if (!r.ok) {
-        toast.error("Не удалось сохранить", { description: r.error });
+        toast.error("Не удалось сохранить главную", { description: r.error ?? "Неизвестная ошибка", duration: 14_000 });
         return;
       }
       toast.success("Главная страница сохранена");
       router.refresh();
-    });
+    } catch (e) {
+      toast.dismiss(toastLoadingId);
+      toast.error("Сбой при сохранении", { description: (e as Error).message, duration: 14_000 });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const h1a = form.hero.h1Lines[0] ?? "";
@@ -115,11 +127,12 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
       <div className="flex flex-wrap gap-3 justify-between">
         <button
           type="button"
-          disabled={pending}
+          disabled={saving}
           onClick={() => {
             setForm(buildDefaultHomePageContent());
             toast.message(
               "Подставлены тексты из кода. Пути /img/ и ролики из public для сохранения нужно заменить на файлы из раздела «Медиа».",
+              { duration: 10_000 },
             );
           }}
           className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-line text-[11px] font-semibold uppercase tracking-wider"
@@ -128,11 +141,11 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </button>
         <button
           type="button"
-          disabled={pending}
-          onClick={() => persist()}
+          disabled={saving}
+          onClick={() => void persist()}
           className="inline-flex items-center gap-2 h-10 px-5 rounded-full bg-flame text-white text-[11px] font-semibold uppercase tracking-wider disabled:opacity-50"
         >
-          {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+          {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
           Сохранить
         </button>
       </div>
