@@ -22,7 +22,9 @@ const ALLOWED_IMAGE_MIMES = new Set([
   "image/gif",
   "image/svg+xml",
 ]);
-const MAX_BYTES = 12 * 1024 * 1024; // 12MB
+const ALLOWED_VIDEO_MIMES = new Set(["video/mp4", "video/webm"]);
+const MAX_IMAGE_BYTES = 12 * 1024 * 1024; // 12MB
+const MAX_VIDEO_BYTES = 120 * 1024 * 1024; // 120MB
 
 @Injectable()
 export class MediaService {
@@ -51,11 +53,18 @@ export class MediaService {
     sizeBytes: number;
     alt?: string;
   }) {
-    if (input.sizeBytes > MAX_BYTES) {
-      throw new BadRequestException(`Файл слишком большой (>${MAX_BYTES / 1024 / 1024}MB)`);
+    if (ALLOWED_VIDEO_MIMES.has(input.mime)) {
+      if (input.sizeBytes > MAX_VIDEO_BYTES) {
+        throw new BadRequestException(`Видео слишком большое (>${MAX_VIDEO_BYTES / 1024 / 1024}MB)`);
+      }
+      return this.persistVideoUpload(input);
+    }
+
+    if (input.sizeBytes > MAX_IMAGE_BYTES) {
+      throw new BadRequestException(`Файл слишком большой (>${MAX_IMAGE_BYTES / 1024 / 1024}MB)`);
     }
     if (!input.mime.startsWith("image/")) {
-      throw new BadRequestException("Поддерживаются только изображения");
+      throw new BadRequestException("Поддерживаются только изображения и видео (MP4, WebM)");
     }
     if (!ALLOWED_IMAGE_MIMES.has(input.mime)) {
       throw new BadRequestException(`Неподдерживаемый формат: ${input.mime}`);
@@ -118,6 +127,41 @@ export class MediaService {
         kind: "IMAGE" as MediaKind,
         width,
         height,
+        sizeBytes: input.sizeBytes,
+        altDefault: input.alt?.trim() || null,
+        storagePath: originalRel,
+      },
+    });
+  }
+
+  private async persistVideoUpload(input: {
+    buffer: Buffer;
+    originalName: string;
+    mime: string;
+    sizeBytes: number;
+    alt?: string;
+  }) {
+    const now = new Date();
+    const yyyy = String(now.getUTCFullYear());
+    const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const baseDir = path.join(this.uploadsDir(), yyyy, mm);
+    await fs.mkdir(baseDir, { recursive: true });
+    const id = randomUUID();
+    const safeExt =
+      this.extFromVideoMime(input.mime) ?? this.extFromName(input.originalName) ?? "mp4";
+    const originalRel = path.posix.join(yyyy, mm, `${id}.${safeExt}`);
+    const originalAbs = path.join(baseDir, `${id}.${safeExt}`);
+    await fs.writeFile(originalAbs, input.buffer);
+    const base = this.publicBase().replace(/\/$/, "");
+    return this.prisma.mediaFile.create({
+      data: {
+        url: `${base}/${originalRel}`,
+        webpUrl: null,
+        thumbUrl: null,
+        mime: input.mime,
+        kind: "VIDEO" as MediaKind,
+        width: null,
+        height: null,
         sizeBytes: input.sizeBytes,
         altDefault: input.alt?.trim() || null,
         storagePath: originalRel,
@@ -191,6 +235,14 @@ export class MediaService {
       "image/avif": "avif",
       "image/gif": "gif",
       "image/svg+xml": "svg",
+    };
+    return map[mime] ?? null;
+  }
+
+  private extFromVideoMime(mime: string): string | null {
+    const map: Record<string, string> = {
+      "video/mp4": "mp4",
+      "video/webm": "webm",
     };
     return map[mime] ?? null;
   }

@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Загрузка файлов через server actions (`uploadMediaAction`): дефолтный лимит Next слишком мал.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "125mb",
+    },
+  },
+
   // Output: stand-alone for slim docker/PM2 deploy
   output: "standalone",
 

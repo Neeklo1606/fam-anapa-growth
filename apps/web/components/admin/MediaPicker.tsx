@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Image as ImageIcon, Loader2, Upload, X } from "lucide-react";
+import { Film, Image as ImageIcon, Loader2, Upload, X } from "lucide-react";
 
 import type { AdminMedia } from "@/lib/admin-api";
 import { listMediaAction, uploadMediaAction } from "@/lib/auth-actions";
@@ -14,16 +14,25 @@ export function MediaPicker({
   fallbackPreviewUrl,
   siteStaticPaths,
   onPickSiteStatic,
+  assetKind = "IMAGE",
+  clearableFallback,
+  onFallbackClear,
 }: {
   value: { id: string; url: string; thumbUrl: string | null } | null;
   onChange: (v: { id: string; url: string; thumbUrl: string | null } | null) => void;
   hint?: string;
-  /** Показывать превью, когда медиа из библиотеки не выбрано (например URL из public). */
   fallbackPreviewUrl?: string | null;
-  /** Пути вида `/img/...` для быстрого выбора без загрузки в БД. */
   siteStaticPaths?: string[];
   onPickSiteStatic?: (path: string) => void;
+  /** Только файлы нужного типа в списке и при загрузке. */
+  assetKind?: "IMAGE" | "VIDEO";
+  /** Показать «Очистить» при сохранённом URL в fallback (форма хранит только строку без `value`). */
+  clearableFallback?: boolean;
+  onFallbackClear?: () => void;
 }) {
+  const isVideo = assetKind === "VIDEO";
+  const kindFilter = assetKind;
+
   const [open, setOpen] = useState(false);
   const [list, setList] = useState<AdminMedia[]>([]);
   const [total, setTotal] = useState(0);
@@ -38,11 +47,16 @@ export function MediaPicker({
     value?.url ??
     (fallbackPreviewUrl && fallbackPreviewUrl.trim().length > 0 ? fallbackPreviewUrl.trim() : null);
 
+  const showClearBtn =
+    Boolean(value) || Boolean(clearableFallback && fallbackPreviewUrl && fallbackPreviewUrl.trim().length > 0);
+  const hasPreview = Boolean(previewSrc);
+  const actionLabel = hasPreview ? "Заменить" : isVideo ? "Выбрать видео из медиа" : "Выбрать из медиа";
+
   useEffect(() => {
     if (!open) return;
     setLoading(true);
     let cancelled = false;
-    listMediaAction({ page: 1, limit: 100 })
+    listMediaAction({ page: 1, limit: 100, kind: kindFilter })
       .then((r) => {
         if (cancelled) return;
         if (!r.ok) {
@@ -60,14 +74,14 @@ export function MediaPicker({
     return () => {
       cancelled = true;
     };
-  }, [open]);
+  }, [open, kindFilter]);
 
   const loadMore = () => {
     if (loading || loadingMore) return;
     if (list.length >= total) return;
     const next = lastPage + 1;
     setLoadingMore(true);
-    listMediaAction({ page: next, limit: 100 })
+    listMediaAction({ page: next, limit: 100, kind: kindFilter })
       .then((r) => {
         if (!r.ok) {
           toast.error("Не удалось подгрузить медиа", { description: r.error });
@@ -81,7 +95,8 @@ export function MediaPicker({
   };
 
   const select = (m: AdminMedia) => {
-    onChange({ id: m.id, url: m.webpUrl ?? m.url, thumbUrl: m.thumbUrl });
+    const pickedUrl = isVideo ? m.url : (m.webpUrl ?? m.url);
+    onChange({ id: m.id, url: pickedUrl, thumbUrl: m.thumbUrl });
     setOpen(false);
   };
 
@@ -96,29 +111,47 @@ export function MediaPicker({
       }
       toast.success("Файл загружен");
       if (r.id && r.url) {
-        onChange({ id: r.id, url: r.webpUrl ?? r.url, thumbUrl: r.thumbUrl ?? null });
+        const pickedUrl = isVideo ? r.url : (r.webpUrl ?? r.url);
+        onChange({ id: r.id, url: pickedUrl, thumbUrl: r.thumbUrl ?? null });
         setOpen(false);
       }
     });
   };
 
-  const showStatic =
-    Boolean(siteStaticPaths?.length && onPickSiteStatic);
+  const showStatic = Boolean(siteStaticPaths?.length && onPickSiteStatic && !isVideo);
+
+  const clear = () => {
+    onChange(null);
+    onFallbackClear?.();
+  };
+
+  const fileAccept = isVideo ? "video/mp4,video/webm" : "image/*";
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-3">
         <div className="relative h-20 w-20 rounded-xl overflow-hidden bg-surface border border-line shrink-0">
           {previewSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={previewSrc}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            isVideo ? (
+              // eslint-disable-next-line jsx-a11y/media-has-caption
+              <video
+                src={previewSrc}
+                muted
+                playsInline
+                preload="metadata"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={previewSrc}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )
           ) : (
             <span className="absolute inset-0 flex items-center justify-center text-ink/30">
-              <ImageIcon className="h-5 w-5" />
+              {isVideo ? <Film className="h-6 w-6" /> : <ImageIcon className="h-5 w-5" />}
             </span>
           )}
         </div>
@@ -128,15 +161,15 @@ export function MediaPicker({
             onClick={() => setOpen(true)}
             className="h-9 px-4 rounded-lg border border-line text-xs uppercase tracking-wider hover:bg-surface transition w-fit"
           >
-            {value ? "Заменить" : "Выбрать из медиа"}
+            {actionLabel}
           </button>
-          {value && (
+          {showClearBtn && (
             <button
               type="button"
-              onClick={() => onChange(null)}
+              onClick={() => clear()}
               className="h-9 px-4 rounded-lg text-xs uppercase tracking-wider text-red-600 hover:bg-red-50 transition w-fit"
             >
-              Очистить выбор медиа
+              Очистить
             </button>
           )}
           {hint && <p className="text-[10px] text-ink/45 leading-snug">{hint}</p>}
@@ -149,7 +182,7 @@ export function MediaPicker({
             <header className="flex items-center justify-between p-4 border-b border-line shrink-0">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-flame">Медиа</div>
-                <h3 className="font-display text-lg">Выбор изображения</h3>
+                <h3 className="font-display text-lg">{isVideo ? "Выбор видео" : "Выбор изображения"}</h3>
                 <p className="text-[10px] text-ink/45 mt-0.5">
                   Загружено в систему: {total ? `${list.length} из ${total}` : loading ? "…" : "0"}
                 </p>
@@ -158,7 +191,7 @@ export function MediaPicker({
                 <input
                   ref={inputRef}
                   type="file"
-                  accept="image/*"
+                  accept={fileAccept}
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
@@ -229,7 +262,9 @@ export function MediaPicker({
                   <p className="text-center py-10 text-ink/40">Загрузка…</p>
                 ) : list.length === 0 ? (
                   <p className="text-center py-10 text-ink/40">
-                    В медиатеке пока пусто. Загрузите файл или выберите картинку из «Статика сайта» выше.
+                    {isVideo
+                      ? "Видео в медиатеке пока нет. Загрузите MP4 или WebM (до 120MB)."
+                      : "В медиатеке пока пусто. Загрузите файл или выберите картинку из «Статика сайта» выше."}
                   </p>
                 ) : (
                   <>
@@ -241,13 +276,24 @@ export function MediaPicker({
                             onClick={() => select(m)}
                             className="relative aspect-square w-full rounded-xl overflow-hidden border border-line hover:border-flame transition"
                           >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={m.thumbUrl ?? m.webpUrl ?? m.url}
-                              alt={m.altDefault ?? ""}
-                              loading="lazy"
-                              className="absolute inset-0 h-full w-full object-cover"
-                            />
+                            {(m.kind === "VIDEO" || (m.mime ?? "").startsWith("video/")) ? (
+                              // eslint-disable-next-line jsx-a11y/media-has-caption
+                              <video
+                                src={m.url}
+                                muted
+                                playsInline
+                                preload="metadata"
+                                className="absolute inset-0 h-full w-full object-cover bg-night"
+                              />
+                            ) : (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={m.thumbUrl ?? m.webpUrl ?? m.url}
+                                alt={m.altDefault ?? ""}
+                                loading="lazy"
+                                className="absolute inset-0 h-full w-full object-cover"
+                              />
+                            )}
                           </button>
                         </li>
                       ))}

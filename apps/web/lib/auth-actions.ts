@@ -406,10 +406,15 @@ export type ListMediaItem = {
   webpUrl: string | null;
   thumbUrl: string | null;
   mime: string;
+  kind: "IMAGE" | "VIDEO" | "POSTER" | "DOCUMENT";
   altDefault: string | null;
 };
 
-export async function listMediaAction(params: { page?: number; limit?: number } = {}): Promise<{
+export async function listMediaAction(params: {
+  page?: number;
+  limit?: number;
+  kind?: ListMediaItem["kind"];
+} = {}): Promise<{
   ok: boolean;
   error?: string;
   items?: ListMediaItem[];
@@ -420,6 +425,7 @@ export async function listMediaAction(params: { page?: number; limit?: number } 
   const sp = new URLSearchParams();
   sp.set("page", String(params.page ?? 1));
   sp.set("limit", String(params.limit ?? 100));
+  if (params.kind) sp.set("kind", params.kind);
   const r = await authedJson<{
     items: ListMediaItem[];
     total: number;

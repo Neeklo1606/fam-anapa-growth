@@ -56,7 +56,7 @@ export class MediaController {
   @Roles("ADMIN", "EDITOR", "MANAGER")
   @UseInterceptors(
     FileInterceptor("file", {
-      limits: { fileSize: 12 * 1024 * 1024 },
+      limits: { fileSize: 120 * 1024 * 1024 },
     }),
   )
   async upload(

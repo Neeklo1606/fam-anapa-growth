@@ -114,7 +114,7 @@ export function MediaGallery({
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,video/mp4,video/webm"
             className="hidden"
             onChange={onFile}
           />
@@ -126,11 +126,11 @@ export function MediaGallery({
               onClick={() => inputRef.current?.click()}
               className="text-flame hover:underline"
             >
-              выберите изображение
+              выберите файл
             </button>
           </p>
           <p className="mt-1 text-[10px] uppercase tracking-wider text-ink/40">
-            JPG · PNG · WebP · AVIF · GIF · SVG · до 12MB
+            Изображения: JPG · PNG · WebP · AVIF · GIF · SVG · до 12MB · Видео: MP4 · WebM · до 120MB
           </p>
           {pending && (
             <p className="mt-3 text-xs text-ink/55 inline-flex items-center gap-2">
@@ -150,21 +150,36 @@ export function MediaGallery({
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {items.map((m) => {
             const preview = m.thumbUrl ?? m.webpUrl ?? m.url;
+            const mime = m.mime ?? "";
+            const isVid = m.kind === "VIDEO" || mime.startsWith("video/");
             return (
               <li
                 key={m.id}
                 className="group relative rounded-xl overflow-hidden border border-line bg-white aspect-square"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={preview}
-                  alt={m.altDefault ?? ""}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+                {isVid ? (
+                  /* eslint-disable-next-line jsx-a11y/media-has-caption */
+                  <video
+                    aria-label={m.altDefault ?? "Видео"}
+                    src={m.url}
+                    muted
+                    playsInline
+                    preload="metadata"
+                    className="absolute inset-0 h-full w-full object-cover bg-night"
+                  />
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={preview}
+                    alt={m.altDefault ?? ""}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                )}
                 <div className="absolute inset-0 bg-night/70 opacity-0 group-hover:opacity-100 transition flex flex-col justify-end p-2">
                   <div className="text-[9px] uppercase text-white/60 font-mono-pro mb-1">
-                    {m.mime.replace("image/", "")} · {prettySize(m.sizeBytes)}
+                    {isVid ? mime.replace("video/", "video ") : mime.replace("image/", "")} ·{" "}
+                    {prettySize(m.sizeBytes)}
                   </div>
                   <div
                     className={`flex items-center gap-1 ${canMutate ? "justify-between" : "justify-start"}`}

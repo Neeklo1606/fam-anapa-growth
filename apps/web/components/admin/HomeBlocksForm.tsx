@@ -8,11 +8,61 @@ import { Loader2, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 import type { GallerySlideCfg, HomeCoachCard, HomePageContent, PrincipleItem } from "@/lib/home-page-content";
 import { buildDefaultHomePageContent } from "@/lib/home-page-content";
 import { updateHomePageContentAction } from "@/lib/auth-actions";
+import { MediaPicker } from "@/components/admin/MediaPicker";
 
 const inputCls =
   "h-10 w-full px-3 rounded-lg border border-line bg-white text-sm focus:outline-none focus:border-flame";
 const taCls =
   "min-h-[88px] w-full px-3 py-2 rounded-lg border border-line bg-white text-sm focus:outline-none focus:border-flame";
+
+function isUploadedMediaUrl(s: string): boolean {
+  const t = s.trim();
+  if (!t) return false;
+  if (t.startsWith("/uploads/")) return true;
+  try {
+    const u = new URL(t);
+    return u.pathname.includes("/uploads/");
+  } catch {
+    return false;
+  }
+}
+
+function validateHomeMedia(h: HomePageContent): string[] {
+  const errs: string[] = [];
+  if (!isUploadedMediaUrl(h.hero.videoSrc)) {
+    errs.push("Hero: основное видео — только из «Медиа» (MP4/WebM).");
+  }
+  if (!isUploadedMediaUrl(h.hero.posterSrc)) {
+    errs.push("Hero: постер — только изображение из «Медиа».");
+  }
+  if (!isUploadedMediaUrl(h.about.imageUrl)) {
+    errs.push("Об академии: фото — только из «Медиа».");
+  }
+  if (!isUploadedMediaUrl(h.goalkeeper.videoWebmSrc)) {
+    errs.push("Школа вратарей: WebM — только из «Медиа».");
+  }
+  if (!isUploadedMediaUrl(h.goalkeeper.videoMp4Src)) {
+    errs.push("Школа вратарей: MP4 — только из «Медиа».");
+  }
+  if (!isUploadedMediaUrl(h.goalkeeper.videoPoster)) {
+    errs.push("Школа вратарей: постер видео — только из «Медиа».");
+  }
+
+  if (!h.coachesSection.useCoachesApi) {
+    h.coachesSection.staticCoaches.forEach((c, i) => {
+      if (!isUploadedMediaUrl(c.photoUrl)) errs.push(`Тренеры · статичная карточка ${i + 1}: фото только из «Медиа».`);
+    });
+  }
+
+  if (!h.location.useGalleryApi) {
+    h.location.carouselSlides.forEach((s, i) => {
+      if (!isUploadedMediaUrl(s.src)) {
+        errs.push(`Локация · слайд карусели ${i + 1}: только изображение из «Медиа».`);
+      }
+    });
+  }
+  return errs;
+}
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -30,6 +80,13 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
 
   const persist = () => {
     startTransition(async () => {
+      const mediaErrs = validateHomeMedia(form);
+      if (mediaErrs.length) {
+        toast.error("Сохранение отменено: выберите медиа в «Медиатеке»", {
+          description: mediaErrs.slice(0, 4).join(" "),
+        });
+        return;
+      }
       const payload = JSON.parse(JSON.stringify(form)) as Record<string, unknown>;
       const r = await updateHomePageContentAction(payload);
       if (!r.ok) {
@@ -61,7 +118,9 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           disabled={pending}
           onClick={() => {
             setForm(buildDefaultHomePageContent());
-            toast.message("Подставлены значения из кода. Сохраните, чтобы записать на сервер.");
+            toast.message(
+              "Подставлены тексты из кода. Пути /img/ и ролики из public для сохранения нужно заменить на файлы из раздела «Медиа».",
+            );
           }}
           className="inline-flex items-center gap-2 h-10 px-4 rounded-full border border-line text-[11px] font-semibold uppercase tracking-wider"
         >
@@ -78,13 +137,20 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </button>
       </div>
 
+      <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed">
+        Все фото и видеофайлы главной (герой, блоки, статичные карточки при отключённом API) выбираются только из{" "}
+        <strong className="font-medium text-ink/70">«Медиа»</strong> — загрузка на сервер по пути{" "}
+        <code className="text-[10px]">/uploads/…</code>. Сохранение с путями <code className="text-[10px]">/img/…</code>{" "}
+        или внешними URL для этих полей не выполняется.
+      </p>
+
       <fieldset className="rounded-2xl border border-line bg-white p-5 space-y-4">
         <legend className="text-[10px] uppercase tracking-[0.25em] text-flame font-mono-pro px-1">
           Подключение коллекций
         </legend>
         <p className="text-xs text-ink/55 leading-relaxed">
-          Данные из разделов «Тренеры», «Галерея», «Видео». При отключении подставляются поля блоков ниже — карусель локации
-          (<code className="text-[11px]">/img/...</code>), статичные карточки тренеров.
+          Данные из разделов «Тренеры», «Галерея», «Видео». При отключении подставляются поля блоков ниже — карусель локации и
+          статичные карточки тренеров; изображения всех слайдов и фото тренеров — только из медиатеки.
         </p>
         <label className="flex items-start gap-2 text-sm cursor-pointer">
           <input
@@ -147,18 +213,34 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
 
       <Section title="Hero (видео)">
         <div className="grid sm:grid-cols-2 gap-4">
-          <Field label="Видео (URL в public или абс.)">
-            <input
-              className={inputCls}
-              value={form.hero.videoSrc}
-              onChange={(e) => setForm((f) => ({ ...f, hero: { ...f.hero, videoSrc: e.target.value } }))}
+          <Field label="Видео (только из «Медиа»)">
+            <MediaPicker
+              assetKind="VIDEO"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.hero.videoSrc || null}
+              hint="Загрузите MP4 или WebM в разделе «Медиа», затем выберите здесь."
+              onChange={(v) =>
+                setForm((f) => ({
+                  ...f,
+                  hero: { ...f.hero, videoSrc: v?.url ?? "" },
+                }))
+              }
             />
           </Field>
-          <Field label="Постер (картинка)">
-            <input
-              className={inputCls}
-              value={form.hero.posterSrc}
-              onChange={(e) => setForm((f) => ({ ...f, hero: { ...f.hero, posterSrc: e.target.value } }))}
+          <Field label="Постер (изображение из «Медиа»)">
+            <MediaPicker
+              assetKind="IMAGE"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.hero.posterSrc || null}
+              hint="Картинка до воспроизведения (WebP будет предпочтителен при выборе из библиотеки)."
+              onChange={(v) =>
+                setForm((f) => ({
+                  ...f,
+                  hero: { ...f.hero, posterSrc: v?.url ?? "" },
+                }))
+              }
             />
           </Field>
           <Field label="Заголовок · строка 1">
@@ -258,14 +340,17 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Изображение (URL)">
-            <input
-              className={inputCls}
-              value={form.about.imageUrl}
-              onChange={(e) =>
+          <Field label="Изображение (только из «Медиа»)">
+            <MediaPicker
+              assetKind="IMAGE"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.about.imageUrl || null}
+              hint="Загрузите в «Медиа» или выберите уже загруженный снимок."
+              onChange={(v) =>
                 setForm((f) => ({
                   ...f,
-                  about: { ...f.about, imageUrl: e.target.value },
+                  about: { ...f.about, imageUrl: v?.url ?? "" },
                 }))
               }
             />
@@ -326,38 +411,47 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="WebM источник">
-            <input
-              className={inputCls}
-              value={form.goalkeeper.videoWebmSrc}
-              onChange={(e) =>
+          <Field label="Видео WebM (из «Медиа»)">
+            <MediaPicker
+              assetKind="VIDEO"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.goalkeeper.videoWebmSrc || null}
+              hint=""
+              onChange={(v) =>
                 setForm((f) => ({
                   ...f,
-                  goalkeeper: { ...f.goalkeeper, videoWebmSrc: e.target.value },
+                  goalkeeper: { ...f.goalkeeper, videoWebmSrc: v?.url ?? "" },
                 }))
               }
             />
           </Field>
-          <Field label="MP4 источник">
-            <input
-              className={inputCls}
-              value={form.goalkeeper.videoMp4Src}
-              onChange={(e) =>
+          <Field label="Видео MP4 (из «Медиа»)">
+            <MediaPicker
+              assetKind="VIDEO"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.goalkeeper.videoMp4Src || null}
+              hint=""
+              onChange={(v) =>
                 setForm((f) => ({
                   ...f,
-                  goalkeeper: { ...f.goalkeeper, videoMp4Src: e.target.value },
+                  goalkeeper: { ...f.goalkeeper, videoMp4Src: v?.url ?? "" },
                 }))
               }
             />
           </Field>
-          <Field label="Постер видео">
-            <input
-              className={inputCls}
-              value={form.goalkeeper.videoPoster}
-              onChange={(e) =>
+          <Field label="Постер видео (изображение из «Медиа»)">
+            <MediaPicker
+              assetKind="IMAGE"
+              value={null}
+              clearableFallback
+              fallbackPreviewUrl={form.goalkeeper.videoPoster || null}
+              hint=""
+              onChange={(v) =>
                 setForm((f) => ({
                   ...f,
-                  goalkeeper: { ...f.goalkeeper, videoPoster: e.target.value },
+                  goalkeeper: { ...f.goalkeeper, videoPoster: v?.url ?? "" },
                 }))
               }
             />
@@ -556,16 +650,20 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
                 }}
               />
             </div>
-            <input
-              className={inputCls}
-              value={c.photoUrl}
-              placeholder="URL фото"
-              onChange={(e) => {
-                const next = [...form.coachesSection.staticCoaches];
-                next[idx] = { ...c, photoUrl: e.target.value };
-                setStaticCoaches(next);
-              }}
-            />
+            <div className="pt-1">
+              <MediaPicker
+                assetKind="IMAGE"
+                value={null}
+                clearableFallback
+                fallbackPreviewUrl={c.photoUrl || null}
+                hint="Фото тренера только из медиатеки."
+                onChange={(v) => {
+                  const next = [...form.coachesSection.staticCoaches];
+                  next[idx] = { ...c, photoUrl: v?.url ?? "" };
+                  setStaticCoaches(next);
+                }}
+              />
+            </div>
             <textarea
               className={taCls}
               value={c.shortDescription}
@@ -591,7 +689,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           onClick={() =>
             setStaticCoaches([
               ...form.coachesSection.staticCoaches,
-              { fullName: "", role: "", photoUrl: "/img/", shortDescription: "" },
+              { fullName: "", role: "", photoUrl: "", shortDescription: "" },
             ])
           }
         >
@@ -703,19 +801,25 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
             }
           />
         </Field>
-        <p className="text-xs text-ink/50">Слайды карусели (если API галереи выключен).</p>
+        <p className="text-xs text-ink/50">
+          Слайды ниже задаются только если галерея с API выключена. Каждый кадр — изображение из «Медиа».
+        </p>
         {form.location.carouselSlides.map((s, idx) => (
-          <div key={idx} className="flex flex-wrap gap-2 items-center">
-            <input
-              className={`${inputCls} flex-1 min-w-[200px]`}
-              value={s.src}
-              placeholder="/img/..."
-              onChange={(e) => {
-                const next = [...form.location.carouselSlides];
-                next[idx] = { ...s, src: e.target.value };
-                setSlides(next);
-              }}
-            />
+          <div key={idx} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start border border-line rounded-xl p-4">
+            <div className="flex-1 min-w-[220px]">
+              <MediaPicker
+                assetKind="IMAGE"
+                value={null}
+                clearableFallback
+                fallbackPreviewUrl={s.src || null}
+                hint="Только загруженные в «Медиа» файлы."
+                onChange={(v) => {
+                  const next = [...form.location.carouselSlides];
+                  next[idx] = { ...s, src: v?.url ?? "" };
+                  setSlides(next);
+                }}
+              />
+            </div>
             <input
               className={`${inputCls} flex-1 min-w-[160px]`}
               value={s.label}
@@ -739,7 +843,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         <button
           type="button"
           className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-flame"
-          onClick={() => setSlides([...form.location.carouselSlides, { src: "/img/", label: "" }])}
+          onClick={() => setSlides([...form.location.carouselSlides, { src: "", label: "" }])}
         >
           <Plus className="h-3 w-3" /> Слайд
         </button>
