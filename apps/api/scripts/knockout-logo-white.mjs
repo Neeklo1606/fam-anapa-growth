@@ -1,6 +1,5 @@
 /**
- * Одноразовая обработка: делает очень светлые пиксели прозрачными (эмблема на тёмном фоне).
- * Запуск из каталога apps/api: node scripts/knockout-logo-white.mjs
+ * Запуск из apps/api: node scripts/knockout-logo-white.mjs
  */
 import path from "node:path";
 import { fileURLToPath } from "node:url";
