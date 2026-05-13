@@ -51,6 +51,16 @@ if ! curl -sfS "http://127.0.0.1:${API_PORT}/health" >/dev/null; then
   exit 0
 fi
 
+TG_WH_CODE="$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+  "http://127.0.0.1:${API_PORT}/api/integrations/telegram/webhook" \
+  -H "Content-Type: application/json" \
+  -d '{}')"
+if [[ "$TG_WH_CODE" != "401" ]]; then
+  echo "WARN: Telegram webhook without secret: expected HTTP 401, got $TG_WH_CODE"
+else
+  echo "==> Telegram inbound webhook rejects unsigned POST (401) — OK"
+fi
+
 curl -sfS "http://127.0.0.1:${API_PORT}/api/gallery" | head -c 400
 echo
 curl -sfS "http://127.0.0.1:${API_PORT}/api/videos" | head -c 400

@@ -432,3 +432,56 @@ export async function changeOwnPasswordAction(input: {
   jar.delete("fam_refresh");
   return { ok: true, loggedOut: true };
 }
+
+export async function updateTelegramNotifyAction(input: {
+  botToken?: string;
+  publicAppUrl?: string | null;
+  leadOutboundWebhookUrl?: string | null;
+  removeBotToken?: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const body: Record<string, unknown> = {};
+  if (input.removeBotToken) body.removeBotToken = true;
+  else {
+    if (input.botToken !== undefined && input.botToken.trim().length >= 20) body.botToken = input.botToken.trim();
+    if (input.publicAppUrl !== undefined) body.publicAppUrl = input.publicAppUrl?.trim() || null;
+    if (input.leadOutboundWebhookUrl !== undefined) {
+      body.leadOutboundWebhookUrl = input.leadOutboundWebhookUrl?.trim() || null;
+    }
+  }
+  const r = await authedJson("/notifications/telegram", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function syncTelegramWebhookAction(): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson("/notifications/telegram/webhook/sync", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function reviewTelegramSubscriberAction(input: {
+  id: string;
+  decision: "approve" | "reject";
+}): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/notifications/telegram/subscribers/${input.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision: input.decision }),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function revokeTelegramSubscriberAction(id: string): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/notifications/telegram/subscribers/${id}/revoke`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}

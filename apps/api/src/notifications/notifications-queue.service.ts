@@ -10,6 +10,7 @@ import { Queue, Worker } from "bullmq";
 import Redis from "ioredis";
 
 import { PrismaService } from "../prisma/prisma.service";
+import { TelegramNotifyIntegrationService } from "../telegram-notify/telegram-notify-integration.service";
 
 export const NOTIFICATIONS_QUEUE_NAME = "fam-notifications";
 
@@ -37,6 +38,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly telegramNotify: TelegramNotifyIntegrationService,
   ) {}
 
   onModuleInit() {
@@ -139,46 +141,35 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       return;
     }
 
-    const adminBase =
-      this.config.get<string>("ADMIN_PUBLIC_BASE_URL")?.trim() ||
-      "https://morev.neeklo.ru";
-
+    const adminBase = await this.telegramNotify.getPublicAppUrlForLinks();
     const text = this.formatLeadHtml(lead, adminBase);
 
-    const token = this.config.get<string>("TELEGRAM_BOT_TOKEN")?.trim();
-    const chatId = this.config.get<string>("TELEGRAM_CHAT_ID")?.trim();
-    const hook = this.config.get<string>("LEAD_NOTIFICATION_WEBHOOK_URL")?.trim();
+    const token = await this.telegramNotify.getBotTokenForOutbound();
+
+    const subscribers = await this.telegramNotify.getApprovedSubscriberChatIds();
+    const envFallback = this.config.get<string>("TELEGRAM_CHAT_ID")?.trim();
+    const chatTargets = Array.from(
+      new Set(
+        [...subscribers, ...(envFallback ? [envFallback] : [])].filter(Boolean),
+      ),
+    );
+
+    const hook = await this.telegramNotify.getLeadOutboundWebhookUrl();
 
     let telegramSent = false;
     let telegramErr: Error | undefined;
     let webhookSent = false;
     let webhookErr: Error | undefined;
 
-    if (token && chatId) {
-      try {
-        const res = await fetch(
-          `https://api.telegram.org/bot${token}/sendMessage`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_id: chatId,
-              text,
-              parse_mode: "HTML",
-              disable_web_page_preview: false,
-            }),
-          },
-        );
-        const bodyJson = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          throw new Error(
-            `HTTP ${res.status} ${JSON.stringify(bodyJson)}`,
-          );
+    if (token && chatTargets.length > 0) {
+      for (const chatId of chatTargets) {
+        try {
+          await this.telegramNotify.sendChatMessage(token, chatId, text);
+          telegramSent = true;
+        } catch (e) {
+          telegramErr = e as Error;
+          this.logger.warn(`Telegram chat ${chatId}: ${telegramErr.message}`);
         }
-        telegramSent = true;
-      } catch (e) {
-        telegramErr = e as Error;
-        this.logger.warn(`Telegram: ${telegramErr.message}`);
       }
     }
 
@@ -221,21 +212,23 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       }
     }
 
-    const outboundConfigured = Boolean((token && chatId) || hook);
+    const wantTelegram = Boolean(token && chatTargets.length > 0);
+    const outboundConfigured = Boolean(wantTelegram || hook);
 
     if (!outboundConfigured) {
       this.logger.warn(
-        "TELEGRAM_* и LEAD_NOTIFICATION_WEBHOOK_URL не заданы — текст заявки только в логе.",
+        "Нет одобренных Telegram-чатов и не настроен webhook — текст заявки только в логе.",
       );
       this.logger.log(`[dry-run notify lead ${lead.id}]\n${text.replace(/<[^>]+>/g, "")}`);
       return;
     }
 
     if (telegramSent || webhookSent) {
-      await this.persistNotificationLeadCreated(lead.id, telegramSent, webhookSent);
+      const hookUrl = hook?.slice(0, 255);
+      await this.persistNotificationLeadCreated(lead.id, telegramSent, webhookSent, hookUrl);
     }
 
-    const needTgOk = Boolean(token && chatId);
+    const needTgOk = wantTelegram;
     const needHookOk = Boolean(hook);
 
     const tgFailed = needTgOk && !telegramSent;
@@ -247,7 +240,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
 
     if (telegramSent || webhookSent) {
       this.logger.warn(
-        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent} (ретрай пропущен, чтобы не дублировать успешный канал)`,
+        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent}`,
       );
       return;
     }
@@ -265,15 +258,14 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     leadId: string,
     hadTelegram: boolean,
     hadWebhook: boolean,
+    webhookRecipientHint: string | undefined,
   ) {
     try {
       if (hadTelegram) {
         await this.prisma.notification.create({
           data: {
             channel: "TELEGRAM",
-            recipient:
-              this.config.get<string>("TELEGRAM_CHAT_ID")?.slice(0, 255) ??
-              "telegram",
+            recipient: "telegram_subscribers",
             payload: { leadId } as object,
             status: "SENT",
             attempts: 1,
@@ -285,9 +277,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
         await this.prisma.notification.create({
           data: {
             channel: "WEBHOOK",
-            recipient:
-              this.config.get<string>("LEAD_NOTIFICATION_WEBHOOK_URL")?.slice(0, 255) ??
-              "webhook",
+            recipient: webhookRecipientHint?.slice(0, 255) ?? "webhook",
             payload: { leadId } as object,
             status: "SENT",
             attempts: 1,

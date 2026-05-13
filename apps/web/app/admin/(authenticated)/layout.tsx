@@ -31,7 +31,8 @@ export default async function AuthenticatedAdminLayout({
           <SidebarLink href="/admin/gallery" label="Галерея" />
           <SidebarLink href="/admin/videos" label="Видео" />
           <SidebarLink href="/admin/media" label="Медиа" />
-          <SidebarLink href="/admin/settings" label="Настройки" />
+          <SidebarLink href="/admin/settings" label="Настройки сайта" />
+          <SidebarLink href="/admin/settings/notifications" label="Уведомления заявок" />
           {user.role === "ADMIN" && (
             <>
               <div className="pt-4 pb-1 px-3 text-[9px] uppercase tracking-[0.25em] text-white/30">

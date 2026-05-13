@@ -19,6 +19,13 @@ export default async function AdminSettingsPage() {
       <section className="rounded-2xl border border-line bg-white p-5">
         <SettingsForm initial={settings} />
       </section>
+
+      <p className="text-sm text-ink/55">
+        Интеграции (Telegram, webhook заявок):{" "}
+        <a href="/admin/settings/notifications" className="text-flame hover:underline">
+          Настройки уведомлений
+        </a>
+      </p>
     </div>
   );
 }

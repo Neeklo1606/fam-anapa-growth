@@ -285,3 +285,31 @@ export async function fetchVideosAdmin(): Promise<AdminVideo[]> {
 export async function fetchVideo(id: string): Promise<AdminVideo> {
   return callApi<AdminVideo>(`/videos/${id}`);
 }
+
+export type TelegramNotifySubscriberDto = {
+  id: string;
+  chatId: string;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  reviewedAt: string | null;
+};
+
+export type TelegramNotifyAdminState = {
+  integration: {
+    hasBotToken: boolean;
+    publicAppUrl: string | null;
+    leadOutboundWebhookUrl: string | null;
+    webhookUrl: string | null;
+    lastWebhookError: string | null;
+  };
+  webhookInfo: Record<string, unknown> | null;
+  subscribersPending: TelegramNotifySubscriberDto[];
+  subscribersApproved: TelegramNotifySubscriberDto[];
+};
+
+export async function fetchTelegramNotifyState(): Promise<TelegramNotifyAdminState> {
+  return callApi<TelegramNotifyAdminState>("/notifications/telegram");
+}

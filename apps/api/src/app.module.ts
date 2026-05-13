@@ -12,6 +12,7 @@ import { CoachesModule } from "./coaches/coaches.module";
 import { MediaModule } from "./media/media.module";
 import { GalleryModule } from "./gallery/gallery.module";
 import { VideosModule } from "./videos/videos.module";
+import { TelegramNotifyModule } from "./telegram-notify/telegram-notify.module";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { VideosModule } from "./videos/videos.module";
     MediaModule,
     GalleryModule,
     VideosModule,
+    TelegramNotifyModule,
   ],
   controllers: [HealthController],
 })

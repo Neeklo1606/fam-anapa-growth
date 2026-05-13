@@ -37,7 +37,8 @@ model User {
   assignedLeads Lead[]         @relation("LeadAssignedManager")
   leadComments  LeadComment[]
   leadHistory   LeadStatusHistory[]
-  auditLogs     AuditLog[]
+  auditLogs          AuditLog[]
+  telegramSubscribersApproved TelegramNotifySubscriber[] @relation("TelegramSubsReviewed")
 
   @@index([role, isActive])
   @@map("users")
@@ -148,6 +149,33 @@ model LeadComment {
 
   @@index([leadId, createdAt])
   @@map("lead_comments")
+}
+
+// -----------------------------------------------------------------------------
+// Telegram: уведомления о заявках (Этап 5)
+// -----------------------------------------------------------------------------
+
+enum TelegramNotifySubscriberStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model TelegramNotifySubscriber {
+  id           String                          @id @default(cuid())
+  chatId       String                          @unique
+  username     String?
+  firstName    String?
+  lastName     String?
+  status       TelegramNotifySubscriberStatus  @default(PENDING)
+  createdAt    DateTime                        @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?
+
+  reviewedBy User? @relation("TelegramSubsReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("telegram_notify_subscribers")
 }
 
 // -----------------------------------------------------------------------------
