@@ -79,6 +79,7 @@ ADMIN_PROTECTED=(
   /admin/knowledge
   /admin/knowledge/new
   /admin/settings
+  /admin/settings/home
   /admin/settings/ai
   /admin/settings/notifications
   /admin/users

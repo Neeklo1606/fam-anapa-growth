@@ -259,6 +259,17 @@ export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: 
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
+export async function updateHomePageContentAction(
+  homeContent: Record<string, unknown>,
+): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson("/site/admin/home", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ homeContent }),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
 export type AiSettingsPatch = {
   provider?: string | null;
   modelName?: string | null;

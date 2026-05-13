@@ -5,6 +5,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 
 import { UpdateSettingsDto } from "./dto/update-settings.dto";
+import { PatchHomeContentDto } from "./dto/patch-home-content.dto";
 import { SettingsService } from "./settings.service";
 
 function resolvePublicLogoUrl(s: {
@@ -38,6 +39,7 @@ export class SettingsController {
       mapEmbed: s.mapEmbed,
       yandexMapUrl: s.yandexMapUrl,
       logoUrl: resolvePublicLogoUrl(s),
+      homeContent: s.homeContent,
     };
   }
 
@@ -54,5 +56,19 @@ export class SettingsController {
   @Roles("ADMIN", "EDITOR")
   async update(@Body() dto: UpdateSettingsDto) {
     return this.settings.update(dto);
+  }
+
+  @Get("admin/home")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "EDITOR", "MANAGER")
+  async getHomeAdmin() {
+    return this.settings.getHomeContentRaw();
+  }
+
+  @Patch("admin/home")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "EDITOR", "MANAGER")
+  async patchHomeAdmin(@Body() dto: PatchHomeContentDto) {
+    return this.settings.patchHomeContent(dto.homeContent);
   }
 }

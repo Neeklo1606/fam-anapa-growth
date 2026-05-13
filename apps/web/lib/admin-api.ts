@@ -183,11 +183,20 @@ export type SiteSettings = {
     thumbUrl: string | null;
     altDefault: string | null;
   } | null;
+  homeContent?: unknown | null;
   updatedAt: string;
 };
 
 export async function fetchSettings(): Promise<SiteSettings> {
   return callApi<SiteSettings>("/site/admin");
+}
+
+export type AdminHomeContentResponse = {
+  homeContent: unknown | null;
+};
+
+export async function fetchHomePageAdmin(): Promise<AdminHomeContentResponse> {
+  return callApi<AdminHomeContentResponse>("/site/admin/home");
 }
 
 export type PublicSite = {
@@ -202,6 +211,7 @@ export type PublicSite = {
   mapEmbed: string | null;
   yandexMapUrl: string | null;
   logoUrl: string | null;
+  homeContent?: unknown | null;
 };
 
 export async function fetchPublicSite(): Promise<PublicSite> {

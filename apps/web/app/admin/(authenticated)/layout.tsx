@@ -32,6 +32,9 @@ export default async function AuthenticatedAdminLayout({
           <SidebarLink href="/admin/videos" label="Видео" />
           <SidebarLink href="/admin/media" label="Медиа" />
           <SidebarLink href="/admin/knowledge" label="База знаний (RAG)" />
+          {(user.role === "ADMIN" || user.role === "EDITOR" || user.role === "MANAGER") && (
+            <SidebarLink href="/admin/settings/home" label="Главная страница" />
+          )}
           <SidebarLink href="/admin/settings" label="Настройки сайта" />
           <SidebarLink href="/admin/settings/notifications" label="Уведомления заявок" />
           {user.role === "ADMIN" && (

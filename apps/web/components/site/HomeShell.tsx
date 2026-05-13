@@ -19,16 +19,8 @@ import Link from "next/link";
 import { HeroVideo } from "@/components/site/HeroVideo";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton, useApply } from "@/components/site/ApplyModal";
-import {
-  HERO,
-  ABOUT,
-  GOALKEEPER,
-  PRINCIPLES,
-  COACHES as COACHES_FALLBACK,
-  LOCATION,
-  CONTACTS,
-  GALLERY,
-} from "@/content/site";
+import { CONTACTS, COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
+import type { HomePageContent } from "@/lib/home-page-content";
 import { trackSiteEvent } from "@/lib/analytics";
 
 export type HomeCoach = {
@@ -70,41 +62,47 @@ function youtubeEmbedSrc(raw: string): string | null {
 }
 
 export function HomeShell({
+  home,
   coaches,
   gallery,
   videos,
 }: {
+  home: HomePageContent;
   coaches?: HomeCoach[];
   gallery?: HomeGallerySlide[];
   videos?: HomeVideoCard[];
 }) {
   return (
     <div className="overflow-hidden">
-      <Hero />
-      <About />
-      <GoalkeeperSchool />
-      <Principles />
-      <Coaches coaches={coaches} />
-      <VideosStrip videos={videos} />
-      <Location gallery={gallery} />
-      <ApplySection />
+      <Hero home={home} />
+      <About home={home} />
+      <GoalkeeperSchool home={home} />
+      <Principles home={home} />
+      <Coaches home={home} coaches={coaches} />
+      <VideosStrip home={home} videos={videos} />
+      <Location home={home} gallery={gallery} />
+      <ApplySection home={home} />
     </div>
   );
 }
 
-function VideosStrip({ videos }: { videos?: HomeVideoCard[] }) {
-  if (!videos?.length) return null;
+function VideosStrip({ home, videos }: { home: HomePageContent; videos?: HomeVideoCard[] }) {
+  if (!home.videosSection.show) return null;
+  if (!home.videosSection.useVideosApi || !videos?.length) return null;
   return (
     <section id="videos" className="bg-background py-14 md:py-24 border-t border-line scroll-mt-20">
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="absolute inset-0 club-stripes-dark opacity-30 pointer-events-none" />
         <Reveal>
-          <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">Видео</div>
+          <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
+            {home.videosSection.eyebrow}
+          </div>
           <h2
             className="mt-3 font-display tracking-tight text-deep"
             style={{ fontSize: "clamp(1.85rem, 5vw, 3.2rem)", lineHeight: 1.05 }}
           >
-            Смотреть <span className="text-gradient-brand-dark">ролики</span>
+            {home.videosSection.titleBefore}{" "}
+            <span className="text-gradient-brand-dark">{home.videosSection.titleAccent}</span>
           </h2>
         </Reveal>
 
@@ -160,7 +158,7 @@ function VideosStrip({ videos }: { videos?: HomeVideoCard[] }) {
   );
 }
 
-function Hero() {
+function Hero({ home }: { home: HomePageContent }) {
   return (
     <section
       className="relative bg-night text-white overflow-hidden flex items-center"
@@ -168,8 +166,8 @@ function Hero() {
     >
       <div className="absolute inset-0 pointer-events-none">
         <HeroVideo
-          videoSrc={HERO.media.src}
-          posterSrc={HERO.media.poster}
+          videoSrc={home.hero.videoSrc}
+          posterSrc={home.hero.posterSrc}
           alt="Футбольная академия Морева в Анапе"
           objectPosition="65% center"
         />
@@ -203,18 +201,21 @@ function Hero() {
               fontWeight: 700,
             }}
           >
-            Футбольная
-            <br />
-            академия
+            {home.hero.h1Lines.map((line, i) => (
+              <span key={i}>
+                {line}
+                {i < home.hero.h1Lines.length - 1 ? <br /> : null}
+              </span>
+            ))}
             <br />
             <span className="relative inline-block">
-              <span className="text-gradient-brand italic">Морева</span>
+              <span className="text-gradient-brand italic">{home.hero.accentWord}</span>
               <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-flame to-transparent" />
             </span>
           </h1>
 
           <div className="mt-9 lg:mt-10">
-            <ApplyButton>Записать ребёнка</ApplyButton>
+            <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
           </div>
         </motion.div>
       </div>
@@ -222,7 +223,7 @@ function Hero() {
   );
 }
 
-function About() {
+function About({ home }: { home: HomePageContent }) {
   return (
     <section
       id="about"
@@ -237,8 +238,8 @@ function About() {
           <Reveal y={20} className="lg:col-span-6 order-2 lg:order-1">
             <div className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
               <Image
-                src={ABOUT.image}
-                alt="Команда футбольной академии Морева в Анапе"
+                src={home.about.imageUrl}
+                alt={home.about.imageAlt}
                 fill
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 className="absolute inset-0 w-full h-full object-cover"
@@ -246,8 +247,8 @@ function About() {
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
               <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay pointer-events-none" />
               <div className="absolute bottom-5 left-5 right-5">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">FAM · Команда</div>
-                <div className="font-display text-2xl md:text-3xl mt-1">Анапа · Россия</div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">{home.about.cardEyebrow}</div>
+                <div className="font-display text-2xl md:text-3xl mt-1">{home.about.cardTitle}</div>
               </div>
             </div>
           </Reveal>
@@ -258,11 +259,11 @@ function About() {
                 className="mt-4 font-display tracking-tight"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
-                Об <span className="text-gradient-brand">Академии</span>
+                {home.about.titleBefore} <span className="text-gradient-brand">{home.about.titleAccent}</span>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              {ABOUT.body.map((p, i) => (
+              {home.about.paragraphs.map((p, i) => (
                 <p
                   key={i}
                   className={`mt-${i === 0 ? "6" : "4"} ${i === 0 ? "text-white/80 text-base md:text-lg" : "text-white/55 text-sm md:text-base"} leading-relaxed max-w-xl`}
@@ -273,7 +274,7 @@ function About() {
             </Reveal>
             <Reveal delay={0.2}>
               <div className="mt-8">
-                <ApplyButton>Записать ребёнка</ApplyButton>
+                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -283,7 +284,7 @@ function About() {
   );
 }
 
-function GoalkeeperSchool() {
+function GoalkeeperSchool({ home }: { home: HomePageContent }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -318,13 +319,13 @@ function GoalkeeperSchool() {
                   letterSpacing: "-0.025em",
                 }}
               >
-                {GOALKEEPER.title}
+                {home.goalkeeper.title}
               </h2>
               <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
-                {GOALKEEPER.body}
+                {home.goalkeeper.body}
               </p>
               <div className="mt-7">
-                <ApplyButton>Записать ребёнка</ApplyButton>
+                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -337,15 +338,15 @@ function GoalkeeperSchool() {
             >
               <video
                 ref={videoRef}
-                poster={GOALKEEPER.video.poster}
+                poster={home.goalkeeper.videoPoster}
                 playsInline
                 loop
                 muted
                 preload="none"
                 className="absolute inset-0 w-full h-full object-cover"
               >
-                <source src="/hero-720.webm" type="video/webm" />
-                <source src={GOALKEEPER.video.src} type="video/mp4" />
+                <source src={home.goalkeeper.videoWebmSrc} type="video/webm" />
+                <source src={home.goalkeeper.videoMp4Src} type="video/mp4" />
               </video>
               <div
                 className={`absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent transition-opacity duration-500 ${playing ? "opacity-30" : "opacity-100"}`}
@@ -369,11 +370,9 @@ function GoalkeeperSchool() {
               </AnimatePresence>
               <div className="absolute bottom-5 left-5 right-5">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/70">
-                  FAM · Goalkeeper
+                  {home.goalkeeper.overlayEyebrow}
                 </div>
-                <div className="font-display text-xl md:text-2xl mt-1 text-white">
-                  Школа вратарей
-                </div>
+                <div className="font-display text-xl md:text-2xl mt-1 text-white">{home.goalkeeper.overlayTitle}</div>
               </div>
             </button>
           </Reveal>
@@ -383,7 +382,7 @@ function GoalkeeperSchool() {
   );
 }
 
-function Principles() {
+function Principles({ home }: { home: HomePageContent }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section
@@ -400,15 +399,14 @@ function Principles() {
             className="mt-4 font-display tracking-tight"
             style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
           >
-            Наши <span className="text-gradient-brand">принципы</span>
+            {home.principles.sectionTitleBefore}{" "}
+            <span className="text-gradient-brand">{home.principles.sectionTitleAccent}</span>
           </h2>
-          <p className="mt-5 text-white/60 max-w-xl text-base md:text-lg">
-            Что для нас важно в работе с детьми и в подходе к игре.
-          </p>
+          <p className="mt-5 text-white/60 max-w-xl text-base md:text-lg">{home.principles.intro}</p>
         </Reveal>
 
         <div className="mt-10 md:mt-14 divide-y divide-white/10 border-y border-white/10">
-          {PRINCIPLES.map((p, i) => {
+          {home.principles.items.map((p, i) => {
             const isOpen = open === i;
             return (
               <Reveal key={p.title} delay={i * 0.04}>
@@ -462,20 +460,30 @@ function Principles() {
   );
 }
 
-function Coaches({ coaches }: { coaches?: HomeCoach[] }) {
+function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach[] }) {
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false, dragFree: false });
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
 
-  const items: HomeCoach[] =
-    coaches && coaches.length > 0
-      ? coaches
-      : COACHES_FALLBACK.map((c, i) => ({
-          id: `fallback-${i}`,
+  const rawCards =
+    home.coachesSection.staticCoaches.length > 0
+      ? home.coachesSection.staticCoaches
+      : COACHES_FALLBACK_SRC.map((c) => ({
           fullName: c.name,
           role: c.role,
           photoUrl: c.img,
           shortDescription: c.info,
+        }));
+
+  const items: HomeCoach[] =
+    home.coachesSection.useCoachesApi && coaches && coaches.length > 0
+      ? coaches
+      : rawCards.map((c, i) => ({
+          id: `static-${i}`,
+          fullName: c.fullName,
+          role: c.role,
+          photoUrl: c.photoUrl,
+          shortDescription: c.shortDescription,
         }));
 
   useEffect(() => {
@@ -500,12 +508,10 @@ function Coaches({ coaches }: { coaches?: HomeCoach[] }) {
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
               >
-                Тренерский <br className="md:hidden" />{" "}
-                <span className="text-gradient-brand-dark">штаб</span>
+                {home.coachesSection.titleLine1} <br className="md:hidden" />{" "}
+                <span className="text-gradient-brand-dark">{home.coachesSection.titleLine2Accent}</span>
               </h2>
-              <p className="mt-4 text-ink/65 max-w-md text-base md:text-lg">
-                Тренеры академии работают с детскими группами и помогают каждому ребёнку расти на поле.
-              </p>
+              <p className="mt-4 text-ink/65 max-w-md text-base md:text-lg">{home.coachesSection.subtitle}</p>
             </div>
             <div className="hidden md:flex items-center gap-2">
               <button
@@ -573,16 +579,28 @@ function Coaches({ coaches }: { coaches?: HomeCoach[] }) {
   );
 }
 
-function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
-  const slides: HomeGallerySlide[] =
-    gallery && gallery.length > 0
-      ? gallery
-      : GALLERY.map((s, i) => ({
-          id: `fallback-${i}`,
-          src: s.src,
-          label: s.label,
-          alt: s.label,
-        }));
+function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGallerySlide[] }) {
+  const fromCarousel = home.location.carouselSlides.map((s, i) => ({
+    id: `car-${i}`,
+    src: s.src,
+    label: s.label,
+    alt: s.label,
+  }));
+  const fromSiteGallery = SITE_GALLERY.map((s, i) => ({
+    id: `site-${i}`,
+    src: s.src,
+    label: s.label,
+    alt: s.label,
+  }));
+
+  let slides: HomeGallerySlide[];
+  if (home.location.useGalleryApi && gallery && gallery.length > 0) {
+    slides = gallery;
+  } else if (fromCarousel.length > 0) {
+    slides = fromCarousel;
+  } else {
+    slides = fromSiteGallery;
+  }
 
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false });
   const [index, setIndex] = useState(0);
@@ -616,10 +634,10 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
                   letterSpacing: "-0.025em",
                 }}
               >
-                {LOCATION.title}
+                {home.location.title}
               </h2>
               <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
-                {LOCATION.body}
+                {home.location.body}
               </p>
 
               <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md">
@@ -630,10 +648,10 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
                   <div className="min-w-0">
                     <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
                     <div className="mt-1 font-display text-lg tracking-wide text-white">
-                      {LOCATION.address}
+                      {home.location.address}
                     </div>
                     <a
-                      href={LOCATION.mapUrl}
+                      href={home.location.mapUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="mt-2 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
@@ -645,7 +663,7 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
               </div>
 
               <div className="mt-7">
-                <ApplyButton>Записать ребёнка</ApplyButton>
+                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -710,7 +728,7 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
             <div className="mt-4 relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
               <iframe
                 title="Карта · Анапа"
-                src={LOCATION.embedSrc}
+                src={home.location.embedSrc}
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
               />
@@ -722,7 +740,7 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
   );
 }
 
-function ApplySection() {
+function ApplySection({ home }: { home: HomePageContent }) {
   const { open } = useApply();
   return (
     <section
@@ -741,19 +759,14 @@ function ApplySection() {
                 letterSpacing: "-0.02em",
               }}
             >
-              Записать <span className="text-gradient-brand-dark">ребёнка</span>
+              {home.contactsSection.titleBefore}{" "}
+              <span className="text-gradient-brand-dark">{home.contactsSection.titleAccent}</span>
             </h2>
-            <p className="mt-5 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
-              Оставьте заявку — подберём подходящую группу по возрасту и подготовке. Свяжемся с вами в течение дня.
-            </p>
+            <p className="mt-5 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">{home.contactsSection.intro}</p>
 
             <ul className="mt-7 space-y-3 max-w-md">
-              {[
-                "Простая анкета — займёт меньше минуты",
-                "Подбор группы по возрасту и уровню",
-                "Перезвоним и подскажем расписание",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-3 text-ink/75 text-[15px]">
+              {home.contactsSection.bullets.map((t, i) => (
+                <li key={i} className="flex items-start gap-3 text-ink/75 text-[15px]">
                   <span className="mt-2 h-1.5 w-1.5 rounded-full bg-flame shrink-0" />
                   <span>{t}</span>
                 </li>

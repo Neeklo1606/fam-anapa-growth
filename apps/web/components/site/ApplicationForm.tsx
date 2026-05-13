@@ -330,9 +330,6 @@ const inputCls = (err: boolean) =>
     err ? "border-red-400/70" : "border-white/10"
   }`;
 
-const selectCls =
-  "h-12 w-full px-4 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-flame transition appearance-none";
-
 function Field({
   label,
   error,

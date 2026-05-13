@@ -7,6 +7,9 @@ import {
   type HomeVideoCard,
 } from "@/components/site/HomeShell";
 
+import { fetchPublicSite } from "@/lib/admin-api";
+import { mergeStoredHomePage } from "@/lib/home-page-content";
+
 export const metadata: Metadata = {
   title: "Футбольная академия Морева в Анапе · футбол для детей",
   description:
@@ -60,10 +63,23 @@ async function loadVideos(): Promise<HomeVideoCard[] | undefined> {
 }
 
 export default async function HomePage() {
+  let home = mergeStoredHomePage(null);
+  try {
+    const pub = await fetchPublicSite();
+    home = mergeStoredHomePage(pub.homeContent);
+  } catch {
+    /* см. layout: API может быть недоступна при сборке */
+  }
+
+  const needCoaches = home.coachesSection.useCoachesApi;
+  const needGallery = home.location.useGalleryApi;
+  const needVideos = home.videosSection.show && home.videosSection.useVideosApi;
+
   const [coaches, gallery, videos] = await Promise.all([
-    loadCoaches(),
-    loadGallery(),
-    loadVideos(),
+    needCoaches ? loadCoaches() : Promise.resolve(undefined),
+    needGallery ? loadGallery() : Promise.resolve(undefined),
+    needVideos ? loadVideos() : Promise.resolve(undefined),
   ]);
-  return <HomeShell coaches={coaches} gallery={gallery} videos={videos} />;
+
+  return <HomeShell home={home} coaches={coaches} gallery={gallery} videos={videos} />;
 }
