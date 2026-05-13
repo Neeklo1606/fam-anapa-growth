@@ -133,7 +133,16 @@ ADMIN_EMAIL="${ADMIN_EMAIL}" ADMIN_PASSWORD="${ADMIN_PASS}" ADMIN_NAME="Адми
 cd "${REPO_ROOT}"
 export NEXT_PUBLIC_SITE_URL="${PUBLIC_ORIGIN}"
 export NEXT_PUBLIC_API_URL="${PUBLIC_ORIGIN}/api"
-pnpm build
+if ! swapon --show | grep -q '^/swapfile '; then
+  if [[ ! -f /swapfile ]]; then
+    fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=progress
+    chmod 600 /swapfile
+    mkswap /swapfile
+  fi
+  swapon /swapfile || true
+fi
+pnpm --filter @fam/api build
+pnpm --filter @fam/web build
 
 pm2 delete fam-api 2>/dev/null || true
 pm2 delete fam-web 2>/dev/null || true
