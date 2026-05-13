@@ -43,7 +43,7 @@ pnpm build
 
 9. **Этап 8** ✓ (база) **Knowledge Base + RAG** — см. **этап 11** (ключ в админке). Таблицы `knowledge_documents` / chunks, админ `/admin/knowledge`, публичное API поиска/retrieve; доработки: сайт-потребление, pgvector, LLM-ответы.
 10. **Этап 9** ✓ (база) **Security & Performance**: глобальный **rate limit** (`ThrottlerGuard` + дефолт 100/мин, строже на `/auth/login`, вебхуки без лимита); **CSRF** double-submit (`fam_csrf` + `X-CSRF-Token`) для мутаций при сессионных cookies; **gzip** на API; усиленный **helmet** (без CSP на JSON API); на фронте расширены **metadata/OG/Twitter**, **COOP** + DNS-prefetch заголовки. Дальше: жёсткая CSP на Next, refresh-флоу под CSRF без исключения `/auth/refresh`.
-11. **Этап 10** — CI/CD (GitHub Actions), production backups (рекомендуется выпускать перед переносом секретов в админке на новых окружениях).
+11. **Этап 10** ✓ (база) **CI/CD + бэкапы**: [`.github/workflows/ci.yml`](.github/workflows/ci.yml) — на `push` и `pull_request` в `main`: install, `prisma generate`, typecheck, test, build. На VPS: [`deploy/backup-postgres.sh`](deploy/backup-postgres.sh) — `pg_dump` (custom) + gzip и ротация по возрасту; пример `cron` в шапке скрипта.
 12. **Этап 11** ✓ **OpenAI из админки**: `/admin/settings/ai` (только ADMIN) — API-ключ в БД + выбор модели эмбеддингов и поле модели для будущего LLM; переменная `OPENAI_API_KEY` в `.env` — **fallback**, если ключ в БД пустой.
 
 Все этапы выполняются последовательно, без поломок текущего UI.
