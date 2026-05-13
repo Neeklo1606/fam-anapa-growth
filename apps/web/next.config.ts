@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "storage.googleapis.com" },
       { protocol: "https", hostname: "morev.neeklo.ru" },
+      { protocol: "https", hostname: "footballacademymorev.ru" },
+      { protocol: "https", hostname: "www.footballacademymorev.ru" },
     ],
   },
 
