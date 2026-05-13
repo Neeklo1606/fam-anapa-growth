@@ -10,9 +10,19 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
-import type { MediaKind, Prisma } from "@prisma/client";
+import type { MediaFile as MediaRow, MediaKind, Prisma } from "@prisma/client";
 
 import { PrismaService } from "../prisma/prisma.service";
+import {
+  classifyBundledFileBasename,
+  encodeBundledMediaId,
+  isSafeBundledRelativePath,
+  scanBundledPublicFiles,
+  tryDecodeBundledMediaId,
+  type ScannedBundledFile,
+} from "./bundled-public-assets";
+
+type ListedMediaDto = MediaRow & { fromBundle: boolean };
 
 const ALLOWED_IMAGE_MIMES = new Set([
   "image/jpeg",
@@ -29,6 +39,8 @@ const MAX_VIDEO_BYTES = 120 * 1024 * 1024; // 120MB
 @Injectable()
 export class MediaService {
   private readonly logger = new Logger(MediaService.name);
+  /** Cached absolute path to `apps/web/public` (or SITE_STATIC_PUBLIC_DIR), or null if missing */
+  private bundledPublicRootMemo: string | null | undefined = undefined;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -169,31 +181,169 @@ export class MediaService {
     });
   }
 
-  async list(options: { page?: number; limit?: number; kind?: MediaKind } = {}) {
+  private async resolveBundledPublicRoot(): Promise<string | null> {
+    if (this.bundledPublicRootMemo !== undefined) return this.bundledPublicRootMemo;
+    const fromEnv = this.config.get<string>("SITE_STATIC_PUBLIC_DIR")?.trim();
+    const candidates: string[] = [];
+    if (fromEnv) candidates.push(path.resolve(fromEnv));
+    candidates.push(
+      path.resolve(process.cwd(), "..", "web", "public"),
+      path.resolve(process.cwd(), "..", "..", "apps", "web", "public"),
+      path.resolve(process.cwd(), "apps", "web", "public"),
+    );
+    for (const dir of candidates) {
+      try {
+        const st = await fs.stat(dir);
+        if (st.isDirectory()) {
+          this.logger.log(`Bundled site media scanned from ${dir}`);
+          this.bundledPublicRootMemo = dir;
+          return dir;
+        }
+      } catch {
+        /* try next */
+      }
+    }
+    this.logger.warn("SITE_STATIC_PUBLIC_DIR / apps/web/public not found — bundle media list skipped");
+    this.bundledPublicRootMemo = null;
+    return null;
+  }
+
+  private bundledRowToListedDto(s: ScannedBundledFile): ListedMediaDto {
+    const createdAt = new Date(s.mtimeMs);
+    const updatedAt = new Date(s.mtimeMs);
+    return {
+      id: encodeBundledMediaId(s.relPosix),
+      url: `/${s.relPosix}`,
+      webpUrl: null,
+      thumbUrl: null,
+      mime: s.mime,
+      kind: s.kind,
+      width: null,
+      height: null,
+      sizeBytes: s.sizeBytes,
+      altDefault: s.relPosix,
+      storagePath: null,
+      createdAt,
+      updatedAt,
+      fromBundle: true,
+    };
+  }
+
+  async list(options: {
+    page?: number;
+    limit?: number;
+    kind?: MediaKind;
+    /** If false — only uploaded files (same as legacy). Default true — merges `public/` bundle assets first. */
+    includeBundles?: boolean;
+  } = {}) {
     const page = Math.max(1, options.page ?? 1);
     const limit = Math.min(100, Math.max(1, options.limit ?? 30));
     const skip = (page - 1) * limit;
     const where: Prisma.MediaFileWhereInput = options.kind ? { kind: options.kind } : {};
-    const [items, total] = await Promise.all([
-      this.prisma.mediaFile.findMany({
+    const includeBundles = options.includeBundles !== false;
+
+    if (!includeBundles) {
+      const [items, total] = await Promise.all([
+        this.prisma.mediaFile.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+        }),
+        this.prisma.mediaFile.count({ where }),
+      ]);
+      const withFlag = items.map((row) =>
+        ({ ...row, fromBundle: false }) as ListedMediaDto,
+      );
+      return { items: withFlag as unknown[], total, page, limit };
+    }
+
+    let bundledRows: ListedMediaDto[] = [];
+    const bundledRoot = await this.resolveBundledPublicRoot();
+    if (bundledRoot) {
+      const scanned = await scanBundledPublicFiles(bundledRoot);
+      const filtered =
+        options.kind !== undefined ? scanned.filter((row) => row.kind === options.kind) : scanned;
+      bundledRows = filtered.map((s) => this.bundledRowToListedDto(s));
+    }
+
+    const bLen = bundledRows.length;
+    const dbTotal = await this.prisma.mediaFile.count({ where });
+    const total = bLen + dbTotal;
+
+    let pageItems: ListedMediaDto[];
+
+    if (skip < bLen) {
+      const fromB = bundledRows.slice(skip, skip + limit);
+      const need = limit - fromB.length;
+      if (need > 0) {
+        const dbSlice = await this.prisma.mediaFile.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip: 0,
+          take: need,
+        });
+        pageItems = [
+          ...fromB,
+          ...dbSlice.map((row) => ({ ...row, fromBundle: false }) as ListedMediaDto),
+        ];
+      } else {
+        pageItems = fromB;
+      }
+    } else {
+      const dbSkip = skip - bLen;
+      const dbSlice = await this.prisma.mediaFile.findMany({
         where,
         orderBy: { createdAt: "desc" },
-        skip,
+        skip: dbSkip,
         take: limit,
-      }),
-      this.prisma.mediaFile.count({ where }),
-    ]);
-    return { items, total, page, limit };
+      });
+      pageItems = dbSlice.map((row) => ({ ...row, fromBundle: false }) as ListedMediaDto);
+    }
+
+    return { items: pageItems as unknown[], total, page, limit };
   }
 
-  async findById(id: string) {
+  private async bundledFileDtoFromRelative(relPosix: string): Promise<ListedMediaDto | null> {
+    const bundledRoot = await this.resolveBundledPublicRoot();
+    if (!bundledRoot || !isSafeBundledRelativePath(relPosix, bundledRoot)) return null;
+    const absTarget = path.join(bundledRoot, ...relPosix.split("/"));
+    try {
+      const st = await fs.stat(absTarget);
+      if (!st.isFile()) return null;
+      const base = path.basename(relPosix);
+      const scanned = classifyBundledFileBasename(base);
+      if (!scanned) return null;
+      return this.bundledRowToListedDto({
+        relPosix,
+        mime: scanned.mime,
+        kind: scanned.kind,
+        sizeBytes: st.size,
+        mtimeMs: st.mtimeMs,
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async findById(id: string): Promise<ListedMediaDto> {
+    const relDecoded = tryDecodeBundledMediaId(id);
+    if (relDecoded) {
+      const dto = await this.bundledFileDtoFromRelative(relDecoded);
+      if (dto) return dto;
+      throw new NotFoundException("Файл не найден");
+    }
     const m = await this.prisma.mediaFile.findUnique({ where: { id } });
     if (!m) throw new NotFoundException("Файл не найден");
-    return m;
+    return { ...m, fromBundle: false };
   }
 
   async updateAlt(id: string, altDefault: string | null) {
-    await this.findById(id);
+    if (tryDecodeBundledMediaId(id)) {
+      throw new ConflictException("Файлы из папки public сайта здесь недоступны для правки метаданных.");
+    }
+    const exists = await this.prisma.mediaFile.findUnique({ where: { id }, select: { id: true } });
+    if (!exists) throw new NotFoundException("Файл не найден");
     return this.prisma.mediaFile.update({
       where: { id },
       data: { altDefault },
@@ -201,7 +351,13 @@ export class MediaService {
   }
 
   async remove(id: string) {
-    const m = await this.findById(id);
+    if (tryDecodeBundledMediaId(id)) {
+      throw new ConflictException(
+        "Файлы из папки public сайта удаляются только при изменении сборки и деплое — не через медиатеку.",
+      );
+    }
+    const m = await this.prisma.mediaFile.findUnique({ where: { id } });
+    if (!m) throw new NotFoundException("Файл не найден");
     const usedAsCoach = await this.prisma.coach.count({ where: { photoMediaId: id } });
     const usedAsGallery = await this.prisma.galleryItem.count({ where: { mediaId: id } });
     const usedAsVideo = await this.prisma.video.count({ where: { posterMediaId: id } });

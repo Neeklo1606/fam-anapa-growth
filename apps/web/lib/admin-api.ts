@@ -323,6 +323,8 @@ export type AdminMedia = {
   sizeBytes: number | null;
   altDefault: string | null;
   createdAt: string;
+  /** Файлы из Next `public/` (сборка), не строка загрузки в БД — только просмотр / копирование URL в этой вкладке. */
+  fromBundle?: boolean;
 };
 
 export type MediaList = { items: AdminMedia[]; total: number; page: number; limit: number };
@@ -331,11 +333,14 @@ export async function fetchMedia(params: {
   page?: number;
   limit?: number;
   kind?: AdminMedia["kind"];
+  /** По умолчанию true — вместе со статическими файлами `public/`; false — только `/uploads/…` из БД. */
+  includeBundles?: boolean;
 } = {}): Promise<MediaList> {
   const sp = new URLSearchParams();
   if (params.page) sp.set("page", String(params.page));
   if (params.limit) sp.set("limit", String(params.limit));
   if (params.kind) sp.set("kind", params.kind);
+  if (params.includeBundles === false) sp.set("includeBundles", "0");
   const qs = sp.toString() ? `?${sp.toString()}` : "";
   return callApi<MediaList>(`/media${qs}`);
 }

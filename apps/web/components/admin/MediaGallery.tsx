@@ -65,6 +65,10 @@ export function MediaGallery({
 
   const remove = (m: AdminMedia) => {
     if (!canMutate) return;
+    if (m.fromBundle) {
+      toast.message("Файлы из папки public сайта не удаляются здесь — только при обновлении сборки и деплое.");
+      return;
+    }
     if (!confirm("Удалить файл? Восстановить не получится.")) return;
     startTransition(async () => {
       const r = await deleteMediaAction(m.id);
@@ -157,6 +161,11 @@ export function MediaGallery({
                 key={m.id}
                 className="group relative rounded-xl overflow-hidden border border-line bg-white aspect-square"
               >
+                {m.fromBundle ? (
+                  <span className="absolute top-1.5 left-1.5 z-10 text-[8px] uppercase tracking-wider bg-night/80 text-white px-1.5 py-0.5 rounded">
+                    Сборка
+                  </span>
+                ) : null}
                 {isVid ? (
                   /* eslint-disable-next-line jsx-a11y/media-has-caption */
                   <video
@@ -182,7 +191,7 @@ export function MediaGallery({
                     {prettySize(m.sizeBytes)}
                   </div>
                   <div
-                    className={`flex items-center gap-1 ${canMutate ? "justify-between" : "justify-start"}`}
+                    className={`flex items-center gap-1 ${canMutate && !m.fromBundle ? "justify-between" : "justify-start"}`}
                   >
                     <button
                       type="button"
@@ -192,7 +201,7 @@ export function MediaGallery({
                     >
                       <Copy className="h-3 w-3" /> URL
                     </button>
-                    {canMutate ? (
+                    {canMutate && !m.fromBundle ? (
                       <button
                         type="button"
                         onClick={() => remove(m)}

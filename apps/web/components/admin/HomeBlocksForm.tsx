@@ -141,13 +141,13 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         <span className="block">
           Пока главная не сохранена как отдельный JSON, или в настройках указаны дефолты из кода сайта, браузер показывает
           ролики и картинки из <code className="text-[10px]">apps/web/public</code> (<code className="text-[10px]">/hero.mp4</code>,{" "}
-          <code className="text-[10px]">/img/…</code>) — они лежат в репозитории и{" "}
-          <strong className="font-medium text-ink/65">не попадают в медиатеку</strong> и не ищутся в выборе ниже.
+          <code className="text-[10px]">/img/…</code>). Во вкладке «Медиа» они тоже есть в общем каталоге (метка{" "}
+          <strong className="font-medium text-ink/65">«Сборка»</strong>) — там можно скопировать публичный URL.
         </span>
         <span className="block">
-          В выборе доступны только файлы, которые кто-то загрузил в разделе «Медиа» (<code className="text-[10px]">/uploads/…</code> в
-          БД). Сохранение этой формы с «статичными» путями <code className="text-[10px]">/img/…</code> не выполняется — сначала загрузите нужные
-          копии на сервер.
+          В полях выбора медиа <strong className="font-medium text-ink/65">ниже</strong> доступны только загрузки на сервер (
+          <code className="text-[10px]">/uploads/…</code> в БД). Сохранение этой формы с путями вида <code className="text-[10px]">/img/…</code>{" "}
+          не выполняется — при необходимости загрузите копию файла в «Медиа» и выберите её здесь.
         </span>
       </p>
 

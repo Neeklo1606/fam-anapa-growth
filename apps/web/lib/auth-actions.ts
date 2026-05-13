@@ -408,12 +408,15 @@ export type ListMediaItem = {
   mime: string;
   kind: "IMAGE" | "VIDEO" | "POSTER" | "DOCUMENT";
   altDefault: string | null;
+  fromBundle?: boolean;
 };
 
 export async function listMediaAction(params: {
   page?: number;
   limit?: number;
   kind?: ListMediaItem["kind"];
+  /** false — только загрузки; в формах с политикой «только Медиа» используйте false. */
+  includeBundles?: boolean;
 } = {}): Promise<{
   ok: boolean;
   error?: string;
@@ -426,6 +429,7 @@ export async function listMediaAction(params: {
   sp.set("page", String(params.page ?? 1));
   sp.set("limit", String(params.limit ?? 100));
   if (params.kind) sp.set("kind", params.kind);
+  if (params.includeBundles === false) sp.set("includeBundles", "0");
   const r = await authedJson<{
     items: ListMediaItem[];
     total: number;

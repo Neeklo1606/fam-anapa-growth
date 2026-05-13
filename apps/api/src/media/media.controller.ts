@@ -40,10 +40,14 @@ export class MediaController {
     @Query("page") pageRaw?: string,
     @Query("limit") limitRaw?: string,
     @Query("kind") kind?: MediaKind,
+    /** `0` / `false` — только загрузки в БД (для выбора в формах с политикой `/uploads/`). */
+    @Query("includeBundles") includeBundlesRaw?: string,
   ) {
     const page = pageRaw ? Number(pageRaw) : 1;
     const limit = limitRaw ? Number(limitRaw) : 30;
-    return this.media.list({ page, limit, kind });
+    const ib = includeBundlesRaw?.trim().toLowerCase();
+    const includeBundles = ib !== "0" && ib !== "false" && ib !== "no";
+    return this.media.list({ page, limit, kind, includeBundles });
   }
 
   @Get(":id")

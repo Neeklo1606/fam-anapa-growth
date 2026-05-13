@@ -56,7 +56,7 @@ export function MediaPicker({
     if (!open) return;
     setLoading(true);
     let cancelled = false;
-    listMediaAction({ page: 1, limit: 100, kind: kindFilter })
+    listMediaAction({ page: 1, limit: 100, kind: kindFilter, includeBundles: false })
       .then((r) => {
         if (cancelled) return;
         if (!r.ok) {
@@ -81,7 +81,7 @@ export function MediaPicker({
     if (list.length >= total) return;
     const next = lastPage + 1;
     setLoadingMore(true);
-    listMediaAction({ page: next, limit: 100, kind: kindFilter })
+    listMediaAction({ page: next, limit: 100, kind: kindFilter, includeBundles: false })
       .then((r) => {
         if (!r.ok) {
           toast.error("Не удалось подгрузить медиа", { description: r.error });
