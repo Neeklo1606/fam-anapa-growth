@@ -10,6 +10,7 @@ import { Queue, Worker } from "bullmq";
 import Redis from "ioredis";
 
 import { PrismaService } from "../prisma/prisma.service";
+import { LeadNotificationMailService } from "./lead-notification-mail.service";
 import { TelegramNotifyIntegrationService } from "../telegram-notify/telegram-notify-integration.service";
 
 export const NOTIFICATIONS_QUEUE_NAME = "fam-notifications";
@@ -39,6 +40,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly telegramNotify: TelegramNotifyIntegrationService,
+    private readonly leadMail: LeadNotificationMailService,
   ) {}
 
   onModuleInit() {
@@ -155,11 +157,14 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     );
 
     const hook = await this.telegramNotify.getLeadOutboundWebhookUrl();
+    const wantEmail = this.leadMail.isEnabled();
 
     let telegramSent = false;
     let telegramErr: Error | undefined;
     let webhookSent = false;
     let webhookErr: Error | undefined;
+    let emailSent = false;
+    let emailErr: Error | undefined;
 
     if (token && chatTargets.length > 0) {
       for (const chatId of chatTargets) {
@@ -212,35 +217,55 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       }
     }
 
+    if (wantEmail) {
+      try {
+        await this.leadMail.sendLeadCreated(lead, adminBase);
+        emailSent = true;
+      } catch (e) {
+        emailErr = e as Error;
+        this.logger.warn(`Email: ${emailErr.message}`);
+      }
+    }
+
     const wantTelegram = Boolean(token && chatTargets.length > 0);
-    const outboundConfigured = Boolean(wantTelegram || hook);
+    const outboundConfigured = Boolean(wantTelegram || hook || wantEmail);
 
     if (!outboundConfigured) {
       this.logger.warn(
-        "Нет одобренных Telegram-чатов и не настроен webhook — текст заявки только в логе.",
+        "Не настроены каналы уведомлений (Telegram, webhook, email) — текст заявки только в логе.",
       );
       this.logger.log(`[dry-run notify lead ${lead.id}]\n${text.replace(/<[^>]+>/g, "")}`);
       return;
     }
 
-    if (telegramSent || webhookSent) {
+    if (telegramSent || webhookSent || emailSent) {
       const hookUrl = hook?.slice(0, 255);
-      await this.persistNotificationLeadCreated(lead.id, telegramSent, webhookSent, hookUrl);
+      const emailRecipients = this.config.get<string>("LEAD_NOTIFICATION_EMAIL_TO")?.trim();
+      await this.persistNotificationLeadCreated({
+        leadId: lead.id,
+        hadTelegram: telegramSent,
+        hadWebhook: webhookSent,
+        hadEmail: emailSent,
+        webhookRecipientHint: hookUrl,
+        emailRecipientHint: emailRecipients?.slice(0, 255),
+      });
     }
 
     const needTgOk = wantTelegram;
     const needHookOk = Boolean(hook);
+    const needEmailOk = wantEmail;
 
     const tgFailed = needTgOk && !telegramSent;
     const whFailed = needHookOk && !webhookSent;
+    const emFailed = needEmailOk && !emailSent;
 
-    if (!tgFailed && !whFailed) {
+    if (!tgFailed && !whFailed && !emFailed) {
       return;
     }
 
-    if (telegramSent || webhookSent) {
+    if (telegramSent || webhookSent || emailSent) {
       this.logger.warn(
-        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent}`,
+        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent} email=${emailSent}`,
       );
       return;
     }
@@ -248,37 +273,52 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     const detail = [
       tgFailed && telegramErr?.message && `telegram: ${telegramErr.message}`,
       whFailed && webhookErr?.message && `webhook: ${webhookErr.message}`,
+      emFailed && emailErr?.message && `email: ${emailErr.message}`,
     ]
       .filter(Boolean)
       .join("; ");
     throw new Error(`notify_failed:${detail || "all_channels"}`);
   }
 
-  private async persistNotificationLeadCreated(
-    leadId: string,
-    hadTelegram: boolean,
-    hadWebhook: boolean,
-    webhookRecipientHint: string | undefined,
-  ) {
+  private async persistNotificationLeadCreated(opts: {
+    leadId: string;
+    hadTelegram: boolean;
+    hadWebhook: boolean;
+    hadEmail: boolean;
+    webhookRecipientHint?: string;
+    emailRecipientHint?: string;
+  }) {
     try {
-      if (hadTelegram) {
+      if (opts.hadTelegram) {
         await this.prisma.notification.create({
           data: {
             channel: "TELEGRAM",
             recipient: "telegram_subscribers",
-            payload: { leadId } as object,
+            payload: { leadId: opts.leadId } as object,
             status: "SENT",
             attempts: 1,
             sentAt: new Date(),
           },
         });
       }
-      if (hadWebhook) {
+      if (opts.hadWebhook) {
         await this.prisma.notification.create({
           data: {
             channel: "WEBHOOK",
-            recipient: webhookRecipientHint?.slice(0, 255) ?? "webhook",
-            payload: { leadId } as object,
+            recipient: opts.webhookRecipientHint?.slice(0, 255) ?? "webhook",
+            payload: { leadId: opts.leadId } as object,
+            status: "SENT",
+            attempts: 1,
+            sentAt: new Date(),
+          },
+        });
+      }
+      if (opts.hadEmail) {
+        await this.prisma.notification.create({
+          data: {
+            channel: "EMAIL",
+            recipient: opts.emailRecipientHint?.slice(0, 255) ?? "email",
+            payload: { leadId: opts.leadId } as object,
             status: "SENT",
             attempts: 1,
             sentAt: new Date(),

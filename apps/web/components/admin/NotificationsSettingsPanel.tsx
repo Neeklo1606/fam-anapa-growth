@@ -113,6 +113,11 @@ export function NotificationsSettingsPanel({
           <code className="text-ink/80">/start notify</code> — заявка попадает в список ниже; одобрите чат,
           чтобы слать туда новые заявки.
         </p>
+        <p className="text-sm text-ink/50">
+          Копию новой заявки на почту включают переменные <code className="text-ink/70">SMTP_*</code> и{" "}
+          <code className="text-ink/70">LEAD_NOTIFICATION_EMAIL_TO</code> на сервере API (см.{" "}
+          <code className="text-ink/70">apps/api/.env.example</code>).
+        </p>
 
         {initial.integration.webhookUrl && (
           <div className="text-xs font-mono-pro break-all bg-surface rounded-lg p-3 border border-line">
