@@ -17,6 +17,8 @@ export function MediaPicker({
   assetKind = "IMAGE",
   clearableFallback,
   onFallbackClear,
+  /** Если true — в списке и загрузках видны файлы сборки из `public` + загрузки. Для главной страницы. */
+  includeBundles = false,
 }: {
   value: { id: string; url: string; thumbUrl: string | null } | null;
   onChange: (v: { id: string; url: string; thumbUrl: string | null } | null) => void;
@@ -29,6 +31,7 @@ export function MediaPicker({
   /** Показать «Очистить» при сохранённом URL в fallback (форма хранит только строку без `value`). */
   clearableFallback?: boolean;
   onFallbackClear?: () => void;
+  includeBundles?: boolean;
 }) {
   const isVideo = assetKind === "VIDEO";
   const kindFilter = assetKind;
@@ -56,7 +59,7 @@ export function MediaPicker({
     if (!open) return;
     setLoading(true);
     let cancelled = false;
-    listMediaAction({ page: 1, limit: 100, kind: kindFilter, includeBundles: false })
+    listMediaAction({ page: 1, limit: 100, kind: kindFilter, includeBundles })
       .then((r) => {
         if (cancelled) return;
         if (!r.ok) {
@@ -74,14 +77,14 @@ export function MediaPicker({
     return () => {
       cancelled = true;
     };
-  }, [open, kindFilter]);
+  }, [open, kindFilter, includeBundles]);
 
   const loadMore = () => {
     if (loading || loadingMore) return;
     if (list.length >= total) return;
     const next = lastPage + 1;
     setLoadingMore(true);
-    listMediaAction({ page: next, limit: 100, kind: kindFilter, includeBundles: false })
+    listMediaAction({ page: next, limit: 100, kind: kindFilter, includeBundles })
       .then((r) => {
         if (!r.ok) {
           toast.error("Не удалось подгрузить медиа", { description: r.error });

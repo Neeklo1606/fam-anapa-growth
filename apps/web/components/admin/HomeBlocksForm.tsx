@@ -15,52 +15,61 @@ const inputCls =
 const taCls =
   "min-h-[88px] w-full px-3 py-2 rounded-lg border border-line bg-white text-sm focus:outline-none focus:border-flame";
 
-function isUploadedMediaUrl(s: string): boolean {
+function dangerousUrlSchemeHead(s: string): boolean {
+  const h = s.trim().slice(0, 22).toLowerCase();
+  return (
+    h.startsWith("javascript:") ||
+    h.startsWith("data:") ||
+    h.startsWith("vbscript:") ||
+    h.startsWith("file:")
+  );
+}
+
+/** Путь статики сайта (/img/…), загрузки (/uploads/…) или абсолютный http(s). */
+function isAllowedHomeAssetUrl(s: string): boolean {
   const t = s.trim();
   if (!t) return false;
-  if (t.startsWith("/uploads/")) return true;
+  if (dangerousUrlSchemeHead(t)) return false;
+  if (t.startsWith("//")) return false;
+  if (t.startsWith("/")) {
+    if (t.includes("..")) return false;
+    if (/[\n\r\0\\]/.test(t)) return false;
+    return true;
+  }
   try {
     const u = new URL(t);
-    return u.pathname.includes("/uploads/");
+    return u.protocol === "http:" || u.protocol === "https:";
   } catch {
     return false;
   }
 }
 
-function validateHomeMedia(h: HomePageContent): string[] {
+function validateHomeBeforeSave(h: HomePageContent): string[] {
   const errs: string[] = [];
-  if (!isUploadedMediaUrl(h.hero.videoSrc)) {
-    errs.push("Hero: основное видео — только из «Медиа» (MP4/WebM).");
-  }
-  if (!isUploadedMediaUrl(h.hero.posterSrc)) {
-    errs.push("Hero: постер — только изображение из «Медиа».");
-  }
-  if (!isUploadedMediaUrl(h.about.imageUrl)) {
-    errs.push("Об академии: фото — только из «Медиа».");
-  }
-  if (!isUploadedMediaUrl(h.goalkeeper.videoWebmSrc)) {
-    errs.push("Школа вратарей: WebM — только из «Медиа».");
-  }
-  if (!isUploadedMediaUrl(h.goalkeeper.videoMp4Src)) {
-    errs.push("Школа вратарей: MP4 — только из «Медиа».");
-  }
-  if (!isUploadedMediaUrl(h.goalkeeper.videoPoster)) {
-    errs.push("Школа вратарей: постер видео — только из «Медиа».");
-  }
+
+  const need = (ok: boolean, msg: string) => {
+    if (!ok) errs.push(msg);
+  };
+
+  need(isAllowedHomeAssetUrl(h.hero.videoSrc), "Hero: укажите URL основного видео (например /hero.mp4 или из «Медиа»).");
+  need(isAllowedHomeAssetUrl(h.hero.posterSrc), "Hero: укажите URL постера.");
+  need(isAllowedHomeAssetUrl(h.about.imageUrl), "Об академии: укажите URL изображения.");
+  need(isAllowedHomeAssetUrl(h.goalkeeper.videoWebmSrc), "Школа вратарей: укажите URL WebM.");
+  need(isAllowedHomeAssetUrl(h.goalkeeper.videoMp4Src), "Школа вратарей: укажите URL MP4.");
+  need(isAllowedHomeAssetUrl(h.goalkeeper.videoPoster), "Школа вратарей: укажите URL постера видео.");
 
   if (!h.coachesSection.useCoachesApi) {
     h.coachesSection.staticCoaches.forEach((c, i) => {
-      if (!isUploadedMediaUrl(c.photoUrl)) errs.push(`Тренеры · статичная карточка ${i + 1}: фото только из «Медиа».`);
+      need(isAllowedHomeAssetUrl(c.photoUrl), `Тренеры · карточка ${i + 1}: укажите URL фото.`);
     });
   }
 
   if (!h.location.useGalleryApi) {
     h.location.carouselSlides.forEach((s, i) => {
-      if (!isUploadedMediaUrl(s.src)) {
-        errs.push(`Локация · слайд карусели ${i + 1}: только изображение из «Медиа».`);
-      }
+      need(isAllowedHomeAssetUrl(s.src), `Локация · слайд ${i + 1}: укажите URL изображения.`);
     });
   }
+
   return errs;
 }
 
@@ -83,10 +92,10 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
     setSaving(true);
     const toastLoadingId = "home-settings-save";
     try {
-      const mediaErrs = validateHomeMedia(form);
-      if (mediaErrs.length > 0) {
-        toast.error("Сохранение отменено: проверьте медиа", {
-          description: mediaErrs.slice(0, 6).join(" · "),
+      const urlErrs = validateHomeBeforeSave(form);
+      if (urlErrs.length > 0) {
+        toast.error("Сохранение отменено: проверьте адреса файлов", {
+          description: urlErrs.slice(0, 8).join(" · "),
           duration: 14_000,
         });
         return;
@@ -152,15 +161,13 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
 
       <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed space-y-2">
         <span className="block">
-          Пока главная не сохранена как отдельный JSON, или в настройках указаны дефолты из кода сайта, браузер показывает
-          ролики и картинки из <code className="text-[10px]">apps/web/public</code> (<code className="text-[10px]">/hero.mp4</code>,{" "}
-          <code className="text-[10px]">/img/…</code>). Во вкладке «Медиа» они тоже есть в общем каталоге (метка{" "}
-          <strong className="font-medium text-ink/65">«Сборка»</strong>) — там можно скопировать публичный URL.
+          Медиа для героя, блоков и статичных карточек можно задать путями сайта (<code className="text-[10px]">/img/…</code>,{" "}
+          <code className="text-[10px]">/hero.mp4</code> и т.д.) или выбрать загрузки из вкладки «Медиа» (
+          <code className="text-[10px]">/uploads/…</code>). Уже подставленные из сборки файлы есть в том же каталоге с меткой{" "}
+          <strong className="font-medium text-ink/65">«Сборка»</strong>.
         </span>
         <span className="block">
-          В полях выбора медиа <strong className="font-medium text-ink/65">ниже</strong> доступны только загрузки на сервер (
-          <code className="text-[10px]">/uploads/…</code> в БД). Сохранение этой формы с путями вида <code className="text-[10px]">/img/…</code>{" "}
-          не выполняется — при необходимости загрузите копию файла в «Медиа» и выберите её здесь.
+          После нажатия «Сохранить» конфиг записывается в базу и сразу влияет на отображение главной (слияние с дефолтами из кода).
         </span>
       </p>
 
@@ -233,13 +240,14 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
 
       <Section title="Hero (видео)">
         <div className="grid sm:grid-cols-2 gap-4">
-          <Field label="Видео (только из «Медиа»)">
+          <Field label="Видео">
             <MediaPicker
               assetKind="VIDEO"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.hero.videoSrc || null}
-              hint="Загрузите MP4 или WebM в разделе «Медиа», затем выберите здесь."
+              hint="MP4 или WebM: из «Медиа», метка «Сборка», или уже заданный путь (/hero.mp4 …)."
               onChange={(v) =>
                 setForm((f) => ({
                   ...f,
@@ -248,13 +256,14 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Постер (изображение из «Медиа»)">
+          <Field label="Постер">
             <MediaPicker
               assetKind="IMAGE"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.hero.posterSrc || null}
-              hint="Картинка до воспроизведения (WebP будет предпочтителен при выборе из библиотеки)."
+              hint="WebP после загрузки в «Медиа», либо путь вида /img/… или выбор из «Сборки»."
               onChange={(v) =>
                 setForm((f) => ({
                   ...f,
@@ -360,13 +369,14 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Изображение (только из «Медиа»)">
+          <Field label="Изображение">
             <MediaPicker
               assetKind="IMAGE"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.about.imageUrl || null}
-              hint="Загрузите в «Медиа» или выберите уже загруженный снимок."
+              hint="Из «Медиа», «Сборки» или существующий путь сайта (/img/…)."
               onChange={(v) =>
                 setForm((f) => ({
                   ...f,
@@ -431,9 +441,10 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Видео WebM (из «Медиа»)">
+          <Field label="Видео WebM">
             <MediaPicker
               assetKind="VIDEO"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.goalkeeper.videoWebmSrc || null}
@@ -446,9 +457,10 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Видео MP4 (из «Медиа»)">
+          <Field label="Видео MP4">
             <MediaPicker
               assetKind="VIDEO"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.goalkeeper.videoMp4Src || null}
@@ -461,9 +473,10 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Постер видео (изображение из «Медиа»)">
+          <Field label="Постер видео">
             <MediaPicker
               assetKind="IMAGE"
+              includeBundles
               value={null}
               clearableFallback
               fallbackPreviewUrl={form.goalkeeper.videoPoster || null}
@@ -673,10 +686,11 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
             <div className="pt-1">
               <MediaPicker
                 assetKind="IMAGE"
+                includeBundles
                 value={null}
                 clearableFallback
                 fallbackPreviewUrl={c.photoUrl || null}
-                hint="Фото тренера только из медиатеки."
+                hint="«Медиа», метка «Сборка», пути /img/…"
                 onChange={(v) => {
                   const next = [...form.coachesSection.staticCoaches];
                   next[idx] = { ...c, photoUrl: v?.url ?? "" };
@@ -822,17 +836,18 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
         <p className="text-xs text-ink/50">
-          Слайды ниже задаются только если галерея с API выключена. Каждый кадр — изображение из «Медиа».
+          Слайды ниже — только когда галерея с API выключена. Изображение: загрузки, «Сборка» или путь /img/…
         </p>
         {form.location.carouselSlides.map((s, idx) => (
           <div key={idx} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start border border-line rounded-xl p-4">
             <div className="flex-1 min-w-[220px]">
               <MediaPicker
                 assetKind="IMAGE"
+                includeBundles
                 value={null}
                 clearableFallback
                 fallbackPreviewUrl={s.src || null}
-                hint="Только загруженные в «Медиа» файлы."
+                hint="«Медиа», «Сборка» или путь /img/…"
                 onChange={(v) => {
                   const next = [...form.location.carouselSlides];
                   next[idx] = { ...s, src: v?.url ?? "" };
