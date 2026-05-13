@@ -34,7 +34,7 @@ export function Header() {
             width={48}
             height={48}
             priority
-            className="h-9 w-9 md:h-11 md:w-11 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] transition group-hover:scale-105"
+            className="h-9 w-9 md:h-11 md:w-11 object-contain mix-blend-multiply drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] transition group-hover:scale-105"
           />
           <span className="hidden sm:block leading-none min-w-0">
             <span className="block font-display text-[13px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase truncate">

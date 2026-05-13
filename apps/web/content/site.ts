@@ -26,7 +26,6 @@ export const CONTACTS = {
 
 export const HERO = {
   media: { type: "video" as const, src: "/hero.mp4", poster: heroImg },
-  metaLine: ["6–14 лет", "Анапа", "ФАМ"],
 };
 
 export const ABOUT = {

@@ -213,34 +213,11 @@ function Hero() {
             </span>
           </h1>
 
-          <div className="mt-7 flex items-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-white/60 font-mono-pro">
-            {HERO.metaLine.map((m, i) => (
-              <span key={m} className="flex items-center gap-3 sm:gap-4">
-                {i > 0 && <span className="h-px w-5 sm:w-6 bg-white/25" />}
-                <span>{m}</span>
-              </span>
-            ))}
-          </div>
-
           <div className="mt-9 lg:mt-10">
             <ApplyButton>Записать ребёнка</ApplyButton>
           </div>
         </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40 pointer-events-none"
-      >
-        <span className="text-[10px] uppercase tracking-[0.3em] font-mono-pro">Scroll</span>
-        <motion.span
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity }}
-          className="h-8 w-px bg-white/30"
-        />
-      </motion.div>
     </section>
   );
 }
