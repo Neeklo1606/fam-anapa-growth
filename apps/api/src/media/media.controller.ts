@@ -35,7 +35,7 @@ export class MediaController {
   constructor(private readonly media: MediaService) {}
 
   @Get()
-  @Roles("ADMIN", "EDITOR", "VIEWER")
+  @Roles("ADMIN", "EDITOR", "VIEWER", "MANAGER")
   list(
     @Query("page") pageRaw?: string,
     @Query("limit") limitRaw?: string,
@@ -47,13 +47,13 @@ export class MediaController {
   }
 
   @Get(":id")
-  @Roles("ADMIN", "EDITOR", "VIEWER")
+  @Roles("ADMIN", "EDITOR", "VIEWER", "MANAGER")
   getOne(@Param("id") id: string) {
     return this.media.findById(id);
   }
 
   @Post("upload")
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN", "EDITOR", "MANAGER")
   @UseInterceptors(
     FileInterceptor("file", {
       limits: { fileSize: 12 * 1024 * 1024 },
@@ -74,13 +74,13 @@ export class MediaController {
   }
 
   @Patch(":id")
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN", "EDITOR", "MANAGER")
   updateAlt(@Param("id") id: string, @Body() dto: UpdateAltDto) {
     return this.media.updateAlt(id, dto.altDefault ?? null);
   }
 
   @Delete(":id")
-  @Roles("ADMIN", "EDITOR")
+  @Roles("ADMIN", "EDITOR", "MANAGER")
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param("id") id: string) {
     await this.media.remove(id);

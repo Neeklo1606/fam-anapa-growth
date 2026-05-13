@@ -12,7 +12,14 @@ import {
   uploadMediaAction,
 } from "@/lib/auth-actions";
 
-export function MediaGallery({ initial }: { initial: MediaList }) {
+export function MediaGallery({
+  initial,
+  canMutate = true,
+}: {
+  initial: MediaList;
+  /** ADMIN / EDITOR / MANAGER; VIEWER — только просмотр */
+  canMutate?: boolean;
+}) {
   const [items, setItems] = useState<AdminMedia[]>(initial.items);
   const [total, setTotal] = useState(initial.total);
   const [page, setPage] = useState(initial.page);
@@ -29,6 +36,7 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
   }, [initial.items, initial.total, initial.page, initial.limit]);
 
   const upload = async (file: File) => {
+    if (!canMutate) return;
     const fd = new FormData();
     fd.append("file", file);
     if (file.name) fd.append("alt", file.name.replace(/\.[a-z0-9]+$/i, ""));
@@ -56,6 +64,7 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
   };
 
   const remove = (m: AdminMedia) => {
+    if (!canMutate) return;
     if (!confirm("Удалить файл? Восстановить не получится.")) return;
     startTransition(async () => {
       const r = await deleteMediaAction(m.id);
@@ -96,38 +105,44 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
 
   return (
     <div className="space-y-6">
-      <div
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={onDrop}
-        className="rounded-2xl border-2 border-dashed border-line bg-white/60 p-8 text-center"
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={onFile}
-        />
-        <Upload className="mx-auto h-6 w-6 text-flame" />
-        <p className="mt-3 text-sm text-ink/65">
-          Перетащите файл сюда или{" "}
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="text-flame hover:underline"
-          >
-            выберите изображение
-          </button>
-        </p>
-        <p className="mt-1 text-[10px] uppercase tracking-wider text-ink/40">
-          JPG · PNG · WebP · AVIF · GIF · SVG · до 12MB
-        </p>
-        {pending && (
-          <p className="mt-3 text-xs text-ink/55 inline-flex items-center gap-2">
-            <Loader2 className="h-3 w-3 animate-spin" /> Обработка…
+      {canMutate ? (
+        <div
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={onDrop}
+          className="rounded-2xl border-2 border-dashed border-line bg-white/60 p-8 text-center"
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onFile}
+          />
+          <Upload className="mx-auto h-6 w-6 text-flame" />
+          <p className="mt-3 text-sm text-ink/65">
+            Перетащите файл сюда или{" "}
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="text-flame hover:underline"
+            >
+              выберите изображение
+            </button>
           </p>
-        )}
-      </div>
+          <p className="mt-1 text-[10px] uppercase tracking-wider text-ink/40">
+            JPG · PNG · WebP · AVIF · GIF · SVG · до 12MB
+          </p>
+          {pending && (
+            <p className="mt-3 text-xs text-ink/55 inline-flex items-center gap-2">
+              <Loader2 className="h-3 w-3 animate-spin" /> Обработка…
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-line bg-white/60 p-6 text-center text-sm text-ink/55">
+          Загрузка недоступна для вашей роли. Нужны права ADMIN, EDITOR или MANAGER.
+        </div>
+      )}
 
       {items.length === 0 ? (
         <p className="text-center text-ink/40 py-10">Файлов пока нет.</p>
@@ -151,7 +166,9 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
                   <div className="text-[9px] uppercase text-white/60 font-mono-pro mb-1">
                     {m.mime.replace("image/", "")} · {prettySize(m.sizeBytes)}
                   </div>
-                  <div className="flex items-center justify-between gap-1">
+                  <div
+                    className={`flex items-center gap-1 ${canMutate ? "justify-between" : "justify-start"}`}
+                  >
                     <button
                       type="button"
                       onClick={() => copy(m.webpUrl ?? m.url)}
@@ -160,15 +177,17 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
                     >
                       <Copy className="h-3 w-3" /> URL
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => remove(m)}
-                      disabled={pending}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-red-500/20 hover:bg-red-500/30 text-white disabled:opacity-40"
-                      title="Удалить"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    {canMutate ? (
+                      <button
+                        type="button"
+                        onClick={() => remove(m)}
+                        disabled={pending}
+                        className="h-7 w-7 inline-flex items-center justify-center rounded-md bg-red-500/20 hover:bg-red-500/30 text-white disabled:opacity-40"
+                        title="Удалить"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    ) : null}
                   </div>
                 </div>
               </li>

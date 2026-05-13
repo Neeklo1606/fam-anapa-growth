@@ -1,5 +1,12 @@
-import { fetchMedia } from "@/lib/admin-api";
+import { fetchMedia, fetchMe, type MediaList } from "@/lib/admin-api";
 import { MediaGallery } from "@/components/admin/MediaGallery";
+
+const emptyList = (page: number): MediaList => ({
+  items: [],
+  total: 0,
+  page,
+  limit: 60,
+});
 
 export default async function AdminMediaPage({
   searchParams,
@@ -8,7 +15,19 @@ export default async function AdminMediaPage({
 }) {
   const sp = await searchParams;
   const page = sp.page ? Number(sp.page) : 1;
-  const list = await fetchMedia({ page, limit: 60 });
+  const user = await fetchMe();
+
+  let list: MediaList = emptyList(page);
+  let listError: string | null = null;
+  try {
+    list = await fetchMedia({ page, limit: 60 });
+  } catch (e) {
+    listError = e instanceof Error ? e.message : String(e);
+  }
+
+  const canMutate =
+    user &&
+    (user.role === "ADMIN" || user.role === "EDITOR" || user.role === "MANAGER");
 
   return (
     <div className="space-y-8">
@@ -23,10 +42,29 @@ export default async function AdminMediaPage({
             <code className="text-xs bg-surface px-1 rounded">public/img</code> не дублируются здесь — их
             можно выбрать в форме тренера / постера видео (блок «Статика сайта»).
           </p>
+          {user?.role === "VIEWER" && (
+            <p className="mt-2 text-sm text-ink/65">
+              Роль <strong className="font-medium">VIEWER</strong>: просмотр и копирование URL. Загрузка и
+              удаление доступны только <strong className="font-medium">ADMIN / EDITOR / MANAGER</strong>.
+            </p>
+          )}
         </div>
       </header>
 
-      <MediaGallery initial={list} />
+      {listError && (
+        <div
+          role="alert"
+          className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-900 space-y-1"
+        >
+          <div className="font-semibold">Не удалось загрузить список медиа</div>
+          <div className="text-red-800/90 font-mono-pro text-[12px] break-words">{listError}</div>
+          <p className="text-red-800/80 pt-1">
+            Обновите страницу или выполните вход заново. Если ошибка 403 — проверьте роль пользователя и версию API на сервере.
+          </p>
+        </div>
+      )}
+
+      <MediaGallery initial={list} canMutate={Boolean(canMutate)} />
     </div>
   );
 }

@@ -27,15 +27,21 @@ async function callApi<T>(
   const withCsrf = shouldAttachCsrf(init.method ?? "GET");
 
   const url = `${INTERNAL_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
-  const res = await fetch(url, {
-    ...init,
-    cache: "no-store",
-    headers: {
-      ...(init.headers as Record<string, string> | undefined),
-      cookie: cookieHeader,
-      ...(withCsrf && csrf ? { "x-csrf-token": csrf } : {}),
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...init,
+      cache: "no-store",
+      headers: {
+        ...(init.headers as Record<string, string> | undefined),
+        cookie: cookieHeader,
+        ...(withCsrf && csrf ? { "x-csrf-token": csrf } : {}),
+      },
+    });
+  } catch (e) {
+    const hint = e instanceof Error ? e.message : String(e);
+    throw new Error(`${hint} (проверьте INTERNAL_API_URL и доступность API)`);
+  }
   if (!res.ok) {
     let detail: string | undefined;
     try {
