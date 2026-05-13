@@ -133,20 +133,6 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
 
   return (
     <form onSubmit={submit} className="grid gap-3" noValidate>
-      <Field label="Направление">
-        <select
-          value={data.direction}
-          onChange={(e) => update("direction", e.target.value)}
-          className={selectCls}
-        >
-          {FORM_DIRECTIONS.map((d) => (
-            <option key={d} value={d} className="bg-night text-white">
-              {d}
-            </option>
-          ))}
-        </select>
-      </Field>
-
       <Field label="Опыт занятий в спортивных школах">
         <div
           role="radiogroup"

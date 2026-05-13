@@ -79,8 +79,9 @@ export const LOCATION = {
   image: fieldImg,
   address: CONTACTS.address,
   mapUrl: CONTACTS.yandexMaps,
+  /** Yandex Maps embed (без собственного API-ключа на фронте) */
   embedSrc:
-    "https://www.openstreetmap.org/export/embed.html?bbox=37.30%2C44.87%2C37.40%2C44.93&layer=mapnik&marker=44.8946%2C37.3163",
+    "https://yandex.ru/map-widget/v1/?ll=37.316300%2C44.894600&z=14&pt=37.316300,44.894600,pm2rdm",
 };
 
 export const NAV_LINKS = [

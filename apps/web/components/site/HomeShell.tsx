@@ -161,8 +161,11 @@ function VideosStrip({ videos }: { videos?: HomeVideoCard[] }) {
 
 function Hero() {
   return (
-    <section className="relative min-h-[100svh] bg-night text-white overflow-hidden flex items-center">
-      <div className="absolute inset-0">
+    <section
+      className="relative bg-night text-white overflow-hidden flex items-center"
+      style={{ minHeight: "min(820px, 86svh)" }}
+    >
+      <div className="absolute inset-0 pointer-events-none">
         <HeroVideo
           videoSrc={HERO.media.src}
           posterSrc={HERO.media.poster}
@@ -175,19 +178,21 @@ function Hero() {
         <div className="absolute inset-0 club-stripes opacity-50" />
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 lg:px-8 pt-24 lg:pt-32 pb-16 lg:pb-24">
+      <div
+        className="relative mx-auto w-full max-w-7xl"
+        style={{
+          paddingLeft: "clamp(1.25rem, 5vw, 2rem)",
+          paddingRight: "clamp(1.25rem, 5vw, 2rem)",
+          paddingTop: "clamp(5.5rem, 14vw, 8rem)",
+          paddingBottom: "clamp(2.5rem, 7vw, 6rem)",
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-4xl"
         >
-          <div className="flex items-center gap-3 mb-5">
-            <span className="h-px w-8 bg-flame" />
-            <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.4em] text-flame font-mono-pro font-medium">
-              Футбольная школа · Анапа
-            </span>
-          </div>
           <h1
             className="font-display text-white text-balance"
             style={{
@@ -226,7 +231,7 @@ function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40"
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 text-white/40 pointer-events-none"
       >
         <span className="text-[10px] uppercase tracking-[0.3em] font-mono-pro">Scroll</span>
         <motion.span
@@ -245,8 +250,8 @@ function About() {
       id="about"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
@@ -261,7 +266,7 @@ function About() {
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-              <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay" />
+              <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay pointer-events-none" />
               <div className="absolute bottom-5 left-5 right-5">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-flame">FAM · Команда</div>
                 <div className="font-display text-2xl md:text-3xl mt-1">Анапа · Россия</div>
@@ -271,9 +276,6 @@ function About() {
 
           <div className="lg:col-span-6 order-1 lg:order-2">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                01 · Об академии
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -325,14 +327,11 @@ function GoalkeeperSchool() {
       id="goalkeeper"
       className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20"
     >
-      <div className="absolute inset-0 club-stripes-dark opacity-60" />
+      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                02 · Программа
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{
@@ -347,7 +346,7 @@ function GoalkeeperSchool() {
                 {GOALKEEPER.body}
               </p>
               <div className="mt-7">
-                <ApplyButton>Оставить заявку</ApplyButton>
+                <ApplyButton>Записать ребёнка</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -413,15 +412,12 @@ function Principles() {
       id="principles"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute top-1/2 -left-32 h-[400px] w-[400px] bg-flame/15 blur-[140px] rounded-full -translate-y-1/2 pointer-events-none" />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <Reveal>
-          <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-            03 · Принципы
-          </div>
           <h2
             className="mt-4 font-display tracking-tight"
             style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -522,9 +518,6 @@ function Coaches({ coaches }: { coaches?: HomeCoach[] }) {
         <Reveal>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                04 · Тренеры
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-deep"
                 style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
@@ -631,15 +624,12 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
       id="location"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15" />
-      <div className="absolute inset-0 club-stripes opacity-40" />
+      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
+      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
             <Reveal>
-              <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-                05 · Локация
-              </div>
               <h2
                 className="mt-4 font-display tracking-tight text-white"
                 style={{
@@ -677,7 +667,7 @@ function Location({ gallery }: { gallery?: HomeGallerySlide[] }) {
               </div>
 
               <div className="mt-7">
-                <ApplyButton>Оставить заявку</ApplyButton>
+                <ApplyButton>Записать ребёнка</ApplyButton>
               </div>
             </Reveal>
           </div>
@@ -761,13 +751,10 @@ function ApplySection() {
       id="contacts"
       className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20"
     >
-      <div className="absolute inset-0 club-stripes-dark opacity-60" />
+      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <Reveal>
-            <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
-              06 · Запись
-            </div>
             <h2
               className="mt-4 font-display tracking-tight text-deep"
               style={{
@@ -796,7 +783,6 @@ function ApplySection() {
             </ul>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <ApplyButton>Оставить заявку</ApplyButton>
               <a
                 href={CONTACTS.max}
                 target="_blank"

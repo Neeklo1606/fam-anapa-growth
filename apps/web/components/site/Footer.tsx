@@ -30,13 +30,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="flex items-center gap-3">
-              <Image
-                src="/img/logo.webp"
-                alt="Академия Морева"
-                width={48}
-                height={48}
-                className="h-12 w-12 object-contain"
-              />
+              <Image src="/img/logo.webp" alt="Академия Морева" width={64} height={64} className="h-16 w-16 object-contain" />
               <div className="leading-tight">
                 <div className="font-display text-xl tracking-wide uppercase">Академия Морева</div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/45 font-mono-pro">
