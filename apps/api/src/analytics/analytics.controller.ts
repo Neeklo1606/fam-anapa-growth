@@ -6,9 +6,8 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
 } from "@nestjs/common";
-import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
+import { Throttle } from "@nestjs/throttler";
 import { AnalyticsEventType, Prisma } from "@prisma/client";
 import { Allow, IsEnum, IsOptional, IsString, MaxLength } from "class-validator";
 
@@ -54,7 +53,6 @@ export class AnalyticsController {
 
   @Post("events")
   @HttpCode(HttpStatus.OK)
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   async ingest(@Req() req: Request, @Body() dto: AnalyticsIngestDto) {
     const ua = req.headers["user-agent"];

@@ -10,6 +10,7 @@ import { AccessTokenPayload, AuthenticatedUser, RefreshTokenPayload } from "./au
 
 const ACCESS_COOKIE = "fam_access";
 const REFRESH_COOKIE = "fam_refresh";
+const CSRF_COOKIE = "fam_csrf";
 
 type TokenPair = { accessToken: string; refreshToken: string };
 
@@ -25,6 +26,7 @@ export class AuthService {
 
   static readonly ACCESS_COOKIE = ACCESS_COOKIE;
   static readonly REFRESH_COOKIE = REFRESH_COOKIE;
+  static readonly CSRF_COOKIE = CSRF_COOKIE;
 
   async login(
     email: string,
@@ -114,6 +116,11 @@ export class AuthService {
       path: "/",
       maxAge: maxAgeMs,
     };
+  }
+
+  /** CSRF double-submit cookie (эмиссия только с сервером SSR / Next cookie store). */
+  csrfCookieOptions() {
+    return this.cookieOptions(this.ttlRefreshMs());
   }
 
   ttlAccessMs(): number {

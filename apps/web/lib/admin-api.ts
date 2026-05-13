@@ -10,6 +10,12 @@ import type { LeadStatus, UserRole } from "@fam/types";
 
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
 
+const UNSAFE_HTTP = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+function shouldAttachCsrf(method: string | undefined): boolean {
+  return UNSAFE_HTTP.has(String(method ?? "GET").toUpperCase());
+}
+
 async function callApi<T>(
   path: string,
   init: RequestInit = {},
@@ -17,13 +23,17 @@ async function callApi<T>(
 ): Promise<T> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
+  const withCsrf = shouldAttachCsrf(init.method ?? "GET");
+
   const url = `${INTERNAL_API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
   const res = await fetch(url, {
     ...init,
     cache: "no-store",
     headers: {
-      ...(init.headers ?? {}),
+      ...(init.headers as Record<string, string> | undefined),
       cookie: cookieHeader,
+      ...(withCsrf && csrf ? { "x-csrf-token": csrf } : {}),
     },
   });
   if (!res.ok) {
@@ -195,6 +205,41 @@ export async function fetchCoachesAdmin(): Promise<AdminCoach[]> {
 
 export async function fetchCoach(id: string): Promise<AdminCoach> {
   return callApi<AdminCoach>(`/coaches/${id}`);
+}
+
+export type AdminKnowledgeDocBrief = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  published: boolean;
+  sourceUrl: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _count: { chunks: number };
+};
+
+export type AdminKnowledgeDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  body: string;
+  published: boolean;
+  sourceUrl: string | null;
+  meta: unknown;
+  updatedAt: string;
+  createdAt: string;
+  chunkCount: number;
+  embeddedChunkCount: number;
+};
+
+export async function fetchKnowledgeAdmin(): Promise<AdminKnowledgeDocBrief[]> {
+  return callApi<AdminKnowledgeDocBrief[]>("/knowledge/admin");
+}
+
+export async function fetchKnowledgeDoc(id: string): Promise<AdminKnowledgeDetail> {
+  return callApi<AdminKnowledgeDetail>(`/knowledge/admin/${id}`);
 }
 
 export type AdminMedia = {

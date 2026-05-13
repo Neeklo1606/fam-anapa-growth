@@ -5,6 +5,12 @@ import { redirect } from "next/navigation";
 
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
 
+const UNSAFE_HTTP = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+function shouldAttachCsrf(method: string | undefined): boolean {
+  return UNSAFE_HTTP.has(String(method ?? "GET").toUpperCase());
+}
+
 type LoginInput = { email: string; password: string };
 type LoginResult =
   | { ok: true }
@@ -76,15 +82,20 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
 export async function logoutAction(): Promise<void> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
   try {
     await fetch(`${INTERNAL_API_BASE}/auth/logout`, {
       method: "POST",
-      headers: { cookie: cookieHeader },
+      headers: {
+        cookie: cookieHeader,
+        ...(csrf ? { "x-csrf-token": csrf } : {}),
+      },
       cache: "no-store",
     });
   } catch {}
   jar.delete("fam_access");
   jar.delete("fam_refresh");
+  jar.delete("fam_csrf");
   redirect("/admin/login");
 }
 
@@ -97,10 +108,15 @@ export type UpdateStatusInput = {
 export async function updateLeadStatusAction(input: UpdateStatusInput): Promise<{ ok: boolean; error?: string }> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
   try {
     const res = await fetch(`${INTERNAL_API_BASE}/leads/${input.id}/status`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", cookie: cookieHeader },
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieHeader,
+        ...(csrf ? { "x-csrf-token": csrf } : {}),
+      },
       body: JSON.stringify({ status: input.status, note: input.note }),
       cache: "no-store",
     });
@@ -114,10 +130,15 @@ export async function updateLeadStatusAction(input: UpdateStatusInput): Promise<
 export async function addLeadCommentAction(input: { id: string; body: string }): Promise<{ ok: boolean; error?: string }> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
   try {
     const res = await fetch(`${INTERNAL_API_BASE}/leads/${input.id}/comments`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", cookie: cookieHeader },
+      headers: {
+        "Content-Type": "application/json",
+        cookie: cookieHeader,
+        ...(csrf ? { "x-csrf-token": csrf } : {}),
+      },
       body: JSON.stringify({ body: input.body }),
       cache: "no-store",
     });
@@ -134,12 +155,15 @@ async function authedJson<T = unknown>(
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
+  const withCsrf = shouldAttachCsrf(init.method ?? "POST");
   try {
     const res = await fetch(`${INTERNAL_API_BASE}${path}`, {
       ...init,
       headers: {
-        ...(init.headers ?? {}),
+        ...(init.headers as Record<string, string> | undefined),
         cookie: cookieHeader,
+        ...(withCsrf && csrf ? { "x-csrf-token": csrf } : {}),
       },
       cache: "no-store",
     });
@@ -279,6 +303,71 @@ export async function reorderCoachesAction(items: Array<{ id: string; order: num
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
+export type KnowledgeInput = {
+  title: string;
+  slug: string;
+  summary?: string;
+  body: string;
+  sourceUrl?: string;
+  published?: boolean;
+  meta?: Record<string, unknown>;
+};
+
+export async function createKnowledgeDocAction(
+  input: KnowledgeInput,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const r = await authedJson<{ id: string }>("/knowledge/admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!r.ok) return { ok: false, error: r.error };
+  const id = r.data?.id;
+  if (!id || typeof id !== "string") return { ok: false, error: "Нет идентификатора в ответе API" };
+  return { ok: true, id };
+}
+
+export async function updateKnowledgeDocAction(
+  input: { id: string } & Partial<KnowledgeInput>,
+): Promise<{ ok: boolean; error?: string }> {
+  const { id, ...patch } = input;
+  const r = await authedJson(`/knowledge/admin/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function deleteKnowledgeDocAction(id: string): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/knowledge/admin/${id}`, { method: "DELETE" });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function rebuildKnowledgeChunksAction(id: string): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/knowledge/admin/${id}/chunks/rebuild`, { method: "POST" });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function embedKnowledgeChunksAction(id: string): Promise<{
+  ok: boolean;
+  error?: string;
+  updated?: number;
+  message?: string;
+}> {
+  const r = await authedJson<{ ok: boolean; updated?: number; message?: string }>(
+    `/knowledge/admin/${id}/embeddings`,
+    { method: "POST" },
+  );
+  if (!r.ok) return { ok: false, error: r.error };
+  const d = r.data;
+  if (d && d.ok === false) return { ok: false, message: d.message };
+  return {
+    ok: true,
+    updated: d?.updated,
+  };
+}
+
 export async function listMediaAction(params: { page?: number; limit?: number } = {}): Promise<{ ok: boolean; error?: string; items?: Array<{ id: string; url: string; webpUrl: string | null; thumbUrl: string | null; mime: string; altDefault: string | null }> }> {
   const sp = new URLSearchParams();
   sp.set("page", String(params.page ?? 1));
@@ -293,10 +382,14 @@ export async function listMediaAction(params: { page?: number; limit?: number } 
 export async function uploadMediaAction(form: FormData): Promise<{ ok: boolean; error?: string; id?: string; url?: string; webpUrl?: string | null; thumbUrl?: string | null }> {
   const jar = await cookies();
   const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const csrf = jar.get("fam_csrf")?.value;
   try {
     const res = await fetch(`${INTERNAL_API_BASE}/media/upload`, {
       method: "POST",
-      headers: { cookie: cookieHeader },
+      headers: {
+        cookie: cookieHeader,
+        ...(csrf ? { "x-csrf-token": csrf } : {}),
+      },
       body: form,
       cache: "no-store",
     });

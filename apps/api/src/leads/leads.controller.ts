@@ -15,7 +15,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ThrottlerGuard, Throttle } from "@nestjs/throttler";
+import { Throttle } from "@nestjs/throttler";
 import type { Request } from "express";
 import type { LeadStatus } from "@prisma/client";
 
@@ -40,7 +40,6 @@ export class LeadsController {
   // ────────────── PUBLIC ──────────────
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async create(@Body() dto: CreateLeadDto, @Req() req: Request, @Ip() ip: string) {
     if (dto.website && dto.website.trim().length > 0) {

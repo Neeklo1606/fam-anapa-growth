@@ -420,6 +420,43 @@ model AISettings {
 }
 
 // -----------------------------------------------------------------------------
+// Knowledge base (Этап 8): тексты + чанки для RAG / embeddings
+// -----------------------------------------------------------------------------
+
+model KnowledgeDocument {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  summary   String?  @db.Text
+  body      String   @db.Text
+  sourceUrl String?
+  published Boolean  @default(false)
+  meta      Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chunks KnowledgeChunk[]
+
+  @@index([published, updatedAt])
+  @@map("knowledge_documents")
+}
+
+model KnowledgeChunk {
+  id         String   @id @default(cuid())
+  documentId String
+  ordinal    Int
+  content    String   @db.Text
+  /// Вектор эмбеддинга (JSON-массив чисел), опционально; заполняется при наличии OPENAI_API_KEY
+  embedding  Json?
+
+  document KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, ordinal])
+  @@index([documentId])
+  @@map("knowledge_chunks")
+}
+
+// -----------------------------------------------------------------------------
 // Analytics + audit
 // -----------------------------------------------------------------------------
 

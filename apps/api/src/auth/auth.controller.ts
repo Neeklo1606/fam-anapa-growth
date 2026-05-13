@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+
 import {
   Body,
   Controller,
@@ -13,7 +15,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
-import { ThrottlerGuard, Throttle } from "@nestjs/throttler";
+import { Throttle } from "@nestjs/throttler";
 import type { Request, Response } from "express";
 
 import { AuthService } from "./auth.service";
@@ -32,7 +34,6 @@ export class AuthController {
   ) {}
 
   @Post("login")
-  @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 8, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   async login(
@@ -54,6 +55,7 @@ export class AuthController {
   }
 
   @Post("refresh")
+  @Throttle({ default: { limit: 40, ttl: 60_000 } })
   @HttpCode(HttpStatus.OK)
   async refresh(
     @Req() req: Request,
@@ -81,7 +83,12 @@ export class AuthController {
 
   @Get("me")
   @UseGuards(JwtAuthGuard)
-  me(@CurrentUser() user: AuthenticatedUser | null) {
+  me(
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    this.issueCsrfIfNeeded(req, res);
     return { user };
   }
 
@@ -98,6 +105,15 @@ export class AuthController {
     this.clearCookies(res);
   }
 
+  private issueCsrfIfNeeded(req: Request, res: Response) {
+    const c = (req.cookies as Record<string, string | undefined> | undefined)?.[
+      AuthService.CSRF_COOKIE
+    ];
+    if (typeof c === "string" && c.length >= 16) return;
+    const token = randomBytes(32).toString("hex");
+    res.cookie(AuthService.CSRF_COOKIE, token, this.auth.csrfCookieOptions());
+  }
+
   private setCookies(res: Response, access: string, refresh: string) {
     res.cookie(AuthService.ACCESS_COOKIE, access, this.auth.cookieOptions(this.auth.ttlAccessMs()));
     res.cookie(
@@ -105,10 +121,13 @@ export class AuthController {
       refresh,
       this.auth.cookieOptions(this.auth.ttlRefreshMs()),
     );
+    const token = randomBytes(32).toString("hex");
+    res.cookie(AuthService.CSRF_COOKIE, token, this.auth.csrfCookieOptions());
   }
 
   private clearCookies(res: Response) {
     res.clearCookie(AuthService.ACCESS_COOKIE, { path: "/" });
     res.clearCookie(AuthService.REFRESH_COOKIE, { path: "/" });
+    res.clearCookie(AuthService.CSRF_COOKIE, { path: "/" });
   }
 }

@@ -5,12 +5,14 @@ import {
   Post,
   Req,
 } from "@nestjs/common";
+import { SkipThrottle } from "@nestjs/throttler";
 import type { Request } from "express";
 
 import { TelegramNotifyInboundService } from "./telegram-notify-inbound.service";
 import { TelegramNotifyIntegrationService } from "./telegram-notify-integration.service";
 
 @Controller("integrations/telegram")
+@SkipThrottle()
 export class TelegramNotifyWebhookController {
   constructor(
     private readonly integration: TelegramNotifyIntegrationService,

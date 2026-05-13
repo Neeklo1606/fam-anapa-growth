@@ -6,6 +6,7 @@ import {
   Req,
   UnauthorizedException,
 } from "@nestjs/common";
+import { SkipThrottle } from "@nestjs/throttler";
 import type { Request } from "express";
 
 import { MaxNotifyInboundService } from "./max-notify-inbound.service";
@@ -16,6 +17,7 @@ import { MaxNotifyIntegrationService } from "./max-notify-integration.service";
  * Тело может отличаться от OpenAPI-схемы — передаём сырой JSON.
  */
 @Controller("integrations/max")
+@SkipThrottle()
 export class MaxNotifyWebhookController {
   constructor(
     private readonly integration: MaxNotifyIntegrationService,
