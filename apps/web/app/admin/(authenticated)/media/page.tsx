@@ -37,10 +37,13 @@ export default async function AdminMediaPage({
             Сайт
           </div>
           <h1 className="mt-2 font-display text-3xl tracking-tight">Медиа</h1>
-          <p className="mt-1 text-sm text-ink/55">
-            Всего файлов: {list.total}. Загруженные изображения конвертируются в WebP. Картинки из{" "}
-            <code className="text-xs bg-surface px-1 rounded">public/img</code> не дублируются здесь — их
-            можно выбрать в форме тренера / постера видео (блок «Статика сайта»).
+          <p className="mt-1 text-sm text-ink/55 max-w-3xl">
+            Всего записей в библиотеке: <strong className="font-medium text-ink/70">{list.total}</strong>. Сюда попадают только
+            файлы, загруженные через эту страницу или API (папка <code className="text-xs bg-surface px-1 rounded">uploads</code> в
+            БД). Ролики и картинки, которые видны на главной с путями <code className="text-xs bg-surface px-1 rounded">/hero.mp4</code>,{" "}
+            <code className="text-xs bg-surface px-1 rounded">/img/…</code>, лежат в <code className="text-xs bg-surface px-1 rounded">public</code> сборки и здесь{" "}
+            <strong className="font-medium text-ink/70">не отображаются</strong>, пока вы сами не загрузите их как новые файлы. Изображения при загрузке дополнительно
+            конвертируются в WebP.
           </p>
           {user?.role === "VIEWER" && (
             <p className="mt-2 text-sm text-ink/65">

@@ -261,10 +261,19 @@ export function MediaPicker({
                 {loading ? (
                   <p className="text-center py-10 text-ink/40">Загрузка…</p>
                 ) : list.length === 0 ? (
-                  <p className="text-center py-10 text-ink/40">
-                    {isVideo
-                      ? "Видео в медиатеке пока нет. Загрузите MP4 или WebM (до 120MB)."
-                      : "В медиатеке пока пусто. Загрузите файл или выберите картинку из «Статика сайта» выше."}
+                  <p className="text-center py-10 text-ink/45 text-sm leading-relaxed max-w-md mx-auto px-2">
+                    {isVideo ? (
+                      <>
+                        В библиотеке нет загруженных MP4/WebM. Ролик главной из кода сайта (<code className="text-[11px]">/hero.mp4</code>)
+                        лежит в <code className="text-[11px]">public</code> и сюда автоматически не подставляется — нажмите «Загрузить» выше
+                        или добавьте файл в разделе «Медиа» (до 120MB).
+                      </>
+                    ) : (
+                      <>
+                        Загруженных изображений ещё нет. Файлы из <code className="text-[11px]">public/img</code> для сайта здесь не
+                        дублируются автоматически — при необходимости загрузите их вручную.
+                      </>
+                    )}
                   </p>
                 ) : (
                   <>

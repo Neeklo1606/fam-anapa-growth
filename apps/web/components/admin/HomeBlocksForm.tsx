@@ -137,11 +137,18 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </button>
       </div>
 
-      <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed">
-        Все фото и видеофайлы главной (герой, блоки, статичные карточки при отключённом API) выбираются только из{" "}
-        <strong className="font-medium text-ink/70">«Медиа»</strong> — загрузка на сервер по пути{" "}
-        <code className="text-[10px]">/uploads/…</code>. Сохранение с путями <code className="text-[10px]">/img/…</code>{" "}
-        или внешними URL для этих полей не выполняется.
+      <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed space-y-2">
+        <span className="block">
+          Пока главная не сохранена как отдельный JSON, или в настройках указаны дефолты из кода сайта, браузер показывает
+          ролики и картинки из <code className="text-[10px]">apps/web/public</code> (<code className="text-[10px]">/hero.mp4</code>,{" "}
+          <code className="text-[10px]">/img/…</code>) — они лежат в репозитории и{" "}
+          <strong className="font-medium text-ink/65">не попадают в медиатеку</strong> и не ищутся в выборе ниже.
+        </span>
+        <span className="block">
+          В выборе доступны только файлы, которые кто-то загрузил в разделе «Медиа» (<code className="text-[10px]">/uploads/…</code> в
+          БД). Сохранение этой формы с «статичными» путями <code className="text-[10px]">/img/…</code> не выполняется — сначала загрузите нужные
+          копии на сервер.
+        </span>
       </p>
 
       <fieldset className="rounded-2xl border border-line bg-white p-5 space-y-4">
