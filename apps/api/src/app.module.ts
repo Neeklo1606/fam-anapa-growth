@@ -12,6 +12,8 @@ import { CoachesModule } from "./coaches/coaches.module";
 import { MediaModule } from "./media/media.module";
 import { GalleryModule } from "./gallery/gallery.module";
 import { VideosModule } from "./videos/videos.module";
+import { AnalyticsModule } from "./analytics/analytics.module";
+import { MaxNotifyModule } from "./max-notify/max-notify.module";
 import { TelegramNotifyModule } from "./telegram-notify/telegram-notify.module";
 
 @Module({
@@ -28,6 +30,8 @@ import { TelegramNotifyModule } from "./telegram-notify/telegram-notify.module";
     GalleryModule,
     VideosModule,
     TelegramNotifyModule,
+    MaxNotifyModule,
+    AnalyticsModule,
   ],
   controllers: [HealthController],
 })

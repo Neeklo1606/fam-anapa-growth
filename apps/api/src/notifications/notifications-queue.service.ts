@@ -11,6 +11,7 @@ import Redis from "ioredis";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { LeadNotificationMailService } from "./lead-notification-mail.service";
+import { MaxNotifyIntegrationService } from "../max-notify/max-notify-integration.service";
 import { TelegramNotifyIntegrationService } from "../telegram-notify/telegram-notify-integration.service";
 
 export const NOTIFICATIONS_QUEUE_NAME = "fam-notifications";
@@ -23,7 +24,11 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function telegramLimit(text: string, max = 3800): string {
+function plainLimit(text: string, max = 3800): string {
+  return text.length <= max ? text : `${text.slice(0, max - 20)}\n…`;
+}
+
+function telegramHtmlLimit(text: string, max = 3800): string {
   return text.length <= max ? text : `${text.slice(0, max - 40)}\n<i>…усечено</i>`;
 }
 
@@ -40,6 +45,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly telegramNotify: TelegramNotifyIntegrationService,
+    private readonly maxNotify: MaxNotifyIntegrationService,
     private readonly leadMail: LeadNotificationMailService,
   ) {}
 
@@ -131,7 +137,34 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       `<b>ID:</b> <code>${escapeHtml(lead.id)}</code>`,
       `<a href="${escapeHtml(leadUrl)}">Открыть в админке</a>`,
     );
-    return telegramLimit(lines.join("\n"));
+    return telegramHtmlLimit(lines.join("\n"));
+  }
+
+  private formatLeadPlainLead(lead: Lead, adminBase: string): string {
+    const leadUrl = `${adminBase.replace(/\/$/, "")}/admin/leads/${lead.id}`;
+    const lines = [
+      "Новая заявка · FAM",
+      "",
+      `Родитель: ${lead.parentName}`,
+      `Ребёнок: ${lead.childName}`,
+      `Телефон: ${lead.phone}`,
+    ];
+    if (lead.childAge != null) lines.push(`Возраст (форма): ${lead.childAge}`);
+    if (lead.childBirthDate)
+      lines.push(`Дата рождения: ${lead.childBirthDate.toISOString().slice(0, 10)}`);
+    if (lead.email) lines.push(`Email: ${lead.email}`);
+    if (lead.telegram) lines.push(`Telegram: ${lead.telegram}`);
+    if (lead.whatsapp) lines.push(`WhatsApp: ${lead.whatsapp}`);
+    if (lead.direction) lines.push(`Направление: ${lead.direction}`);
+    if (lead.comment) lines.push("", "Комментарий:", lead.comment.slice(0, 900));
+    if (lead.utmSource || lead.utmMedium || lead.utmCampaign) {
+      lines.push(
+        "",
+        `UTM: ${[lead.utmSource, lead.utmMedium, lead.utmCampaign].filter(Boolean).join(" · ")}`,
+      );
+    }
+    lines.push("", `ID: ${lead.id}`, leadUrl);
+    return plainLimit(lines.join("\n"));
   }
 
   private async processLeadCreated(payload: LeadCreatedPayload) {
@@ -227,18 +260,38 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       }
     }
 
+    const maxToken = await this.maxNotify.getBotTokenForOutbound();
+    const maxRecipients = await this.maxNotify.getApprovedSubscriberUserIds();
+    const wantMax = Boolean(maxToken && maxRecipients.length > 0);
+    const maxPlain = this.formatLeadPlainLead(lead, adminBase);
+
+    let maxSent = false;
+    let maxErr: Error | undefined;
+
+    if (maxToken && maxRecipients.length > 0) {
+      for (const uid of maxRecipients) {
+        try {
+          await this.maxNotify.sendDmText(maxToken, uid, maxPlain);
+          maxSent = true;
+        } catch (e) {
+          maxErr = e as Error;
+          this.logger.warn(`MAX uid ${uid}: ${maxErr.message}`);
+        }
+      }
+    }
+
     const wantTelegram = Boolean(token && chatTargets.length > 0);
-    const outboundConfigured = Boolean(wantTelegram || hook || wantEmail);
+    const outboundConfigured = Boolean(wantTelegram || hook || wantEmail || wantMax);
 
     if (!outboundConfigured) {
       this.logger.warn(
-        "Не настроены каналы уведомлений (Telegram, webhook, email) — текст заявки только в логе.",
+        "Не настроены каналы уведомлений (Telegram, webhook, email, MAX) — текст заявки только в логе.",
       );
       this.logger.log(`[dry-run notify lead ${lead.id}]\n${text.replace(/<[^>]+>/g, "")}`);
       return;
     }
 
-    if (telegramSent || webhookSent || emailSent) {
+    if (telegramSent || webhookSent || emailSent || maxSent) {
       const hookUrl = hook?.slice(0, 255);
       const emailRecipients = this.config.get<string>("LEAD_NOTIFICATION_EMAIL_TO")?.trim();
       await this.persistNotificationLeadCreated({
@@ -246,6 +299,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
         hadTelegram: telegramSent,
         hadWebhook: webhookSent,
         hadEmail: emailSent,
+        hadMax: maxSent,
         webhookRecipientHint: hookUrl,
         emailRecipientHint: emailRecipients?.slice(0, 255),
       });
@@ -254,18 +308,20 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     const needTgOk = wantTelegram;
     const needHookOk = Boolean(hook);
     const needEmailOk = wantEmail;
+    const needMaxOk = wantMax;
 
     const tgFailed = needTgOk && !telegramSent;
     const whFailed = needHookOk && !webhookSent;
     const emFailed = needEmailOk && !emailSent;
+    const mxFailed = needMaxOk && !maxSent;
 
-    if (!tgFailed && !whFailed && !emFailed) {
+    if (!tgFailed && !whFailed && !emFailed && !mxFailed) {
       return;
     }
 
-    if (telegramSent || webhookSent || emailSent) {
+    if (telegramSent || webhookSent || emailSent || maxSent) {
       this.logger.warn(
-        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent} email=${emailSent}`,
+        `Уведомление частично: telegram=${telegramSent} webhook=${webhookSent} email=${emailSent} max=${maxSent}`,
       );
       return;
     }
@@ -274,6 +330,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
       tgFailed && telegramErr?.message && `telegram: ${telegramErr.message}`,
       whFailed && webhookErr?.message && `webhook: ${webhookErr.message}`,
       emFailed && emailErr?.message && `email: ${emailErr.message}`,
+      mxFailed && maxErr?.message && `max: ${maxErr.message}`,
     ]
       .filter(Boolean)
       .join("; ");
@@ -285,6 +342,7 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
     hadTelegram: boolean;
     hadWebhook: boolean;
     hadEmail: boolean;
+    hadMax: boolean;
     webhookRecipientHint?: string;
     emailRecipientHint?: string;
   }) {
@@ -318,6 +376,18 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
           data: {
             channel: "EMAIL",
             recipient: opts.emailRecipientHint?.slice(0, 255) ?? "email",
+            payload: { leadId: opts.leadId } as object,
+            status: "SENT",
+            attempts: 1,
+            sentAt: new Date(),
+          },
+        });
+      }
+      if (opts.hadMax) {
+        await this.prisma.notification.create({
+          data: {
+            channel: "MAX",
+            recipient: "max_subscribers",
             payload: { leadId: opts.leadId } as object,
             status: "SENT",
             attempts: 1,

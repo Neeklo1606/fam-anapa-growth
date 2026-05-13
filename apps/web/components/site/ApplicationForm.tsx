@@ -11,6 +11,7 @@ import { ru } from "date-fns/locale";
 import { FORM_DIRECTIONS } from "@/content/site";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { trackSiteEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { submitLead, LeadSubmitError } from "@/lib/api";
 
@@ -87,6 +88,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         landingPage: typeof window !== "undefined" ? window.location.pathname : undefined,
       });
       setDone(true);
+      trackSiteEvent({ type: "FORM_SUBMIT", page: typeof window !== "undefined" ? window.location.pathname : "/", section: "apply_form" });
       toast.success("Заявка отправлена", { description: "Свяжемся с вами в течение дня." });
     } catch (err) {
       if (err instanceof LeadSubmitError) {

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { trackSiteEvent } from "@/lib/analytics";
+
 type Props = {
   videoSrc: string;
   posterSrc: string;
@@ -20,6 +22,7 @@ export function HeroVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const playTracked = useRef(false);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -57,6 +60,15 @@ export function HeroVideo({
           loop
           playsInline
           preload="metadata"
+          onPlaying={() => {
+            if (playTracked.current) return;
+            playTracked.current = true;
+            trackSiteEvent({
+              type: "VIDEO_PLAY",
+              page: window.location.pathname,
+              section: "hero",
+            });
+          }}
           {...({ "webkit-playsinline": "true" } as Record<string, string>)}
           disablePictureInPicture
           disableRemotePlayback

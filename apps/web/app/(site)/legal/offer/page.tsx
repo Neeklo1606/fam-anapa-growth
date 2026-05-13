@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 
 import { LegalLayout } from "@/components/site/LegalLayout";
+import { SITE_URL } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Публичная оферта",
   description: "Публичная оферта на оказание услуг футбольной академии Морева.",
-  alternates: { canonical: "/legal/offer" },
+  alternates: { canonical: `${SITE_URL}/legal/offer` },
+  openGraph: {
+    url: `${SITE_URL}/legal/offer`,
+    type: "website",
+    locale: "ru_RU",
+  },
 };
 
 export default function OfferPage() {

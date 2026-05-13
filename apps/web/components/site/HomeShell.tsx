@@ -29,6 +29,7 @@ import {
   CONTACTS,
   GALLERY,
 } from "@/content/site";
+import { trackSiteEvent } from "@/lib/analytics";
 
 export type HomeCoach = {
   id: string;
@@ -787,6 +788,9 @@ function ApplySection() {
                 href={CONTACTS.max}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  trackSiteEvent({ type: "MAX_CLICK", section: "home_contacts_strip", page: "/" })
+                }
                 className="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-full border border-deep/15 text-deep text-[11px] font-semibold uppercase tracking-[0.18em] hover:bg-deep hover:text-white transition"
               >
                 <MessageCircle className="h-4 w-4" /> MAX
@@ -816,7 +820,14 @@ function ApplySection() {
                 <div className="mt-6 flex items-center justify-between gap-4">
                   <a
                     href={`tel:${CONTACTS.phone}`}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      trackSiteEvent({
+                        type: "PHONE_CLICK",
+                        section: "home_apply_sidebar",
+                        page: "/",
+                      });
+                    }}
                     className="flex items-center gap-2 text-deep text-sm font-semibold hover:text-flame transition"
                   >
                     <Phone className="h-4 w-4" /> {CONTACTS.phoneDisplay}

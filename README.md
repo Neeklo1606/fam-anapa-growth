@@ -37,9 +37,10 @@ pnpm build
 3. **Этап 2** ✓ Prisma schema + NestJS modules (Public/Admin API, Auth/RBAC)
 4. **Этап 3** ✓ Admin panel (`/admin`) на Next.js
 5. **Этап 4** ✓ CRM заявок (статусы, фильтры, экспорт, deep-links)
-6. **Этап 5** ✓ Очередь **BullMQ** + Redis; новая заявка → **Telegram**, опционально **Webhook** и **Email (SMTP)**. Дальше по ТЗ: **MAX**.
+6. **Этап 5** ✓ Очередь **BullMQ** + Redis; новая заявка → **Telegram**, **MAX**, опционально **Webhook** и **Email (SMTP)**.
 7. **Этап 6** ✓ Медиа-центр (upload/resize/webp/thumbnails)
-8. **Этап 7** — SEO + Analytics events
+8. **Этап 7** ✓ (база) **SEO** — абсолютные canonical/OpenGraph на юридических страницах; **события аналитики** — `POST /api/analytics/events` + трекинг ключевых действий на сайте (форма, видео-герой, контакты в подвале и на главной).
+
 9. **Этап 8** — AI-ready слой (Knowledge Base, embeddings, RAG)
 10. **Этап 9** — Security & Performance (rate limit, CSRF, XSS, Lighthouse 90+)
 11. **Этап 10** — CI/CD (GitHub Actions), production backups

@@ -485,3 +485,54 @@ export async function revokeTelegramSubscriberAction(id: string): Promise<{ ok: 
   });
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
+
+export async function updateMaxNotifyAction(input: {
+  botAccessToken?: string;
+  publicAppUrl?: string | null;
+  removeBot?: boolean;
+}): Promise<{ ok: boolean; error?: string }> {
+  const body: Record<string, unknown> = {};
+  if (input.removeBot) body.removeBot = true;
+  else {
+    if (input.botAccessToken !== undefined && input.botAccessToken.trim().length >= 8) {
+      body.botAccessToken = input.botAccessToken.trim();
+    }
+    if (input.publicAppUrl !== undefined) body.publicAppUrl = input.publicAppUrl?.trim() || null;
+  }
+  const r = await authedJson("/notifications/max", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function syncMaxWebhookAction(): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson("/notifications/max/webhook/sync", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function reviewMaxSubscriberAction(input: {
+  id: string;
+  decision: "approve" | "reject";
+}): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/notifications/max/subscribers/${input.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision: input.decision }),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
+export async function revokeMaxSubscriberAction(id: string): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson(`/notifications/max/subscribers/${id}/revoke`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}

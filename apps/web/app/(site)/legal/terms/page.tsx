@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 
 import { LegalLayout } from "@/components/site/LegalLayout";
+import { SITE_URL } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Пользовательское соглашение",
   description: "Пользовательское соглашение сайта футбольной академии Морева.",
-  alternates: { canonical: "/legal/terms" },
+  alternates: { canonical: `${SITE_URL}/legal/terms` },
+  openGraph: {
+    url: `${SITE_URL}/legal/terms`,
+    type: "website",
+    locale: "ru_RU",
+  },
 };
 
 export default function TermsPage() {

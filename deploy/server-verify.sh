@@ -61,6 +61,16 @@ else
   echo "==> Telegram inbound webhook rejects unsigned POST (401) — OK"
 fi
 
+MAX_WH_CODE="$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+  "http://127.0.0.1:${API_PORT}/api/integrations/max/webhook" \
+  -H "Content-Type: application/json" \
+  -d '{}')"
+if [[ "$MAX_WH_CODE" != "401" ]]; then
+  echo "WARN: MAX webhook without secret: expected HTTP 401, got $MAX_WH_CODE"
+else
+  echo "==> MAX inbound webhook rejects unsigned POST (401) — OK"
+fi
+
 curl -sfS "http://127.0.0.1:${API_PORT}/api/gallery" | head -c 400
 echo
 curl -sfS "http://127.0.0.1:${API_PORT}/api/videos" | head -c 400

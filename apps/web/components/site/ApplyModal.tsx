@@ -10,7 +10,9 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 
+import { trackSiteEvent } from "@/lib/analytics";
 import { ApplicationForm } from "./ApplicationForm";
 
 function BallIcon({ className = "" }: { className?: string }) {
@@ -55,6 +57,12 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
 }
 
 function ApplyDialog({ onClose }: { onClose: () => void }) {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    trackSiteEvent({ type: "FORM_OPEN", page: pathname ?? "/", section: "apply_modal" });
+  }, [pathname]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}

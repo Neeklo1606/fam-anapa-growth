@@ -313,3 +313,29 @@ export type TelegramNotifyAdminState = {
 export async function fetchTelegramNotifyState(): Promise<TelegramNotifyAdminState> {
   return callApi<TelegramNotifyAdminState>("/notifications/telegram");
 }
+
+export type MaxNotifySubscriberDto = {
+  id: string;
+  maxUserId: string;
+  name: string | null;
+  username: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  reviewedAt: string | null;
+};
+
+export type MaxNotifyAdminState = {
+  integration: {
+    hasBotToken: boolean;
+    publicAppUrl: string | null;
+    webhookUrl: string | null;
+    lastWebhookError: string | null;
+  };
+  subscriptions: Record<string, unknown>[] | null;
+  subscribersPending: MaxNotifySubscriberDto[];
+  subscribersApproved: MaxNotifySubscriberDto[];
+};
+
+export async function fetchMaxNotifyState(): Promise<MaxNotifyAdminState> {
+  return callApi<MaxNotifyAdminState>("/notifications/max");
+}

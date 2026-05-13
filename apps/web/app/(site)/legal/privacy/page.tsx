@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 
 import { LegalLayout } from "@/components/site/LegalLayout";
+import { SITE_URL } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
   description: "Политика обработки персональных данных футбольной академии Морева в Анапе.",
-  alternates: { canonical: "/legal/privacy" },
+  alternates: { canonical: `${SITE_URL}/legal/privacy` },
+  openGraph: {
+    url: `${SITE_URL}/legal/privacy`,
+    type: "website",
+    locale: "ru_RU",
+  },
 };
 
 export default function PrivacyPage() {

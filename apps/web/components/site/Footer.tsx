@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { CONTACTS } from "@/content/site";
+import { FooterContactsSection } from "@/components/site/FooterContactsSection";
 
 const legal = [
   { to: "/legal/privacy", label: "Конфиденциальность" },
@@ -56,30 +56,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-4">
-            <div className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-mono-pro">Связь</div>
-            <ul className="mt-5 space-y-3 text-sm text-white/80">
-              <li>
-                <a href={`tel:${CONTACTS.phone}`} className="hover:text-flame transition">
-                  {CONTACTS.phoneDisplay}
-                </a>
-              </li>
-              <li>
-                <a href={CONTACTS.whatsapp} target="_blank" rel="noreferrer" className="hover:text-flame transition">
-                  WhatsApp
-                </a>
-                {" · "}
-                <a href={CONTACTS.telegram} target="_blank" rel="noreferrer" className="hover:text-flame transition">
-                  Telegram
-                </a>
-              </li>
-              <li>
-                <a href={CONTACTS.yandexMaps} target="_blank" rel="noreferrer" className="hover:text-flame transition">
-                  {CONTACTS.address}
-                </a>
-              </li>
-            </ul>
-          </div>
+          <FooterContactsSection />
         </div>
 
         <div className="mt-12 pt-6 border-t border-white/10 flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-white/45">

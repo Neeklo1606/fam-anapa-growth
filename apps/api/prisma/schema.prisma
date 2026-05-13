@@ -39,6 +39,7 @@ model User {
   leadHistory   LeadStatusHistory[]
   auditLogs          AuditLog[]
   telegramSubscribersApproved TelegramNotifySubscriber[] @relation("TelegramSubsReviewed")
+  maxSubsApproved          MaxNotifySubscriber[]        @relation("MaxSubsReviewed")
 
   @@index([role, isActive])
   @@map("users")
@@ -176,6 +177,32 @@ model TelegramNotifySubscriber {
 
   @@index([status, createdAt])
   @@map("telegram_notify_subscribers")
+}
+
+// -----------------------------------------------------------------------------
+// MAX (max.ru bot): notifications about leads (Этап 5)
+// -----------------------------------------------------------------------------
+
+enum MaxNotifySubscriberStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model MaxNotifySubscriber {
+  id           String                    @id @default(cuid())
+  maxUserId    String                    @unique
+  name         String?
+  username     String?
+  status       MaxNotifySubscriberStatus @default(PENDING)
+  createdAt    DateTime                  @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?
+
+  reviewedBy User? @relation("MaxSubsReviewed", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@map("max_notify_subscribers")
 }
 
 // -----------------------------------------------------------------------------
