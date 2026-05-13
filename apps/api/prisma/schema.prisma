@@ -365,7 +365,7 @@ model SiteSettings {
   logoMediaId String? @unique @map("logo_media_id")
   logoMedia    MediaFile? @relation("SiteLogo", fields: [logoMediaId], references: [id], onDelete: SetNull)
   /// Снимок/оверрайды главной страницы (JSON). Если null — используются значения по умолчанию из кода.
-  homeContent  Json?
+  homeContent  Json? @map("home_content")
   updatedAt    DateTime @updatedAt @default(now())
 
   @@map("site_settings")
