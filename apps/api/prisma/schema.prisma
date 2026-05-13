@@ -1,0 +1,415 @@
+// Prisma schema for fam-anapa-growth
+// Drives entities required by ТЗ section 15.
+// MVP focus (Этап 2): Lead + User/Role + content seed entities.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Auth / RBAC
+// -----------------------------------------------------------------------------
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         UserRole @default(VIEWER)
+  isActive     Boolean  @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+  assignedLeads Lead[]         @relation("LeadAssignedManager")
+  leadComments  LeadComment[]
+  leadHistory   LeadStatusHistory[]
+  auditLogs     AuditLog[]
+
+  @@index([role, isActive])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt])
+  @@map("refresh_tokens")
+}
+
+// -----------------------------------------------------------------------------
+// CRM: Leads
+// -----------------------------------------------------------------------------
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  CONTACTED
+  TRAINING_BOOKED
+  NO_ANSWER
+  REJECTED
+  ARCHIVED
+}
+
+enum ExperienceLevel {
+  NONE
+  YES
+}
+
+model Lead {
+  id                 String          @id @default(cuid())
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  source             String?         // "website" | "telegram" | "manual" | …
+  childName          String
+  childBirthDate     DateTime?
+  childAge           Int?
+  parentName         String
+  phone              String
+  email              String?
+  telegram           String?
+  whatsapp           String?
+  direction          String?
+  experienceLevel    ExperienceLevel @default(NONE)
+  comment            String?
+  privacyAccepted    Boolean         @default(false)
+  status             LeadStatus      @default(NEW)
+  assignedManagerId  String?
+  managerNotes       String?
+  utmSource          String?
+  utmMedium          String?
+  utmCampaign        String?
+  utmContent         String?
+  utmTerm            String?
+  landingPage        String?
+  ip                 String?
+  userAgent          String?
+  urgent             Boolean         @default(false)
+  archived           Boolean         @default(false)
+
+  assignedManager User?               @relation("LeadAssignedManager", fields: [assignedManagerId], references: [id], onDelete: SetNull)
+  history         LeadStatusHistory[]
+  comments        LeadComment[]
+
+  @@index([status, archived])
+  @@index([createdAt])
+  @@index([phone])
+  @@index([assignedManagerId])
+  @@map("leads")
+}
+
+model LeadStatusHistory {
+  id        String     @id @default(cuid())
+  leadId    String
+  fromStatus LeadStatus?
+  toStatus  LeadStatus
+  changedById String?
+  note      String?
+  createdAt DateTime   @default(now())
+
+  lead      Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  changedBy User? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([leadId, createdAt])
+  @@map("lead_status_history")
+}
+
+model LeadComment {
+  id        String   @id @default(cuid())
+  leadId    String
+  authorId  String?
+  body      String
+  createdAt DateTime @default(now())
+
+  lead   Lead  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([leadId, createdAt])
+  @@map("lead_comments")
+}
+
+// -----------------------------------------------------------------------------
+// Content entities (filled by /api/site, /api/home, etc. — Этап 2 expansion)
+// -----------------------------------------------------------------------------
+
+model Coach {
+  id               String  @id @default(cuid())
+  fullName         String
+  role             String
+  photoMediaId     String?
+  photoUrl         String? // MVP fallback while MediaCenter (Этап 6) is not live
+  education        String?
+  license          String?
+  experience       String?
+  shortDescription String  @db.Text
+  fullDescription  String? @db.Text
+  order            Int     @default(0)
+  active           Boolean @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  photo MediaFile? @relation(fields: [photoMediaId], references: [id], onDelete: SetNull)
+
+  @@index([active, order])
+  @@map("coaches")
+}
+
+enum GalleryCategory {
+  TRAININGS
+  TOURNAMENTS
+  GOALKEEPER_SCHOOL
+  FIELD
+  TEAM
+  OTHER
+}
+
+model GalleryItem {
+  id           String          @id @default(cuid())
+  mediaId      String
+  alt          String
+  title        String?
+  category     GalleryCategory @default(OTHER)
+  order        Int             @default(0)
+  active       Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  media MediaFile @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([category, order])
+  @@index([active])
+  @@map("gallery_items")
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  posterMediaId String?
+  posterUrl   String? // fallback poster (e.g. /img/...) until Media Center
+  description String?  @db.Text
+  order       Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  poster MediaFile? @relation(fields: [posterMediaId], references: [id], onDelete: SetNull)
+
+  @@index([active, order])
+  @@map("videos")
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  htmlContent String   @db.Text
+  isLegal     Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  seo SeoMeta?
+
+  @@index([slug])
+  @@map("pages")
+}
+
+model SeoMeta {
+  id           String   @id @default(cuid())
+  pageId       String?  @unique
+  pageSlug     String   @unique
+  title        String?
+  description  String?
+  keywords     String?
+  ogImage      String?
+  noindex      Boolean  @default(false)
+  jsonLd       Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  page Page? @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@map("seo_meta")
+}
+
+// -----------------------------------------------------------------------------
+// Media library (Этап 6 backend, MVP placeholder now)
+// -----------------------------------------------------------------------------
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+  POSTER
+  DOCUMENT
+}
+
+model MediaFile {
+  id            String    @id @default(cuid())
+  url           String
+  thumbUrl      String?
+  webpUrl       String?
+  mime          String
+  kind          MediaKind @default(IMAGE)
+  width         Int?
+  height        Int?
+  sizeBytes     Int?
+  altDefault    String?
+  storagePath   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  gallery GalleryItem[]
+  coaches Coach[]
+  videos  Video[]
+
+  @@index([kind])
+  @@map("media_files")
+}
+
+// -----------------------------------------------------------------------------
+// Site settings + integrations + AI (placeholders for later этапы)
+// -----------------------------------------------------------------------------
+
+model SiteSettings {
+  id           Int      @id @default(1)
+  brandName    String   @default("Футбольная академия Морева")
+  brandTagline String?
+  phone        String?
+  whatsapp     String?
+  telegram     String?
+  maxLink      String?  @map("max_link")
+  email        String?
+  address      String?
+  mapEmbed     String?  @db.Text
+  yandexMapUrl String?
+  updatedAt    DateTime @updatedAt @default(now())
+
+  @@map("site_settings")
+}
+
+model Integration {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  enabled      Boolean  @default(false)
+  config       Json
+  lastTestedAt DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("integrations")
+}
+
+enum NotificationChannel {
+  TELEGRAM
+  MAX
+  EMAIL
+  WEBHOOK
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model Notification {
+  id          String              @id @default(cuid())
+  channel     NotificationChannel
+  recipient   String
+  payload     Json
+  status      NotificationStatus  @default(PENDING)
+  attempts    Int                 @default(0)
+  error       String?
+  scheduledAt DateTime            @default(now())
+  sentAt      DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([status, channel])
+  @@map("notifications")
+}
+
+model AISettings {
+  id           Int      @id @default(1)
+  provider     String?
+  modelName    String?
+  apiKeyVault  String?
+  systemPrompt String?  @db.Text
+  contextSize  Int      @default(8000)
+  temperature  Float    @default(0.7)
+  updatedAt    DateTime @updatedAt @default(now())
+
+  @@map("ai_settings")
+}
+
+// -----------------------------------------------------------------------------
+// Analytics + audit
+// -----------------------------------------------------------------------------
+
+enum AnalyticsEventType {
+  FORM_OPEN
+  FORM_SUBMIT
+  PHONE_CLICK
+  WHATSAPP_CLICK
+  TELEGRAM_CLICK
+  MAX_CLICK
+  MAP_CLICK
+  VIDEO_PLAY
+  MENU_OPEN
+  SECTION_VIEW
+}
+
+model AnalyticsEvent {
+  id        String             @id @default(cuid())
+  type      AnalyticsEventType
+  page      String?
+  section   String?
+  metadata  Json?
+  sessionId String?
+  userAgent String?
+  ip        String?
+  createdAt DateTime           @default(now())
+
+  @@index([type, createdAt])
+  @@index([sessionId])
+  @@map("analytics_events")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  diff      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+  @@map("audit_logs")
+}

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://fam-anapa-growth.lovable.app/sitemap.xml

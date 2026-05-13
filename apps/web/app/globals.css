@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Unbounded", "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-condensed: "Bebas Neue", "Unbounded", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 14px);
+  --radius-3xl: calc(var(--radius) + 22px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-deep: var(--brand-deep);
+  --color-royal: var(--brand);
+  --color-electric: var(--brand-bright);
+  --color-flame: var(--flame);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Brand */
+  --night: oklch(0.16 0.06 268);
+  --brand-deep: oklch(0.21 0.16 271);
+  --brand: oklch(0.42 0.21 264);
+  --brand-bright: oklch(0.62 0.20 256);
+  --flame: oklch(0.72 0.16 55);
+  --surface: oklch(0.975 0.005 250);
+  --ink: oklch(0.18 0.04 265);
+  --line: oklch(0.92 0.01 255);
+
+  --background: oklch(1 0 0);
+  --foreground: var(--ink);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--ink);
+  --primary: var(--brand);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: var(--surface);
+  --secondary-foreground: var(--brand-deep);
+  --muted: var(--surface);
+  --muted-foreground: oklch(0.48 0.04 260);
+  --accent: oklch(0.95 0.02 255);
+  --accent-foreground: var(--brand-deep);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--brand-bright);
+
+  --shadow-soft: 0 1px 2px oklch(0.16 0.06 268 / 0.06), 0 8px 24px oklch(0.16 0.06 268 / 0.08);
+  --shadow-elevated: 0 2px 4px oklch(0.16 0.06 268 / 0.08), 0 24px 60px oklch(0.16 0.06 268 / 0.18);
+  --shadow-flame: 0 8px 28px oklch(0.72 0.16 55 / 0.22), 0 2px 8px oklch(0.72 0.16 55 / 0.18);
+  --gradient-brand: linear-gradient(135deg, var(--brand-deep), var(--brand) 55%, var(--brand-bright));
+  --gradient-night: linear-gradient(180deg, var(--night) 0%, var(--brand-deep) 100%);
+  --gradient-pitch: radial-gradient(ellipse at 50% 100%, oklch(0.42 0.21 264 / 0.45), transparent 60%);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    font-weight: 700;
+  }
+  body { font-feature-settings: "ss01", "cv11"; letter-spacing: -0.005em; }
+  html, body { overflow-x: hidden; }
+}
+
+@utility font-condensed { font-family: var(--font-condensed); letter-spacing: 0.01em; }
+@utility font-mono-pro { font-family: var(--font-mono); }
+@utility text-balance { text-wrap: balance; }
+
+@utility shadow-soft { box-shadow: var(--shadow-soft); }
+@utility shadow-elevated { box-shadow: var(--shadow-elevated); }
+@utility shadow-flame { box-shadow: var(--shadow-flame); }
+@utility bg-gradient-brand { background-image: var(--gradient-brand); }
+@utility bg-gradient-night { background-image: var(--gradient-night); }
+@utility bg-gradient-pitch { background-image: var(--gradient-pitch); }
+@utility text-gradient-brand {
+  background-image: linear-gradient(120deg,
+    oklch(1 0 0) 0%,
+    oklch(0.88 0.08 252) 45%,
+    oklch(0.68 0.18 254) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px oklch(0.62 0.20 256 / 0.18);
+}
+@utility text-gradient-brand-dark {
+  background-image: linear-gradient(120deg,
+    oklch(0.22 0.16 268) 0%,
+    oklch(0.38 0.24 262) 45%,
+    oklch(0.72 0.16 55) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility pitch-lines {
+  background-image:
+    linear-gradient(to right, oklch(1 0 0 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+@utility club-stripes {
+  background-image: repeating-linear-gradient(
+    90deg,
+    oklch(1 0 0 / 0.04) 0 2px,
+    transparent 2px 14px
+  );
+}
+@utility club-stripes-dark {
+  background-image: repeating-linear-gradient(
+    90deg,
+    oklch(0.21 0.16 271 / 0.07) 0 2px,
+    transparent 2px 14px
+  );
+}
+@utility marquee-mask {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@utility pb-safe-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+}
+@utility pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+}

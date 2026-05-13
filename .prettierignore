@@ -1,7 +1,11 @@
 node_modules
 dist
-.output
-.vinxi
+build
+.next
+out
+.turbo
+coverage
 pnpm-lock.yaml
-package-lock.json
-routeTree.gen.ts
+*.min.js
+*.min.css
+public
