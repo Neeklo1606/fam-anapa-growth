@@ -196,9 +196,10 @@ export class KnowledgeService {
     });
 
     const withVec = chunks.filter((c) => isNumberArray(c.embedding));
-    const qVec = withVec.length > 0 && this.embedding.isConfigured()
-      ? await this.embedding.embedOne(query)
-      : null;
+    const qVec =
+      withVec.length > 0 && (await this.embedding.hasConfiguredKey())
+        ? await this.embedding.embedOne(query)
+        : null;
 
     if (qVec && withVec.length > 0) {
       const ranked = withVec
@@ -403,10 +404,11 @@ export class KnowledgeService {
 
   /** Заполняет `embedding` у чанков документа; нужен OPENAI_API_KEY на API. */
   async refreshEmbeddings(documentId: string) {
-    if (!this.embedding.isConfigured()) {
+    if (!(await this.embedding.hasConfiguredKey())) {
       return {
         ok: false,
-        message: "OPENAI_API_KEY не задан — эмбеддинги пропущены",
+        message:
+          "API-ключ не настроен: задайте в админке /admin/settings/ai или OPENAI_API_KEY в .env",
         updated: 0,
       };
     }

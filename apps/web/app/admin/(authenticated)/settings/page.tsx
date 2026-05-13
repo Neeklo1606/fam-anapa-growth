@@ -25,6 +25,12 @@ export default async function AdminSettingsPage() {
         <a href="/admin/settings/notifications" className="text-flame hover:underline">
           Настройки уведомлений
         </a>
+        {" · "}
+        OPENAI (ключ и модель для RAG):{" "}
+        <a href="/admin/settings/ai" className="text-flame hover:underline">
+          настройки ИИ
+        </a>{" "}
+        (только ADMIN).
       </p>
     </div>
   );

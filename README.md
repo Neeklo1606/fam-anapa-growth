@@ -41,8 +41,9 @@ pnpm build
 7. **Этап 6** ✓ Медиа-центр (upload/resize/webp/thumbnails)
 8. **Этап 7** ✓ (база) **SEO** — абсолютные canonical/OpenGraph на юридических страницах; **события аналитики** — `POST /api/analytics/events` + трекинг ключевых действий на сайте (форма, видео-герой, контакты в подвале и на главной).
 
-9. **Этап 8** ✓ (база) **Knowledge Base + RAG-заготовка**: таблицы `knowledge_documents` / `chunks`, админ `/admin/knowledge`, публичные `GET /api/knowledge`, `GET /api/knowledge/search`, `POST /api/knowledge/retrieve`, опционально эмбеддинги через `OPENAI_API_KEY`; доработки: связка с сайтом, pgvector при росте объёма, LLM-ответы.
+9. **Этап 8** ✓ (база) **Knowledge Base + RAG** — см. **этап 11** (ключ в админке). Таблицы `knowledge_documents` / chunks, админ `/admin/knowledge`, публичное API поиска/retrieve; доработки: сайт-потребление, pgvector, LLM-ответы.
 10. **Этап 9** ✓ (база) **Security & Performance**: глобальный **rate limit** (`ThrottlerGuard` + дефолт 100/мин, строже на `/auth/login`, вебхуки без лимита); **CSRF** double-submit (`fam_csrf` + `X-CSRF-Token`) для мутаций при сессионных cookies; **gzip** на API; усиленный **helmet** (без CSP на JSON API); на фронте расширены **metadata/OG/Twitter**, **COOP** + DNS-prefetch заголовки. Дальше: жёсткая CSP на Next, refresh-флоу под CSRF без исключения `/auth/refresh`.
-11. **Этап 10** — CI/CD (GitHub Actions), production backups
+11. **Этап 10** — CI/CD (GitHub Actions), production backups (рекомендуется выпускать перед переносом секретов в админке на новых окружениях).
+12. **Этап 11** ✓ **OpenAI из админки**: `/admin/settings/ai` (только ADMIN) — API-ключ в БД + выбор модели эмбеддингов и поле модели для будущего LLM; переменная `OPENAI_API_KEY` в `.env` — **fallback**, если ключ в БД пустой.
 
 Все этапы выполняются последовательно, без поломок текущего UI.

@@ -1,27 +1,41 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
-/** Опциональные эмбеддинги OpenAI (`text-embedding-3-small`), если задан OPENAI_API_KEY. */
+import { AiSettingsService } from "../settings/ai-settings.service";
+
+/** Эмбеддинги OpenAI: ключ и модель из БД (админка), при отсутствии — `OPENAI_API_KEY` в env. */
 @Injectable()
 export class EmbeddingService {
   private readonly log = new Logger(EmbeddingService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly aiSettings: AiSettingsService,
+  ) {}
 
-  private get apiKey(): string | undefined {
-    const k = this.config.get<string>("OPENAI_API_KEY");
-    return typeof k === "string" && k.trim().length > 0 ? k.trim() : undefined;
+  private async resolve(): Promise<{ key?: string; model: string }> {
+    const row = await this.aiSettings.getSecretsForWorkers();
+    const dbKey = row.apiKeyVault?.trim();
+    const envKey = this.config.get<string>("OPENAI_API_KEY")?.trim();
+    const key =
+      dbKey && dbKey.length > 0 ? dbKey : envKey && envKey.length > 0 ? envKey : undefined;
+    const model =
+      row.embeddingModel?.trim() && row.embeddingModel.trim().length > 0
+        ? row.embeddingModel.trim()
+        : "text-embedding-3-small";
+    return { key, model };
   }
 
-  isConfigured(): boolean {
-    return Boolean(this.apiKey);
+  async hasConfiguredKey(): Promise<boolean> {
+    const { key } = await this.resolve();
+    return Boolean(key);
   }
 
   /**
    * Возвращает векторы в том же порядке; при отсутствии ключа или ошибке — null на позицию.
    */
   async embedTexts(texts: string[]): Promise<(number[] | null)[]> {
-    const key = this.apiKey;
+    const { key, model } = await this.resolve();
     if (!key || texts.length === 0) {
       return texts.map(() => null);
     }
@@ -31,7 +45,7 @@ export class EmbeddingService {
     try {
       for (let i = 0; i < sanitized.length; i += batchSize) {
         const slice = sanitized.slice(i, i + batchSize);
-        const input = slice.map((s, j) => (s.length === 0 ? "." : s));
+        const input = slice.map((s) => (s.length === 0 ? "." : s));
         const res = await fetch("https://api.openai.com/v1/embeddings", {
           method: "POST",
           headers: {
@@ -39,7 +53,7 @@ export class EmbeddingService {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "text-embedding-3-small",
+            model,
             input,
           }),
         });

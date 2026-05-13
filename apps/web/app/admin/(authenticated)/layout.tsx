@@ -40,6 +40,7 @@ export default async function AuthenticatedAdminLayout({
                 Система
               </div>
               <SidebarLink href="/admin/users" label="Пользователи" />
+              <SidebarLink href="/admin/settings/ai" label="OpenAI · эмбеддинги" />
             </>
           )}
         </nav>

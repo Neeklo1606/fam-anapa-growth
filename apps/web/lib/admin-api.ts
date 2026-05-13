@@ -175,6 +175,25 @@ export async function fetchSettings(): Promise<SiteSettings> {
   return callApi<SiteSettings>("/site/admin");
 }
 
+export type AdminAiEmbeddingModelOption = {
+  id: string;
+  label: string;
+};
+
+export type AdminAiSettings = {
+  provider: string | null;
+  modelName: string | null;
+  embeddingModel: string;
+  contextSize: number;
+  temperature: number;
+  hasApiKey: boolean;
+  embeddingModels: AdminAiEmbeddingModelOption[];
+};
+
+export async function fetchAiSettingsAdmin(): Promise<AdminAiSettings> {
+  return callApi<AdminAiSettings>("/ai/admin");
+}
+
 export type AdminCoach = {
   id: string;
   fullName: string;

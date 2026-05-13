@@ -257,6 +257,25 @@ export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: 
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
+export type AiSettingsPatch = {
+  provider?: string | null;
+  modelName?: string | null;
+  embeddingModel?: string | null;
+  apiKey?: string;
+  clearApiKey?: boolean;
+};
+
+export async function updateAiSettingsAction(
+  patch: AiSettingsPatch,
+): Promise<{ ok: boolean; error?: string }> {
+  const r = await authedJson("/ai/admin", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
+}
+
 export type CoachInput = {
   fullName: string;
   role: string;

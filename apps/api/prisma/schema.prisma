@@ -407,14 +407,16 @@ model Notification {
 }
 
 model AISettings {
-  id           Int      @id @default(1)
-  provider     String?
-  modelName    String?
-  apiKeyVault  String?
-  systemPrompt String?  @db.Text
-  contextSize  Int      @default(8000)
-  temperature  Float    @default(0.7)
-  updatedAt    DateTime @updatedAt @default(now())
+  id               Int      @id @default(1)
+  provider         String?
+  modelName        String?
+  apiKeyVault      String?
+  /// Модель эмбеддингов OpenAI для RAG (`text-embedding-3-small` и т.п.)
+  embeddingModel   String?  @map("embedding_model") @db.VarChar(160)
+  systemPrompt     String?  @db.Text
+  contextSize      Int      @default(8000)
+  temperature      Float    @default(0.7)
+  updatedAt        DateTime @updatedAt @default(now())
 
   @@map("ai_settings")
 }

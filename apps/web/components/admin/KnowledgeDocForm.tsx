@@ -199,7 +199,9 @@ export function KnowledgeDocForm({
             </button>
           </div>
           <p className="text-[11px] text-ink/40">
-            После сохранения текста чанки обновятся автоматически; эмбеддинги — при наличии OPENAI_API_KEY на сервере API.
+            После сохранения текста чанки обновятся автоматически; эмбеддинги — при ключе в админке{" "}
+            <code className="text-[10px] bg-ink/5 px-1 rounded">/admin/settings/ai</code> или в .env (
+            <code className="text-[10px] bg-ink/5 px-1 rounded">OPENAI_API_KEY</code> как fallback).
           </p>
         </div>
       ) : null}
