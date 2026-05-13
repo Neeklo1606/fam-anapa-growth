@@ -4,7 +4,7 @@
 #
 #   FAM_REPO_ROOT  — path to repo (default: parent of deploy/)
 #   API_PORT       — for curl smoke (default: 4200)
-#   SKIP_SMOKE     — set to 1 to skip curl checks
+#   SKIP_ROUTES_SMOKE — если 1: не гонять deploy/routes-smoke.sh (Next + публичные API)
 #   SKIP_BUILD     — set to 1 to skip pnpm build (faster verify after code-only change)
 #   PM2_RESTART    — space-separated PM2 names to restart after build, before HTTP smoke
 #                    (required for Nest/Next to pick up new dist; e.g. "fam-api fam-web")
@@ -77,4 +77,15 @@ curl -sfS "http://127.0.0.1:${API_PORT}/api/videos" | head -c 400
 echo
 curl -sfS "http://127.0.0.1:${API_PORT}/api/coaches" | head -c 400
 echo
+
+if [[ "${SKIP_ROUTES_SMOKE:-0}" == "1" ]]; then
+  echo "==> SKIP_ROUTES_SMOKE=1 — пропуск routes-smoke"
+else
+  WEB_PORT="${WEB_PORT:-3000}"
+  WEB_BASE="http://127.0.0.1:${WEB_PORT}"
+  API_BASE="http://127.0.0.1:${API_PORT}"
+  echo "==> routes-smoke (Next :${WEB_PORT} + API :${API_PORT})"
+  WEB_BASE="$WEB_BASE" API_BASE="$API_BASE" bash "$ROOT/deploy/routes-smoke.sh"
+fi
+
 echo "==> smoke OK"

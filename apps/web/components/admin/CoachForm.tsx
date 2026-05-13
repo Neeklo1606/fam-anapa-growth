@@ -11,6 +11,7 @@ import {
   updateCoachAction,
   type CoachInput,
 } from "@/lib/auth-actions";
+import { SITE_PUBLIC_IMAGE_PATHS } from "@/lib/site-public-images";
 import { MediaPicker } from "./MediaPicker";
 
 type Mode = "create" | "edit";
@@ -100,7 +101,13 @@ export function CoachForm({
         <MediaPicker
           value={picked}
           onChange={setPicked}
-          hint="Загрузите фотографию или выберите из библиотеки. Поле «URL фото» ниже используется как fallback, если не выбрано медиа."
+          fallbackPreviewUrl={form.photoUrl}
+          siteStaticPaths={SITE_PUBLIC_IMAGE_PATHS}
+          onPickSiteStatic={(path) => {
+            setPicked(null);
+            set("photoUrl", path);
+          }}
+          hint="Загрузите фотографию или выберите из библиотеки / статики сайта. Поле «URL фото» ниже — явный fallback, если медиа не выбрано."
         />
       </Field>
       <Field label="URL фото (fallback)" wide>

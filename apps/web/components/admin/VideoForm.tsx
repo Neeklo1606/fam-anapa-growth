@@ -8,6 +8,7 @@ import { Loader2, Save } from "lucide-react";
 import type { AdminVideo } from "@/lib/admin-api";
 import { createVideoAction, updateVideoAction } from "@/lib/auth-actions";
 import { MediaPicker } from "@/components/admin/MediaPicker";
+import { SITE_PUBLIC_IMAGE_PATHS } from "@/lib/site-public-images";
 
 export function VideoForm({
   mode,
@@ -83,7 +84,13 @@ export function VideoForm({
         <MediaPicker
           value={picked}
           onChange={setPicked}
-          hint="Необязательно. Если пусто — используется URL постера ниже."
+          fallbackPreviewUrl={posterUrl}
+          siteStaticPaths={SITE_PUBLIC_IMAGE_PATHS}
+          onPickSiteStatic={(path) => {
+            setPicked(null);
+            setPosterUrl(path);
+          }}
+          hint="Необязательно. Если пусто — используется URL постера ниже или картинка из статики."
         />
       </div>
       <label className="block">

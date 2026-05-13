@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Copy, Loader2, Trash2, Upload } from "lucide-react";
@@ -8,14 +8,25 @@ import { Copy, Loader2, Trash2, Upload } from "lucide-react";
 import type { AdminMedia, MediaList } from "@/lib/admin-api";
 import {
   deleteMediaAction,
+  listMediaAction,
   uploadMediaAction,
 } from "@/lib/auth-actions";
 
 export function MediaGallery({ initial }: { initial: MediaList }) {
   const [items, setItems] = useState<AdminMedia[]>(initial.items);
+  const [total, setTotal] = useState(initial.total);
+  const [page, setPage] = useState(initial.page);
+  const [limit] = useState(initial.limit);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [pending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    setItems(initial.items);
+    setTotal(initial.total);
+    setPage(initial.page);
+  }, [initial.items, initial.total, initial.page, initial.limit]);
 
   const upload = async (file: File) => {
     const fd = new FormData();
@@ -56,6 +67,22 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
       toast.success("Файл удалён");
       router.refresh();
     });
+  };
+
+  const loadMore = () => {
+    if (items.length >= total || loadingMore) return;
+    setLoadingMore(true);
+    listMediaAction({ page: page + 1, limit })
+      .then((r) => {
+        if (!r.ok) {
+          toast.error("Не удалось подгрузить", { description: r.error });
+          return;
+        }
+        setItems((prev) => [...prev, ...((r.items ?? []) as AdminMedia[])]);
+        setPage(r.page ?? page + 1);
+        setTotal(r.total ?? total);
+      })
+      .finally(() => setLoadingMore(false));
   };
 
   const copy = async (url: string) => {
@@ -148,6 +175,19 @@ export function MediaGallery({ initial }: { initial: MediaList }) {
             );
           })}
         </ul>
+      )}
+      {items.length > 0 && items.length < total && (
+        <div className="flex justify-center pt-2">
+          <button
+            type="button"
+            disabled={loadingMore}
+            onClick={() => loadMore()}
+            className="h-10 px-5 rounded-full border border-line text-xs uppercase tracking-wider hover:bg-surface disabled:opacity-50 inline-flex items-center gap-2"
+          >
+            {loadingMore ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+            Показать ещё ({total - items.length})
+          </button>
+        </div>
       )}
     </div>
   );

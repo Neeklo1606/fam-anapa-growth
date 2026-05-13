@@ -387,15 +387,41 @@ export async function embedKnowledgeChunksAction(id: string): Promise<{
   };
 }
 
-export async function listMediaAction(params: { page?: number; limit?: number } = {}): Promise<{ ok: boolean; error?: string; items?: Array<{ id: string; url: string; webpUrl: string | null; thumbUrl: string | null; mime: string; altDefault: string | null }> }> {
+export type ListMediaItem = {
+  id: string;
+  url: string;
+  webpUrl: string | null;
+  thumbUrl: string | null;
+  mime: string;
+  altDefault: string | null;
+};
+
+export async function listMediaAction(params: { page?: number; limit?: number } = {}): Promise<{
+  ok: boolean;
+  error?: string;
+  items?: ListMediaItem[];
+  total?: number;
+  page?: number;
+  limit?: number;
+}> {
   const sp = new URLSearchParams();
   sp.set("page", String(params.page ?? 1));
-  sp.set("limit", String(params.limit ?? 60));
-  const r = await authedJson<{ items: Array<{ id: string; url: string; webpUrl: string | null; thumbUrl: string | null; mime: string; altDefault: string | null }> }>(
-    `/media?${sp.toString()}`,
-    { method: "GET" },
-  );
-  return r.ok ? { ok: true, items: r.data?.items ?? [] } : { ok: false, error: r.error };
+  sp.set("limit", String(params.limit ?? 100));
+  const r = await authedJson<{
+    items: ListMediaItem[];
+    total: number;
+    page: number;
+    limit: number;
+  }>(`/media?${sp.toString()}`, { method: "GET" });
+  return r.ok
+    ? {
+        ok: true,
+        items: r.data?.items ?? [],
+        total: r.data?.total ?? 0,
+        page: r.data?.page ?? 1,
+        limit: r.data?.limit ?? Number(params.limit ?? 100),
+      }
+    : { ok: false, error: r.error };
 }
 
 export async function uploadMediaAction(form: FormData): Promise<{ ok: boolean; error?: string; id?: string; url?: string; webpUrl?: string | null; thumbUrl?: string | null }> {
