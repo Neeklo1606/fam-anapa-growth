@@ -7,6 +7,16 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { UpdateSettingsDto } from "./dto/update-settings.dto";
 import { SettingsService } from "./settings.service";
 
+function resolvePublicLogoUrl(s: {
+  logoMedia: { webpUrl: string | null; url: string } | null;
+  logoFallbackUrl: string | null;
+}): string | null {
+  const fromMedia = (s.logoMedia?.webpUrl ?? s.logoMedia?.url)?.trim();
+  if (fromMedia) return fromMedia;
+  const fb = s.logoFallbackUrl?.trim();
+  return fb || null;
+}
+
 @Controller("site")
 export class SettingsController {
   constructor(private readonly settings: SettingsService) {}
@@ -27,6 +37,7 @@ export class SettingsController {
       address: s.address,
       mapEmbed: s.mapEmbed,
       yandexMapUrl: s.yandexMapUrl,
+      logoUrl: resolvePublicLogoUrl(s),
     };
   }
 

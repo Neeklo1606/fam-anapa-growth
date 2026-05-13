@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { FooterContactsSection } from "@/components/site/FooterContactsSection";
 
@@ -18,7 +17,7 @@ const nav = [
   { href: "/#contacts", label: "Записаться" },
 ];
 
-export function Footer() {
+export function Footer({ logoSrc }: { logoSrc: string }) {
   const year = new Date().getFullYear();
   return (
     <footer className="relative bg-night text-white overflow-hidden border-t border-white/5">
@@ -30,13 +29,16 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-12">
           <div className="md:col-span-5">
             <div className="flex items-center gap-3">
-              <Image
-                src="/img/logo.webp"
-                alt="Академия Морева"
-                width={64}
-                height={64}
-                className="h-16 w-16 object-contain mix-blend-multiply"
-              />
+              <span className="flex size-16 shrink-0 items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoSrc}
+                  alt="Академия Морева"
+                  width={64}
+                  height={64}
+                  className="h-full w-full object-contain"
+                />
+              </span>
               <div className="leading-tight">
                 <div className="font-display text-xl tracking-wide uppercase">Академия Морева</div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/45 font-mono-pro">

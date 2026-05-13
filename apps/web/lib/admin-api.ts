@@ -168,11 +168,45 @@ export type SiteSettings = {
   address: string | null;
   mapEmbed: string | null;
   yandexMapUrl: string | null;
+  logoMediaId: string | null;
+  logoFallbackUrl: string | null;
+  logoMedia: {
+    id: string;
+    url: string;
+    webpUrl: string | null;
+    thumbUrl: string | null;
+    altDefault: string | null;
+  } | null;
   updatedAt: string;
 };
 
 export async function fetchSettings(): Promise<SiteSettings> {
   return callApi<SiteSettings>("/site/admin");
+}
+
+export type PublicSite = {
+  brandName: string;
+  brandTagline: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  telegram: string | null;
+  maxLink: string | null;
+  email: string | null;
+  address: string | null;
+  mapEmbed: string | null;
+  yandexMapUrl: string | null;
+  logoUrl: string | null;
+};
+
+export async function fetchPublicSite(): Promise<PublicSite> {
+  const url = `${INTERNAL_API_BASE}/site`;
+  const res = await fetch(url, { next: { revalidate: 60 } });
+  if (!res.ok) {
+    const err = new Error(`GET /site failed: ${res.status}`);
+    (err as Error & { status?: number }).status = res.status;
+    throw err;
+  }
+  return (await res.json()) as PublicSite;
 }
 
 export type AdminAiEmbeddingModelOption = {

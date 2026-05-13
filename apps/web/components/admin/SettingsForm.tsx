@@ -7,6 +7,8 @@ import { Loader2, Save } from "lucide-react";
 
 import type { SiteSettings } from "@/lib/admin-api";
 import { updateSettingsAction } from "@/lib/auth-actions";
+import { MediaPicker } from "@/components/admin/MediaPicker";
+import { SITE_PUBLIC_IMAGE_PATHS } from "@/lib/site-public-images";
 
 export function SettingsForm({ initial }: { initial: SiteSettings }) {
   const [form, setForm] = useState({
@@ -20,17 +22,40 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
     address: initial.address ?? "",
     yandexMapUrl: initial.yandexMapUrl ?? "",
     mapEmbed: initial.mapEmbed ?? "",
+    logoFallbackUrl: initial.logoFallbackUrl ?? "",
   });
+  const [logoPicked, setLogoPicked] = useState<{
+    id: string;
+    url: string;
+    thumbUrl: string | null;
+  } | null>(
+    initial.logoMedia
+      ? {
+          id: initial.logoMedia.id,
+          url: initial.logoMedia.webpUrl ?? initial.logoMedia.url,
+          thumbUrl: initial.logoMedia.thumbUrl,
+        }
+      : null,
+  );
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
-  const set = <K extends keyof typeof form>(key: K, value: string) =>
+  const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const onLogoPick = (v: (typeof logoPicked) | null) => {
+    setLogoPicked(v);
+    if (v) setForm((f) => ({ ...f, logoFallbackUrl: "" }));
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
-      const r = await updateSettingsAction(form);
+      const r = await updateSettingsAction({
+        ...form,
+        logoMediaId: logoPicked?.id ?? null,
+        logoFallbackUrl: logoPicked ? null : form.logoFallbackUrl?.trim() || null,
+      });
       if (!r.ok) {
         toast.error("Не удалось сохранить", { description: r.error });
         return;
@@ -47,6 +72,28 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
       </Field>
       <Field label="Слоган / подзаголовок" wide>
         <input className={inputCls} value={form.brandTagline} onChange={(e) => set("brandTagline", e.target.value)} />
+      </Field>
+      <Field label="Логотип сайта" wide>
+        <MediaPicker
+          value={logoPicked}
+          onChange={onLogoPick}
+          fallbackPreviewUrl={form.logoFallbackUrl}
+          siteStaticPaths={SITE_PUBLIC_IMAGE_PATHS}
+          onPickSiteStatic={(path) => {
+            setLogoPicked(null);
+            setForm((f) => ({ ...f, logoFallbackUrl: path }));
+          }}
+          hint="Выберите файл из медиатеки (лучше PNG/WebP с прозрачным фоном), из статики или укажите путь ниже. Без прозрачности на тёмной шапке будет видна подложка файла."
+        />
+      </Field>
+      <Field label="Путь к логотипу в public (если не из медиатеки)" wide>
+        <input
+          className={inputCls}
+          disabled={Boolean(logoPicked)}
+          value={form.logoFallbackUrl}
+          onChange={(e) => set("logoFallbackUrl", e.target.value)}
+          placeholder="/img/logo.webp"
+        />
       </Field>
       <Field label="Телефон">
         <input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+79180000000" />

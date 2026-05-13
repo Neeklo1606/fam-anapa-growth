@@ -87,15 +87,20 @@ export class MediaService {
         width = meta.width ?? null;
         height = meta.height ?? null;
 
+        const webpOpts =
+          meta.hasAlpha === true ? { quality: 88 as const, alphaQuality: 100 as const } : { quality: 82 as const };
         const webpAbs = path.join(baseDir, `${id}.webp`);
-        await img.clone().webp({ quality: 82 }).toFile(webpAbs);
+        await img.clone().webp(webpOpts).toFile(webpAbs);
         webpRel = path.posix.join(yyyy, mm, `${id}.webp`);
+
+        const thumbOpts =
+          meta.hasAlpha === true ? { quality: 78 as const, alphaQuality: 100 as const } : { quality: 78 as const };
 
         const thumbAbs = path.join(thumbDir, `${id}.webp`);
         await img
           .clone()
           .resize({ width: 320, height: 320, fit: "cover", position: "centre" })
-          .webp({ quality: 78 })
+          .webp(thumbOpts)
           .toFile(thumbAbs);
         thumbRel = path.posix.join(yyyy, mm, "thumb", `${id}.webp`);
       } catch (e) {
@@ -156,6 +161,12 @@ export class MediaService {
     const usedAsCoach = await this.prisma.coach.count({ where: { photoMediaId: id } });
     const usedAsGallery = await this.prisma.galleryItem.count({ where: { mediaId: id } });
     const usedAsVideo = await this.prisma.video.count({ where: { posterMediaId: id } });
+    const usedAsSiteLogo = await this.prisma.siteSettings.count({
+      where: { logoMediaId: id },
+    });
+    if (usedAsSiteLogo > 0) {
+      throw new ConflictException("Это изображение задано как логотип сайта — смените логотип в «Настройках».");
+    }
     if (usedAsCoach + usedAsGallery + usedAsVideo > 0) {
       throw new ConflictException("Файл используется в сущностях, сначала отвяжите его");
     }

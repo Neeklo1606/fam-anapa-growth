@@ -339,6 +339,7 @@ model MediaFile {
   gallery GalleryItem[]
   coaches Coach[]
   videos  Video[]
+  siteLogoFor SiteSettings? @relation("SiteLogo")
 
   @@index([kind])
   @@map("media_files")
@@ -360,6 +361,9 @@ model SiteSettings {
   address      String?
   mapEmbed     String?  @db.Text
   yandexMapUrl String?
+  logoFallbackUrl String? @map("logo_fallback_url") @db.VarChar(500)
+  logoMediaId String? @unique @map("logo_media_id")
+  logoMedia    MediaFile? @relation("SiteLogo", fields: [logoMediaId], references: [id], onDelete: SetNull)
   updatedAt    DateTime @updatedAt @default(now())
 
   @@map("site_settings")

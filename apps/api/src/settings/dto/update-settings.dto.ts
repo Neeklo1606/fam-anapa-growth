@@ -11,4 +11,6 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(300) address?: string;
   @IsOptional() @IsString() @MaxLength(2000) mapEmbed?: string;
   @IsOptional() @IsString() @MaxLength(500) yandexMapUrl?: string;
+  @IsOptional() @IsString() @MaxLength(40) logoMediaId?: string | null;
+  @IsOptional() @IsString() @MaxLength(500) logoFallbackUrl?: string | null;
 }

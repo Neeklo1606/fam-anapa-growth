@@ -5,6 +5,8 @@ import { ApplyProvider } from "@/components/site/ApplyModal";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 
+import { fetchPublicSite } from "@/lib/admin-api";
+import { DEFAULT_SITE_LOGO_SRC } from "@/lib/site-defaults";
 import { SITE_URL, absUrl } from "@/lib/utils";
 
 const SITE_TITLE = "Футбольная академия Морева в Анапе · футбол для детей";
@@ -48,7 +50,7 @@ export const metadata: Metadata = {
   category: "sports",
 };
 
-const ldJson = [
+const ldJsonShell = [
   {
     "@context": "https://schema.org",
     "@type": "SportsActivityLocation",
@@ -71,30 +73,44 @@ const ldJson = [
   },
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Футбольная академия Морева",
-    url: SITE_URL,
-    logo: absUrl("/favicon.ico"),
-  },
-  {
-    "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Футбольная академия Морева в Анапе",
     url: SITE_URL,
     inLanguage: "ru-RU",
   },
-];
+] as const;
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  let logoSrc = DEFAULT_SITE_LOGO_SRC;
+  try {
+    const pub = await fetchPublicSite();
+    const u = pub.logoUrl?.trim();
+    if (u) logoSrc = u;
+  } catch {
+    // API может быть недоступна при сборке / без Nest — остаётся локальный fallback
+  }
+
+  const ldJson = [
+    ldJsonShell[0],
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Футбольная академия Морева",
+      url: SITE_URL,
+      logo: absUrl(logoSrc),
+    },
+    ldJsonShell[1],
+  ];
+
   return (
     <ApplyProvider>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
-      <Header />
+      <Header logoSrc={logoSrc} />
       <main>{children}</main>
-      <Footer />
+      <Footer logoSrc={logoSrc} />
       <Toaster />
     </ApplyProvider>
   );

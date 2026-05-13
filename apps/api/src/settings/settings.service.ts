@@ -12,6 +12,11 @@ export class SettingsService {
       where: { id: 1 },
       update: {},
       create: { id: 1 },
+      include: {
+        logoMedia: {
+          select: { id: true, url: true, webpUrl: true, thumbUrl: true, altDefault: true },
+        },
+      },
     });
   }
 
@@ -20,6 +25,11 @@ export class SettingsService {
       where: { id: 1 },
       update: patch,
       create: { id: 1, ...patch },
+      include: {
+        logoMedia: {
+          select: { id: true, url: true, webpUrl: true, thumbUrl: true, altDefault: true },
+        },
+      },
     });
   }
 }

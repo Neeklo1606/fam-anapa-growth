@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 import { MobileMenu } from "@/components/site/MobileMenu";
 import { ApplyButton } from "@/components/site/ApplyModal";
 import { NAV_LINKS } from "@/content/site";
 
-export function Header() {
+export function Header({ logoSrc }: { logoSrc: string }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -28,14 +27,18 @@ export function Header() {
     >
       <div className="mx-auto max-w-7xl px-4 lg:px-8 h-16 md:h-[72px] flex items-center justify-between gap-3">
         <Link href="/" className="relative z-10 flex items-center gap-2.5 min-w-0 group" aria-label="Академия Морева">
-          <Image
-            src="/img/logo.webp"
-            alt="Академия Морева"
-            width={48}
-            height={48}
-            priority
-            className="h-9 w-9 md:h-11 md:w-11 object-contain mix-blend-multiply drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] transition group-hover:scale-105"
-          />
+          <span className="relative flex size-9 shrink-0 items-center justify-center md:size-11">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={logoSrc}
+              alt="Академия Морева"
+              width={48}
+              height={48}
+              loading="eager"
+              fetchPriority="high"
+              className="h-full w-full object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.55)] transition group-hover:scale-105"
+            />
+          </span>
           <span className="hidden sm:block leading-none min-w-0">
             <span className="block font-display text-[13px] md:text-[15px] tracking-[0.04em] text-white font-bold uppercase truncate">
               Академия Морева

@@ -246,6 +246,8 @@ export type SettingsPatch = {
   address?: string;
   mapEmbed?: string;
   yandexMapUrl?: string;
+  logoMediaId?: string | null;
+  logoFallbackUrl?: string | null;
 };
 
 export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: boolean; error?: string }> {
