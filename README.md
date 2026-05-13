@@ -27,8 +27,27 @@ pnpm build
 
 ## Environments
 
-- **Production**: `https://morev.neeklo.ru` — Next.js (PM2) + Nginx reverse proxy on VPS 89.169.39.244 (Ubuntu 24.04, HAProxy SNI → nginx 127.0.0.1:9443 → next standalone on :3000)
-- Backend, PostgreSQL, Redis — нативно на VPS (Этап 2+ деплой)
+Два независимых прода — **обновляйте тот сервер, с которого открыт нужный домен**.
+
+| Сайт | Типичный VPS | Путь к клону репозитория |
+|------|----------------|---------------------------|
+| `https://morev.neeklo.ru` | `89.169.39.244` | `/var/www/morev.neeklo.ru/repo` |
+| `https://footballacademymorev.ru` | `83.222.26.13` | `/var/www/footballacademymorev/repo` |
+
+На **любом** VPS из таблицы (после `git pull`/актуального `main`), из корня клона:
+
+```bash
+export FAM_REPO_ROOT=/var/www/…/repo   # подставьте путь из таблицы
+export GIT_BRANCH=main GIT_RESET_HARD=1 PM2_RESTART="fam-api fam-web"
+bash deploy/server-git-deploy.sh
+```
+
+или полный цикл после сбоя/первичной установки см. [`deploy/resume-beget-deploy.sh`](deploy/resume-beget-deploy.sh) (по умолчанию каталог **`/var/www/footballacademymorev/repo`** под **footballacademymorev.ru**).
+
+- **morev.neeklo.ru**: Next (PM2) + Nginx (часто HAProxy SNI → nginx `127.0.0.1:9443` → Next standalone `:3000`), API `:4200`.
+- **footballacademymorev.ru**: см. конфиги в [`deploy/nginx-footballacademymorev.ru.*.conf`](deploy/nginx-footballacademymorev.ru.ssl.conf); стек тот же (Nest + Postgres + Redis + BullMQ).
+
+Без деплоя на **83.222.26.13** изменения с GitHub не появятся на **footballacademymorev.ru**; ошибка «Application error» на `/admin/media` чаще всего уходит после выкладки актуального `main`, `prisma migrate deploy` и рестарта **fam-web** / **fam-api**.
 
 ## Этапы реализации
 
