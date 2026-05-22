@@ -455,7 +455,7 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
   const [emblaRef, embla] = useEmblaCarousel({
     align: "start",
     loop: false,
-    dragFree: true,
+    dragFree: false,
     containScroll: "trimSnaps",
   });
   const [snapIndex, setSnapIndex] = useState(0);
@@ -492,70 +492,73 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
   }, [embla]);
 
   return (
-    <section id="coaches" className="relative bg-background py-16 md:py-28 scroll-mt-20">
-      <div className="absolute inset-0 club-stripes-dark opacity-50 pointer-events-none" />
+    <section id="coaches" className="relative bg-background py-10 md:py-24 scroll-mt-20">
+      <div className="absolute inset-0 club-stripes-dark opacity-40 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <div className="max-w-3xl">
-            <h2 className="font-display font-bold tracking-[0.22em] text-deep uppercase text-3xl sm:text-4xl md:text-5xl">
+          <div className="max-w-xl">
+            <h2 className="font-display font-bold tracking-[0.18em] text-deep uppercase text-2xl sm:text-3xl md:text-4xl">
               Тренеры
             </h2>
             {home.coachesSection.subtitle.trim() ? (
-              <p className="mt-4 text-ink/65 max-w-lg text-sm md:text-base leading-relaxed">
+              <p className="mt-2 md:mt-3 text-ink/60 max-w-md text-[13px] md:text-sm leading-snug line-clamp-3 md:line-clamp-none">
                 {home.coachesSection.subtitle}
               </p>
             ) : null}
           </div>
         </Reveal>
 
-        <div className="mt-8 md:mt-12 -mx-5 lg:mx-0">
-          <div className="overflow-hidden pl-5 pr-2 sm:pl-5 sm:pr-5 lg:px-0" ref={emblaRef}>
-            <div className="flex gap-3 sm:gap-4 md:gap-5">
+        <div className="mt-5 md:mt-10 -mx-5 md:mx-0">
+          <div className="overflow-hidden pl-5 pr-3 md:pl-0 md:pr-0" ref={emblaRef}>
+            <div className="flex touch-pan-y gap-3 md:gap-5">
               {items.map((c, i) => (
                 <div
                   key={c.id}
-                  className="shrink-0 min-w-0 w-[min(88vw,360px)] sm:w-[min(72vw,320px)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-2.5rem)/3)]"
+                  className="min-w-0 shrink-0 basis-[82%] sm:basis-[70%] md:basis-[calc((100%-2.5rem)/3)]"
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 16 }}
+                  <motion.article
+                    initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.45, delay: i * 0.04 }}
-                    className="group relative flex h-full min-h-[420px] flex-col rounded-3xl overflow-hidden bg-night text-white border border-line/30 shadow-soft"
+                    transition={{ duration: 0.4, delay: i * 0.03 }}
+                    className="group relative aspect-[3/4] max-h-[min(52vh,420px)] md:max-h-none w-full overflow-hidden rounded-2xl md:rounded-3xl bg-night shadow-soft ring-1 ring-line/25"
                   >
-                    <div className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-night">
-                      {c.photoUrl && (
-                        <Image
-                          src={c.photoUrl}
-                          alt={c.fullName}
-                          fill
-                          sizes="(min-width: 1024px) 28vw, 88vw"
-                          className="object-cover object-[center_20%] transition duration-500 group-hover:scale-[1.03]"
-                        />
-                      )}
-                    </div>
-                    <div className="flex flex-1 flex-col p-5 md:p-6 bg-gradient-to-b from-night to-night">
-                      <h3 className="font-display text-lg md:text-xl tracking-wide text-white leading-snug">
+                    {c.photoUrl ? (
+                      <Image
+                        src={c.photoUrl}
+                        alt={c.fullName}
+                        fill
+                        sizes="(min-width: 768px) 28vw, 82vw"
+                        className="object-cover object-[center_18%] transition duration-500 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-night" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 bg-night px-4 py-3 md:px-5 md:py-4">
+                      <h3 className="font-display text-[15px] md:text-lg leading-tight text-white tracking-wide">
                         {c.fullName}
                       </h3>
-                      <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-flame/90 font-semibold">
+                      <p className="mt-1 text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">
                         {c.role}
                       </p>
-                      <p className="mt-3 text-sm text-white/70 leading-snug line-clamp-4">{c.shortDescription}</p>
+                      <p className="mt-2 hidden md:block text-sm text-white/70 leading-snug line-clamp-2">
+                        {c.shortDescription}
+                      </p>
                     </div>
-                  </motion.div>
+                  </motion.article>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
+          <div className="mt-3 flex items-center justify-center gap-1.5 md:hidden">
             {items.map((c, i) => (
               <button
                 key={c.id}
                 type="button"
                 aria-label={`Слайд ${i + 1}`}
                 onClick={() => embla?.scrollTo(i)}
-                className={`h-1.5 rounded-full transition-all ${i === snapIndex ? "w-6 bg-flame" : "w-1.5 bg-ink/25"}`}
+                className={`h-1 rounded-full transition-all ${i === snapIndex ? "w-5 bg-flame" : "w-1 bg-ink/25"}`}
               />
             ))}
           </div>
