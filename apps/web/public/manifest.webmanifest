@@ -7,7 +7,5 @@
   "background_color": "#0B1020",
   "theme_color": "#0B1020",
   "lang": "ru",
-  "icons": [
-    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
-  ]
+  "icons": [{ "src": "/img/logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any maskable" }]
 }

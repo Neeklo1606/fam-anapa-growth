@@ -13,6 +13,10 @@ const coachGubin = `${ASSETS}/coach-gubin.jpg`;
 const famTraining = `${ASSETS}/fam-training.jpg`;
 const famCupCelebration = `${ASSETS}/fam-cup-celebration.jpg`;
 
+/** Основное здание / организация в Яндексе · Навигатор */
+const YANDEX_ORG_NAVI =
+  "https://yandex.ru/navi/org/futbolnaya_akademiya_imeni_a_v_moreva/13322284254?si=fmpafb8y7nm42udqbaeyp73ne0";
+
 export const CONTACTS = {
   phone: "+79180000000",
   phoneDisplay: "+7 (918) 000-00-00",
@@ -20,8 +24,15 @@ export const CONTACTS = {
   telegram: "https://t.me/fam_anapa",
   max: "https://max.ru/fam_anapa",
   email: "info@fam-anapa.ru",
-  yandexMaps: "https://yandex.ru/maps/?text=Анапа%2C%20стадион%20Спартак",
-  address: "Анапа, Краснодарский край",
+  /** Яндекс.Навигатор / карточка организации */
+  yandexMaps: YANDEX_ORG_NAVI,
+  /** Длинная подпись для блоков и контактов */
+  addressFull: "Футбольная академия имени А. В. Морева, Тбилисская ул., 1Г, станица Анапская, Краснодарский край, Россия",
+  /** Одна строка для меню компакт текста */
+  addressShort: "Тбилисская ул., 1Г, ст-ца Анапская",
+  addressLocality: "Анапская",
+  addressRegion: "Краснодарский край",
+  streetAddress: "улица Тбилисская, 1Г",
 } as const;
 
 export const HERO = {
@@ -54,36 +65,60 @@ export const PRINCIPLES = [
 export const COACHES = [
   {
     name: "Губин Алексей Олегович",
-    role: "Главный тренер",
+    role: "Главный тренер / тренер",
     info: "Тренер футбольной академии Морева. Работает с детскими группами, развивает технику и игровое мышление.",
     img: coachGubin,
   },
   {
     name: "Тренерский состав",
     role: "Полевые тренеры",
-    info: "Команда тренеров академии работает с детскими группами от 6 до 14 лет.",
+    info: "Команда тренеров академии работает с детьми от младших до старших групп.",
     img: famTraining,
   },
   {
     name: "Школа вратарей",
     role: "Goalkeeper coach",
-    info: "Отдельная программа подготовки вратарей под руководством профильного тренера.",
+    info: "Программа подготовки вратарей под руководством профильного тренера.",
     img: famCupCelebration,
   },
 ];
 
+/** Точка карты около ул. Тбилисская, 1Г, ст. Анапская (виджет Яндекс) */
+const MAP_EMBED_LL = "37.331448%2C44.895923";
+const MAP_EMBED_PT = "37.331448,44.895923";
+
+/** Две строки в блоке локации (п. 3.1 ТЗ); полный адрес для схемы — CONTACTS.addressFull */
+const LOCATION_CARD_ADDRESS = [
+  "Футбольная академия имени А. В. Морева",
+  "Тбилисская ул., 1Г, станица Анапская",
+].join("\n");
+
 export const LOCATION = {
   title: "Где мы тренируемся",
-  body: "Тренировки проходят в Анапе на профессиональном футбольном поле с искусственным покрытием. Удобный подъезд, всё необходимое для занятий рядом.",
+  body: "Футбольная академия имени А. В. Морева в станице Анапская. Удобный подъезд, поле для тренировок и игр.",
   image: fieldImg,
-  address: CONTACTS.address,
+  address: LOCATION_CARD_ADDRESS,
   mapUrl: CONTACTS.yandexMaps,
-  /** Yandex Maps embed (без собственного API-ключа на фронте) */
-  embedSrc:
-    "https://yandex.ru/map-widget/v1/?ll=37.316300%2C44.894600&z=14&pt=37.316300,44.894600,pm2rdm",
+  embedSrc: `https://yandex.ru/map-widget/v1/?ll=${MAP_EMBED_LL}&z=16&l=map&pt=${MAP_EMBED_PT},pm2rdm`,
 };
 
-export const NAV_LINKS = [
+export type SiteNavItem =
+  | { kind: "link"; href: string; label: string }
+  | { kind: "apply"; label: string };
+
+/** Верхнее и мобильное меню: якорь + пункт, открывающий анкету */
+export const SITE_NAV: readonly SiteNavItem[] = [
+  { kind: "link", href: "/#about", label: "Академия" },
+  { kind: "link", href: "/#goalkeeper", label: "Школа вратарей" },
+  { kind: "link", href: "/#principles", label: "Принципы" },
+  { kind: "link", href: "/#coaches", label: "Тренеры" },
+  { kind: "link", href: "/#location", label: "Локация" },
+  { kind: "link", href: "/#contacts", label: "Контакты" },
+  { kind: "apply", label: "Записать ребёнка" },
+];
+
+/** Короткий список ссылок для футера (без дубля «оставить заявку» у контактов — там якорь) */
+export const FOOTER_NAV: readonly { href: string; label: string }[] = [
   { href: "/#about", label: "Академия" },
   { href: "/#goalkeeper", label: "Школа вратарей" },
   { href: "/#principles", label: "Принципы" },
@@ -104,7 +139,6 @@ export const FORM_DIRECTIONS = [
 export const GALLERY = [
   { src: `${ASSETS}/fam-training.jpg`, label: "Тренировочное поле" },
   { src: `${ASSETS}/fam-cup-night.jpg`, label: "Вечерние занятия" },
-  { src: `${ASSETS}/fam-team-diplomas.jpg`, label: "Награждение" },
   { src: `${ASSETS}/fam-cup-celebration.jpg`, label: "Игровой момент" },
   { src: `${ASSETS}/p-kick.jpg`, label: "Работа с мячом" },
   { src: `${ASSETS}/p-dribble.jpg`, label: "Ведение" },

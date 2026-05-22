@@ -45,12 +45,22 @@ export const metadata: Metadata = {
   keywords: [
     "футбол дети Анапа",
     "футбольная школа Анапа",
+    "футбольные школы Анапа",
+    "футбольная секция Анапа",
+    "футбол для детей Анапа",
+    "футбольная академия Анапа",
     "футбольная академия",
+    "детский футбольный клуб Анапа",
+    "школа вратарей Анапа",
+    "записать ребёнка на футбол Анапа",
     "записаться в футбольную школу",
   ],
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico", apple: "/favicon.ico" },
+  icons: {
+    icon: [{ url: "/img/logo.webp", type: "image/webp" }],
+    apple: [{ url: "/img/logo.webp", type: "image/webp", sizes: "180x180" }],
+  },
   manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",

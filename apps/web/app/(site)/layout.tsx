@@ -6,6 +6,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 
 import { fetchPublicSite } from "@/lib/admin-api";
+import { CONTACTS } from "@/content/site";
 import { DEFAULT_SITE_LOGO_SRC } from "@/lib/site-defaults";
 import { SITE_URL, absUrl } from "@/lib/utils";
 
@@ -19,11 +20,17 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   keywords: [
     "футбольная академия Анапа",
+    "футбольная школа Анапа",
+    "футбольные школы Анапа",
     "футбол для детей Анапа",
     "футбольная секция Анапа",
     "детский футбольный клуб Анапа",
+    "школа вратарей Анапа",
+    "записать ребёнка на футбол Анапа",
     "тренировки по футболу для детей Анапа",
-    "футбольная школа Анапа",
+    "футбольная школа станица Анапская",
+    "Краснодарский край детский футбол",
+    "пробное занятие футбол дети",
   ],
   alternates: { canonical: SITE_URL },
   openGraph: {
@@ -50,27 +57,30 @@ export const metadata: Metadata = {
   category: "sports",
 };
 
-const ldJsonShell = [
-  {
-    "@context": "https://schema.org",
-    "@type": "SportsActivityLocation",
-    name: "Футбольная академия Морева",
-    alternateName: "Академия Морева",
-    description:
-      "Футбольная школа в Анапе для детей от 4 до 14 лет. Тренировки по футболу, школа вратарей, развитие техники, координации и уверенности на поле.",
-    url: SITE_URL,
-    image: absUrl(OG_IMAGE),
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Анапа",
-      addressRegion: "Краснодарский край",
-      addressCountry: "RU",
-    },
-    areaServed: { "@type": "City", name: "Анапа" },
-    sport: "Football",
-    telephone: "+7 (918) 000-00-00",
-    sameAs: ["https://wa.me/79180000000", "https://t.me/fam_anapa"],
+const sportsActivityLd = {
+  "@context": "https://schema.org",
+  "@type": "SportsActivityLocation",
+  name: "Футбольная академия Морева",
+  alternateName: "Академия Морева",
+  description:
+    "Детская футбольная академия имени А. В. Морева в станице Анапская. Тренировки по футболу для детей, школа вратарей, развитие техники и уверенности на поле.",
+  url: SITE_URL,
+  image: absUrl(OG_IMAGE),
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: CONTACTS.streetAddress,
+    addressLocality: CONTACTS.addressLocality,
+    addressRegion: CONTACTS.addressRegion,
+    addressCountry: "RU",
   },
+  areaServed: { "@type": "AdministrativeArea", name: CONTACTS.addressRegion },
+  sport: "Football",
+  telephone: CONTACTS.phone,
+  sameAs: [CONTACTS.whatsapp, CONTACTS.telegram, CONTACTS.max, CONTACTS.yandexMaps],
+} as const;
+
+const ldJsonShell = [
+  sportsActivityLd,
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -98,6 +108,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       name: "Футбольная академия Морева",
       url: SITE_URL,
       logo: absUrl(logoSrc),
+      telephone: CONTACTS.phone,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: CONTACTS.streetAddress,
+        addressLocality: CONTACTS.addressLocality,
+        addressRegion: CONTACTS.addressRegion,
+        addressCountry: "RU",
+      },
+      sameAs: [...sportsActivityLd.sameAs],
     },
     ldJsonShell[1],
   ];

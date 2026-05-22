@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Phone,
-  MessageCircle,
   Play,
   MapPin,
   Plus,
@@ -272,11 +271,6 @@ function About({ home }: { home: HomePageContent }) {
                 </p>
               ))}
             </Reveal>
-            <Reveal delay={0.2}>
-              <div className="mt-8">
-                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
-              </div>
-            </Reveal>
           </div>
         </div>
       </div>
@@ -324,9 +318,6 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
               <p className="mt-6 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">
                 {home.goalkeeper.body}
               </p>
-              <div className="mt-7">
-                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
-              </div>
             </Reveal>
           </div>
 
@@ -461,9 +452,13 @@ function Principles({ home }: { home: HomePageContent }) {
 }
 
 function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach[] }) {
-  const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false, dragFree: false });
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(true);
+  const [emblaRef, embla] = useEmblaCarousel({
+    align: "start",
+    loop: false,
+    dragFree: true,
+    containScroll: "trimSnaps",
+  });
+  const [snapIndex, setSnapIndex] = useState(0);
 
   const rawCards =
     home.coachesSection.staticCoaches.length > 0
@@ -489,8 +484,7 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
   useEffect(() => {
     if (!embla) return;
     const update = () => {
-      setCanPrev(embla.canScrollPrev());
-      setCanNext(embla.canScrollNext());
+      setSnapIndex(embla.selectedScrollSnap());
     };
     update();
     embla.on("select", update);
@@ -502,76 +496,68 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
       <div className="absolute inset-0 club-stripes-dark opacity-50 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
-            <div>
-              <h2
-                className="mt-4 font-display tracking-tight text-deep"
-                style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", lineHeight: 0.95 }}
-              >
-                {home.coachesSection.titleLine1} <br className="md:hidden" />{" "}
-                <span className="text-gradient-brand-dark">{home.coachesSection.titleLine2Accent}</span>
-              </h2>
-              <p className="mt-4 text-ink/65 max-w-md text-base md:text-lg">{home.coachesSection.subtitle}</p>
-            </div>
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                onClick={() => embla?.scrollPrev()}
-                disabled={!canPrev}
-                className="h-12 w-12 rounded-full border border-ink/15 text-ink hover:bg-ink hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink flex items-center justify-center"
-                aria-label="Назад"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => embla?.scrollNext()}
-                disabled={!canNext}
-                className="h-12 w-12 rounded-full border border-ink/15 text-ink hover:bg-ink hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-ink flex items-center justify-center"
-                aria-label="Далее"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
+          <div className="max-w-3xl">
+            <h2 className="font-display font-bold tracking-[0.22em] text-deep uppercase text-3xl sm:text-4xl md:text-5xl">
+              Тренеры
+            </h2>
+            {home.coachesSection.subtitle.trim() ? (
+              <p className="mt-4 text-ink/65 max-w-lg text-sm md:text-base leading-relaxed">
+                {home.coachesSection.subtitle}
+              </p>
+            ) : null}
           </div>
         </Reveal>
 
-        <div className="mt-10 md:mt-14 -mx-5 lg:mx-0">
-          <div className="overflow-hidden px-5 lg:px-0" ref={emblaRef}>
-            <div className="flex gap-4 md:gap-6">
+        <div className="mt-8 md:mt-12 -mx-5 lg:mx-0">
+          <div className="overflow-hidden pl-5 pr-2 sm:pl-5 sm:pr-5 lg:px-0" ref={emblaRef}>
+            <div className="flex gap-3 sm:gap-4 md:gap-5">
               {items.map((c, i) => (
                 <div
                   key={c.id}
-                  className="shrink-0 w-[78%] sm:w-[55%] md:w-[42%] lg:w-[32%]"
+                  className="shrink-0 min-w-0 w-[min(88vw,360px)] sm:w-[min(72vw,320px)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-2.5rem)/3)]"
                 >
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.5, delay: i * 0.05 }}
-                    className="group relative rounded-3xl overflow-hidden bg-night text-white aspect-[3/4] hover:shadow-elevated transition"
+                    transition={{ duration: 0.45, delay: i * 0.04 }}
+                    className="group relative flex h-full min-h-[420px] flex-col rounded-3xl overflow-hidden bg-night text-white border border-line/30 shadow-soft"
                   >
-                    {c.photoUrl && (
-                      <Image
-                        src={c.photoUrl}
-                        alt={c.fullName}
-                        fill
-                        sizes="(min-width: 1024px) 32vw, 78vw"
-                        className="absolute inset-0 w-full h-full object-cover object-[center_15%] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition duration-700"
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-night via-night/40 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                      <div className="text-[10px] uppercase tracking-[0.25em] text-flame font-semibold">
-                        {c.role}
-                      </div>
-                      <div className="mt-2 font-display text-xl md:text-2xl tracking-wide leading-tight">
+                    <div className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-night">
+                      {c.photoUrl && (
+                        <Image
+                          src={c.photoUrl}
+                          alt={c.fullName}
+                          fill
+                          sizes="(min-width: 1024px) 28vw, 88vw"
+                          className="object-cover object-[center_20%] transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col p-5 md:p-6 bg-gradient-to-b from-night to-night">
+                      <h3 className="font-display text-lg md:text-xl tracking-wide text-white leading-snug">
                         {c.fullName}
-                      </div>
-                      <p className="mt-2 text-white/70 text-xs md:text-sm leading-snug">{c.shortDescription}</p>
+                      </h3>
+                      <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-flame/90 font-semibold">
+                        {c.role}
+                      </p>
+                      <p className="mt-3 text-sm text-white/70 leading-snug line-clamp-4">{c.shortDescription}</p>
                     </div>
                   </motion.div>
                 </div>
               ))}
             </div>
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
+            {items.map((c, i) => (
+              <button
+                key={c.id}
+                type="button"
+                aria-label={`Слайд ${i + 1}`}
+                onClick={() => embla?.scrollTo(i)}
+                className={`h-1.5 rounded-full transition-all ${i === snapIndex ? "w-6 bg-flame" : "w-1.5 bg-ink/25"}`}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -640,31 +626,37 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                 {home.location.body}
               </p>
 
-              <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md">
+              <a
+                href={home.location.mapUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-7 block rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md hover:border-flame/40 hover:bg-white/[0.07] transition"
+              >
                 <div className="flex items-start gap-4">
                   <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
                     <MapPin className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
                     <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
-                    <div className="mt-1 font-display text-lg tracking-wide text-white">
-                      {home.location.address}
+                    <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug space-y-1">
+                      {home.location.address.split(/\n/).map((ln) => ln.trim()).filter(Boolean).length > 1
+                        ? home.location.address
+                            .split(/\n/)
+                            .map((ln) => ln.trim())
+                            .filter(Boolean)
+                            .map((line) => (
+                              <span key={line} className="block">
+                                {line}
+                              </span>
+                            ))
+                        : home.location.address}
                     </div>
-                    <a
-                      href={home.location.mapUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
-                    >
-                      Открыть на Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
-                    </a>
+                    <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame">
+                      Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="mt-7">
-                <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
-              </div>
+              </a>
             </Reveal>
           </div>
 
@@ -725,13 +717,25 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
               </div>
             </div>
 
-            <div className="mt-4 relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
-              <iframe
-                title="Карта · Анапа"
-                src={home.location.embedSrc}
-                className="absolute inset-0 w-full h-full"
-                loading="lazy"
-              />
+            <div className="mt-4">
+              <div className="relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
+                <iframe
+                  title="Карта · ст. Анапская"
+                  src={home.location.embedSrc}
+                  className="absolute inset-0 h-full w-full border-0"
+                  loading="lazy"
+                />
+              </div>
+              <div className="mt-3 flex justify-end">
+                <a
+                  href={home.location.mapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
+                >
+                  Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+                </a>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -773,19 +777,6 @@ function ApplySection({ home }: { home: HomePageContent }) {
               ))}
             </ul>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href={CONTACTS.max}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() =>
-                  trackSiteEvent({ type: "MAX_CLICK", section: "home_contacts_strip", page: "/" })
-                }
-                className="inline-flex items-center justify-center gap-2 h-12 px-5 rounded-full border border-deep/15 text-deep text-[11px] font-semibold uppercase tracking-[0.18em] hover:bg-deep hover:text-white transition"
-              >
-                <MessageCircle className="h-4 w-4" /> MAX
-              </a>
-            </div>
           </Reveal>
 
           <Reveal y={20} delay={0.1}>
@@ -801,10 +792,10 @@ function ApplySection({ home }: { home: HomePageContent }) {
                   Анкета записи
                 </div>
                 <div className="mt-3 font-display text-2xl md:text-3xl tracking-wide text-deep">
-                  Открыть форму
+                  Записать ребёнка
                 </div>
                 <p className="mt-3 text-ink/60 text-sm leading-relaxed">
-                  Направление · ФИО ребёнка · Дата рождения · Контакты родителя
+                  Ребёнок и родитель · телефон · дата рождения · опыт футбола · комментарий
                 </p>
 
                 <div className="mt-6 flex items-center justify-between gap-4">
@@ -832,7 +823,7 @@ function ApplySection({ home }: { home: HomePageContent }) {
             <p className="mt-4 text-[11px] text-ink/50 leading-relaxed text-center">
               Нажимая кнопку, вы соглашаетесь с{" "}
               <Link
-                href="/legal/consent"
+                href="/legal/privacy"
                 className="underline decoration-ink/30 hover:text-flame transition"
               >
                 политикой обработки персональных данных

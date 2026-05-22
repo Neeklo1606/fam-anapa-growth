@@ -8,7 +8,6 @@ import { CalendarIcon, CheckCircle2, Send } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
-import { FORM_DIRECTIONS } from "@/content/site";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trackSiteEvent } from "@/lib/analytics";
@@ -18,27 +17,21 @@ import { submitLead, LeadSubmitError } from "@/lib/api";
 type Experience = "none" | "yes";
 
 type FormState = {
-  direction: string;
   experience: Experience;
   childName: string;
   birthDate?: Date;
   parentName: string;
-  email: string;
   phone: string;
-  telegram: string;
   comment: string;
   consent: boolean;
 };
 
 const initial: FormState = {
-  direction: FORM_DIRECTIONS[0]!,
   experience: "none",
   childName: "",
   birthDate: undefined,
   parentName: "",
-  email: "",
   phone: "",
-  telegram: "",
   comment: "",
   consent: false,
 };
@@ -62,7 +55,6 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     const digits = data.phone.replace(/\D/g, "");
     if (digits.length !== 11 || !/^[78]/.test(digits))
       e.phone = "Введите телефон в формате +7 (___) ___-__-__";
-    if (data.email && !/^\S+@\S+\.\S+$/.test(data.email)) e.email = "Проверьте email";
     if (!data.consent) e.consent = "Необходимо согласие на обработку данных";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -78,9 +70,6 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         childName: data.childName,
         childBirthDate: data.birthDate?.toISOString(),
         phone: data.phone,
-        email: data.email || undefined,
-        telegram: data.telegram || undefined,
-        direction: data.direction,
         experienceLevel: data.experience === "yes" ? "YES" : "NONE",
         comment: data.comment || undefined,
         privacyAccepted: data.consent,
@@ -88,7 +77,11 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         landingPage: typeof window !== "undefined" ? window.location.pathname : undefined,
       });
       setDone(true);
-      trackSiteEvent({ type: "FORM_SUBMIT", page: typeof window !== "undefined" ? window.location.pathname : "/", section: "apply_form" });
+      trackSiteEvent({
+        type: "FORM_SUBMIT",
+        page: typeof window !== "undefined" ? window.location.pathname : "/",
+        section: "apply_form",
+      });
       toast.success("Заявка отправлена", { description: "Свяжемся с вами в течение дня." });
     } catch (err) {
       if (err instanceof LeadSubmitError) {
@@ -134,11 +127,11 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="grid gap-3" noValidate>
-      <Field label="Опыт занятий в спортивных школах">
+    <form onSubmit={submit} className="grid gap-3.5" noValidate>
+      <Field label="Опыт занятий футболом">
         <div
           role="radiogroup"
-          aria-label="Опыт занятий"
+          aria-label="Опыт занятий футболом"
           className="relative grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10"
         >
           <motion.div
@@ -173,7 +166,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         </div>
       </Field>
 
-      <Field label="ФИО опекуна *" error={errors.parentName}>
+      <Field label="ФИО опекуна / родителя *" error={errors.parentName}>
         <input
           value={data.parentName}
           onChange={(e) => update("parentName", e.target.value)}
@@ -228,57 +221,36 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         </Popover>
       </Field>
 
-      <div className="grid sm:grid-cols-2 gap-3">
-        <Field label="Телефон *" error={errors.phone}>
-          <input
-            type="tel"
-            value={data.phone}
-            onChange={(e) => update("phone", formatRuPhone(e.target.value))}
-            onFocus={(e) => {
-              if (!e.target.value) update("phone", "+7 ");
-            }}
-            onBlur={(e) => {
-              if (e.target.value.replace(/\D/g, "").length <= 1) update("phone", "");
-            }}
-            className={inputCls(!!errors.phone)}
-            placeholder="+7 (___) ___-__-__"
-            inputMode="tel"
-            maxLength={18}
-            autoComplete="tel"
-          />
-        </Field>
-        <Field label="Email" error={errors.email}>
-          <input
-            type="email"
-            value={data.email}
-            onChange={(e) => update("email", e.target.value)}
-            className={inputCls(!!errors.email)}
-            placeholder="you@example.com"
-            inputMode="email"
-          />
-        </Field>
-      </div>
-
-      <Field label="Telegram">
+      <Field label="Телефон *" error={errors.phone}>
         <input
-          value={data.telegram}
-          onChange={(e) => update("telegram", e.target.value)}
-          className={inputCls(false)}
-          placeholder="@username"
+          type="tel"
+          value={data.phone}
+          onChange={(e) => update("phone", formatRuPhone(e.target.value))}
+          onFocus={(e) => {
+            if (!e.target.value) update("phone", "+7 ");
+          }}
+          onBlur={(e) => {
+            if (e.target.value.replace(/\D/g, "").length <= 1) update("phone", "");
+          }}
+          className={inputCls(!!errors.phone)}
+          placeholder="+7 (___) ___-__-__"
+          inputMode="tel"
+          maxLength={18}
+          autoComplete="tel"
         />
       </Field>
 
-      <Field label="Комментарий">
+      <Field label="Комментарий / дополнительные пожелания">
         <textarea
           value={data.comment}
           onChange={(e) => update("comment", e.target.value)}
           rows={3}
           className={`${inputCls(false)} h-auto py-3 resize-none`}
-          placeholder="Дополнительные пожелания"
+          placeholder="Например, удобное время для звонка"
         />
       </Field>
 
-      <label className="flex items-start gap-3 mt-1 cursor-pointer select-none">
+      <label className="flex items-start gap-3 cursor-pointer select-none">
         <input
           type="checkbox"
           checked={data.consent}
@@ -286,26 +258,10 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           className="mt-1 h-4 w-4 rounded border-white/20 bg-white/5 accent-flame shrink-0"
         />
         <span className="text-[12px] leading-relaxed text-white/70">
-          Даю{" "}
-          <Link
-            href="/legal/consent"
-            target="_blank"
-            className="text-white underline decoration-white/40 hover:text-flame transition"
-          >
-            согласие на обработку персональных данных
-          </Link>{" "}
-          и принимаю{" "}
-          <Link
-            href="/legal/privacy"
-            target="_blank"
-            className="text-white underline decoration-white/40 hover:text-flame transition"
-          >
-            политику обработки персональных данных
-          </Link>
-          .
+          Согласен(на) на обработку персональных данных в соответствии с указанными в анкете сведениями.
         </span>
       </label>
-      {errors.consent && <span className="text-[11px] text-red-300 -mt-1">{errors.consent}</span>}
+      {errors.consent && <span className="text-[11px] text-red-300 -mt-2">{errors.consent}</span>}
 
       <button
         type="submit"
@@ -321,6 +277,19 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           </>
         )}
       </button>
+
+      <p className="text-[11px] leading-snug text-white/65 text-center px-1">
+        Нажимая кнопку, вы соглашаетесь с{" "}
+        <Link
+          href="/legal/privacy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-white hover:text-flame transition"
+        >
+          политикой обработки персональных данных
+        </Link>
+        .
+      </p>
     </form>
   );
 }
@@ -357,7 +326,7 @@ function formatRuPhone(input: string): string {
   digits = digits.slice(0, 11);
   const d = digits.slice(1);
   let out = "+7";
-  if (d.length === 0) return out + " ";
+  if (d.length === 0) return `${out} `;
   out += " (" + d.slice(0, 3);
   if (d.length < 3) return out;
   out += ") " + d.slice(3, 6);

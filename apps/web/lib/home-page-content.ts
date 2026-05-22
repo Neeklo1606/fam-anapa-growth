@@ -145,8 +145,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
     coachesSection: {
       titleLine1: "Тренерский",
       titleLine2Accent: "штаб",
-      subtitle:
-        "Тренеры академии работают с детскими группами и помогают каждому ребёнку расти на поле.",
+      subtitle: "Знакомьтесь с тренерами ФАМ.",
       useCoachesApi: true,
       staticCoaches: COACHES.map((c) => ({
         fullName: c.name,

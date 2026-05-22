@@ -6,8 +6,8 @@ import { trackSiteEvent } from "@/lib/analytics";
 export function FooterContactsSection() {
   return (
     <div className="md:col-span-4">
-      <div className="text-[11px] uppercase tracking-[0.2em] text-white/40 font-mono-pro">Связь</div>
-      <ul className="mt-5 space-y-3 text-sm text-white/80">
+      <div className="text-[10px] uppercase tracking-[0.22em] text-white/35 font-mono-pro">Связь</div>
+      <ul className="mt-4 space-y-3 text-[13px] text-white/[0.8]">
         <li>
           <a
             href={`tel:${CONTACTS.phone}`}
@@ -20,29 +20,34 @@ export function FooterContactsSection() {
           </a>
         </li>
         <li>
-          <a
-            href={CONTACTS.whatsapp}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() =>
-              trackSiteEvent({ type: "WHATSAPP_CLICK", section: "footer", page: window.location.pathname })
-            }
-            className="hover:text-flame transition"
-          >
-            WhatsApp
-          </a>
-          {" · "}
-          <a
-            href={CONTACTS.telegram}
-            target="_blank"
-            rel="noreferrer"
-            onClick={() =>
-              trackSiteEvent({ type: "TELEGRAM_CLICK", section: "footer", page: window.location.pathname })
-            }
-            className="hover:text-flame transition"
-          >
-            Telegram
-          </a>
+          <span className="text-white/50 text-xs uppercase tracking-[0.12em]">Мессенджеры</span>
+          <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+            <a
+              href={CONTACTS.whatsapp}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() =>
+                trackSiteEvent({ type: "WHATSAPP_CLICK", section: "footer", page: window.location.pathname })
+              }
+              className="hover:text-flame transition"
+            >
+              WhatsApp
+            </a>
+            <span aria-hidden className="text-white/35">
+              ·
+            </span>
+            <a
+              href={CONTACTS.telegram}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() =>
+                trackSiteEvent({ type: "TELEGRAM_CLICK", section: "footer", page: window.location.pathname })
+              }
+              className="hover:text-flame transition"
+            >
+              Telegram
+            </a>
+          </div>
         </li>
         <li>
           <a
@@ -67,7 +72,7 @@ export function FooterContactsSection() {
             }
             className="hover:text-flame transition"
           >
-            {CONTACTS.address}
+            Яндекс.Карты · {CONTACTS.addressShort}
           </a>
         </li>
       </ul>
