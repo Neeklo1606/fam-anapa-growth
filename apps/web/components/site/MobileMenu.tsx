@@ -125,22 +125,12 @@ export function MobileMenu() {
                   </nav>
 
                   <div className="relative p-5 space-y-3">
-                    <div className="grid grid-cols-2 gap-2">
-                      <a
-                        href={`tel:${CONTACTS.phone}`}
-                        className="h-11 rounded-full border border-white/15 bg-white/5 text-white text-[11px] font-semibold uppercase tracking-[0.18em] flex items-center justify-center hover:bg-white/10 transition"
-                      >
-                        Позвонить
-                      </a>
-                      <a
-                        href={CONTACTS.whatsapp}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="h-11 rounded-full border border-white/15 bg-white/5 text-white text-[11px] font-semibold uppercase tracking-[0.18em] flex items-center justify-center hover:bg-white/10 transition"
-                      >
-                        WhatsApp
-                      </a>
-                    </div>
+                    <a
+                      href={`tel:${CONTACTS.phone}`}
+                      className="flex h-11 w-full items-center justify-center rounded-full border border-white/15 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10"
+                    >
+                      Позвонить
+                    </a>
                     <div className="text-center text-[10px] uppercase tracking-[0.28em] text-white/40 pt-2 font-mono-pro">
                       FAM · ANAPA
                     </div>
