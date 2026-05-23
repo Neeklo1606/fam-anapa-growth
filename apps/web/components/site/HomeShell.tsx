@@ -12,8 +12,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
 import Link from "next/link";
+
+import { SiteImage } from "@/components/site/SiteImage";
 
 import { HeroVideo } from "@/components/site/HeroVideo";
 import { Reveal } from "@/components/site/Reveal";
@@ -119,7 +120,7 @@ function VideosStrip({ home, videos }: { home: HomePageContent; videos?: HomeVid
                   ) : (
                     <a href={v.url} target="_blank" rel="noreferrer" className="absolute inset-0 group block">
                       {v.posterUrl ? (
-                        <Image src={v.posterUrl} alt="" fill sizes="400px" className="object-cover opacity-95 group-hover:opacity-100 transition" />
+                        <SiteImage src={v.posterUrl} alt="" fill sizes="400px" className="object-cover opacity-95 group-hover:opacity-100 transition" />
                       ) : (
                         <div className="absolute inset-0 bg-night" />
                       )}
@@ -236,7 +237,7 @@ function About({ home }: { home: HomePageContent }) {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <Reveal y={20} className="lg:col-span-6 order-2 lg:order-1">
             <div className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
-              <Image
+              <SiteImage
                 src={home.about.imageUrl}
                 alt={home.about.imageAlt}
                 fill
@@ -524,7 +525,7 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
                     className="group relative aspect-[3/4] max-h-[min(52vh,420px)] md:max-h-none w-full overflow-hidden rounded-2xl md:rounded-3xl bg-night shadow-soft ring-1 ring-line/25"
                   >
                     {c.photoUrl ? (
-                      <Image
+                      <SiteImage
                         src={c.photoUrl}
                         alt={c.fullName}
                         fill
@@ -672,7 +673,7 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                       key={s.id}
                       className="shrink-0 w-full relative aspect-[4/3] md:aspect-[16/10]"
                     >
-                      <Image
+                      <SiteImage
                         src={s.src}
                         alt={s.alt}
                         fill
