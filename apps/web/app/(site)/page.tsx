@@ -9,6 +9,7 @@ import {
 
 import { fetchPublicSite } from "@/lib/admin-api";
 import { mergeStoredHomePage } from "@/lib/home-page-content";
+import { applyPublicSiteToHome } from "@/lib/site-contacts";
 
 export const metadata: Metadata = {
   title: "Футбольная академия Морева в Анапе · футбол для детей",
@@ -67,6 +68,7 @@ export default async function HomePage() {
   try {
     const pub = await fetchPublicSite();
     home = mergeStoredHomePage(pub.homeContent);
+    home = applyPublicSiteToHome(home, pub);
   } catch {
     /* см. layout: API может быть недоступна при сборке */
   }

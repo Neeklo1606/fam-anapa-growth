@@ -19,7 +19,9 @@ import { SiteImage } from "@/components/site/SiteImage";
 import { HeroVideo } from "@/components/site/HeroVideo";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton, useApply } from "@/components/site/ApplyModal";
-import { CONTACTS, COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
+import { useSiteContacts } from "@/components/site/SiteContactsContext";
+import { COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
+import { isHttpUrl } from "@/lib/site-contacts";
 import type { HomePageContent } from "@/lib/home-page-content";
 import { trackSiteEvent } from "@/lib/analytics";
 
@@ -750,6 +752,7 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
 
 function ApplySection({ home }: { home: HomePageContent }) {
   const { open } = useApply();
+  const contacts = useSiteContacts();
   return (
     <section
       id="contacts"
@@ -802,21 +805,25 @@ function ApplySection({ home }: { home: HomePageContent }) {
                   Ребёнок и родитель · телефон · дата рождения · опыт футбола · комментарий
                 </p>
 
-                <div className="mt-6 flex items-center justify-between gap-4">
-                  <a
-                    href={`tel:${CONTACTS.phone}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      trackSiteEvent({
-                        type: "PHONE_CLICK",
-                        section: "home_apply_sidebar",
-                        page: "/",
-                      });
-                    }}
-                    className="flex items-center gap-2 text-deep text-sm font-semibold hover:text-flame transition"
-                  >
-                    <Phone className="h-4 w-4" /> {CONTACTS.phoneDisplay}
-                  </a>
+                <div
+                  className={`mt-6 flex items-center gap-4 ${contacts.phoneTel ? "justify-between" : "justify-end"}`}
+                >
+                  {contacts.phoneTel && contacts.phoneDisplay ? (
+                    <a
+                      href={`tel:${contacts.phoneTel}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        trackSiteEvent({
+                          type: "PHONE_CLICK",
+                          section: "home_apply_sidebar",
+                          page: "/",
+                        });
+                      }}
+                      className="flex items-center gap-2 text-deep text-sm font-semibold hover:text-flame transition"
+                    >
+                      <Phone className="h-4 w-4" /> {contacts.phoneDisplay}
+                    </a>
+                  ) : null}
                   <span className="h-12 w-12 rounded-full bg-flame text-white flex items-center justify-center shadow-flame group-hover:scale-105 transition">
                     <ArrowRight className="h-5 w-5" />
                   </span>

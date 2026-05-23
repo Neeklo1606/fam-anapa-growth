@@ -5,13 +5,15 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
-import { SITE_NAV, CONTACTS } from "@/content/site";
+import { SITE_NAV } from "@/content/site";
 import { useApply } from "@/components/site/ApplyModal";
+import { useSiteContacts } from "@/components/site/SiteContactsContext";
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { open: openApply } = useApply();
+  const contacts = useSiteContacts();
 
   useEffect(() => {
     setMounted(true);
@@ -125,12 +127,14 @@ export function MobileMenu() {
                   </nav>
 
                   <div className="relative p-5 space-y-3">
-                    <a
-                      href={`tel:${CONTACTS.phone}`}
-                      className="flex h-11 w-full items-center justify-center rounded-full border border-white/15 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10"
-                    >
-                      Позвонить
-                    </a>
+                    {contacts.phoneTel ? (
+                      <a
+                        href={`tel:${contacts.phoneTel}`}
+                        className="flex h-11 w-full items-center justify-center rounded-full border border-white/15 bg-white/5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-white/10"
+                      >
+                        Позвонить
+                      </a>
+                    ) : null}
                     <div className="text-center text-[10px] uppercase tracking-[0.28em] text-white/40 pt-2 font-mono-pro">
                       FAM · ANAPA
                     </div>

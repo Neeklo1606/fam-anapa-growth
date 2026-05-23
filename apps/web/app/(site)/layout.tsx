@@ -4,10 +4,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { ApplyProvider } from "@/components/site/ApplyModal";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SiteContactsProvider } from "@/components/site/SiteContactsContext";
 
 import { fetchPublicSite } from "@/lib/admin-api";
 import { CONTACTS } from "@/content/site";
 import { DEFAULT_SITE_LOGO_SRC } from "@/lib/site-defaults";
+import { resolveSiteContacts, type ResolvedSiteContacts } from "@/lib/site-contacts";
 import { SITE_URL, absUrl } from "@/lib/utils";
 
 const SITE_TITLE = "Футбольная академия Морева в Анапе · футбол для детей";
@@ -57,80 +59,99 @@ export const metadata: Metadata = {
   category: "sports",
 };
 
-const sportsActivityLd = {
-  "@context": "https://schema.org",
-  "@type": "SportsActivityLocation",
-  name: "Футбольная академия Морева",
-  alternateName: "Академия Морева",
-  description:
-    "Детская футбольная академия имени А. В. Морева в станице Анапская. Тренировки по футболу для детей, школа вратарей, развитие техники и уверенности на поле.",
-  url: SITE_URL,
-  image: absUrl(OG_IMAGE),
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: CONTACTS.streetAddress,
-    addressLocality: CONTACTS.addressLocality,
-    addressRegion: CONTACTS.addressRegion,
-    addressCountry: "RU",
-  },
-  areaServed: { "@type": "AdministrativeArea", name: CONTACTS.addressRegion },
-  sport: "Football",
-  telephone: CONTACTS.phone,
-  sameAs: [CONTACTS.whatsapp, CONTACTS.telegram, CONTACTS.max, CONTACTS.yandexMaps],
-} as const;
+function schemaAddress(contacts: ResolvedSiteContacts, apiLoaded: boolean) {
+  if (contacts.address) {
+    return {
+      "@type": "PostalAddress" as const,
+      streetAddress: contacts.address,
+      addressCountry: "RU",
+    };
+  }
+  if (!apiLoaded) {
+    return {
+      "@type": "PostalAddress" as const,
+      streetAddress: CONTACTS.streetAddress,
+      addressLocality: CONTACTS.addressLocality,
+      addressRegion: CONTACTS.addressRegion,
+      addressCountry: "RU",
+    };
+  }
+  return undefined;
+}
 
-const ldJsonShell = [
-  sportsActivityLd,
-  {
+function buildLdJson(contacts: ResolvedSiteContacts, logoSrc: string, apiLoaded: boolean) {
+  const sameAs = [contacts.whatsapp, contacts.telegram, contacts.max, contacts.yandexMaps].filter(
+    (u): u is string => Boolean(u),
+  );
+  const address = schemaAddress(contacts, apiLoaded);
+
+  const sportsActivityLd = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Футбольная академия Морева в Анапе",
+    "@type": "SportsActivityLocation",
+    name: contacts.brandName,
+    alternateName: "Академия Морева",
+    description:
+      "Детская футбольная академия имени А. В. Морева в станице Анапская. Тренировки по футболу для детей, школа вратарей, развитие техники и уверенности на поле.",
     url: SITE_URL,
-    inLanguage: "ru-RU",
-  },
-] as const;
+    image: absUrl(OG_IMAGE),
+    ...(address ? { address } : {}),
+    ...(contacts.address ? { areaServed: { "@type": "AdministrativeArea", name: contacts.address } } : {}),
+    sport: "Football",
+    ...(contacts.phoneTel ? { telephone: contacts.phoneTel } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+  };
+
+  return [
+    sportsActivityLd,
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: contacts.brandName,
+      url: SITE_URL,
+      logo: absUrl(logoSrc),
+      ...(contacts.phoneTel ? { telephone: contacts.phoneTel } : {}),
+      ...(address ? { address } : {}),
+      ...(sameAs.length ? { sameAs } : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "Футбольная академия Морева в Анапе",
+      url: SITE_URL,
+      inLanguage: "ru-RU",
+    },
+  ];
+}
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   let logoSrc = DEFAULT_SITE_LOGO_SRC;
+  let apiLoaded = false;
+  let contacts = resolveSiteContacts(null);
+
   try {
     const pub = await fetchPublicSite();
+    apiLoaded = true;
+    contacts = resolveSiteContacts(pub);
     const u = pub.logoUrl?.trim();
     if (u) logoSrc = u;
   } catch {
     // API может быть недоступна при сборке / без Nest — остаётся локальный fallback
   }
 
-  const ldJson = [
-    ldJsonShell[0],
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "Футбольная академия Морева",
-      url: SITE_URL,
-      logo: absUrl(logoSrc),
-      telephone: CONTACTS.phone,
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: CONTACTS.streetAddress,
-        addressLocality: CONTACTS.addressLocality,
-        addressRegion: CONTACTS.addressRegion,
-        addressCountry: "RU",
-      },
-      sameAs: [...sportsActivityLd.sameAs],
-    },
-    ldJsonShell[1],
-  ];
+  const ldJson = buildLdJson(contacts, logoSrc, apiLoaded);
 
   return (
     <ApplyProvider>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
-      />
-      <Header logoSrc={logoSrc} />
-      <main>{children}</main>
-      <Footer logoSrc={logoSrc} />
-      <Toaster />
+      <SiteContactsProvider contacts={contacts}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+        />
+        <Header logoSrc={logoSrc} />
+        <main>{children}</main>
+        <Footer logoSrc={logoSrc} />
+        <Toaster />
+      </SiteContactsProvider>
     </ApplyProvider>
   );
 }
