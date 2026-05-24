@@ -27,13 +27,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 60;
-
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
 
 async function loadCoaches(): Promise<HomeCoach[] | undefined> {
   try {
-    const res = await fetch(`${INTERNAL_API_BASE}/coaches`, { next: { revalidate: 60 } });
+    const res = await fetch(`${INTERNAL_API_BASE}/coaches`, { next: { tags: [PUBLIC_COACHES_TAG] } });
     if (!res.ok) return undefined;
     const data = (await res.json()) as Array<{
       id: string;
