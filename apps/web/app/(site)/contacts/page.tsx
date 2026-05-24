@@ -19,8 +19,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contacts" },
 };
 
-export const revalidate = 60;
-
 const ICONS: Record<string, LucideIcon> = {
   phone: Phone,
   wa: MessageCircle,

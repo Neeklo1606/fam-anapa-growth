@@ -8,6 +8,8 @@ import { cookies } from "next/headers";
 
 import type { LeadStatus, UserRole } from "@fam/types";
 
+import { PUBLIC_SITE_TAG } from "@/lib/public-cache-tags";
+
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
 
 const UNSAFE_HTTP = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -216,7 +218,7 @@ export type PublicSite = {
 
 export async function fetchPublicSite(): Promise<PublicSite> {
   const url = `${INTERNAL_API_BASE}/site`;
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, { next: { tags: [PUBLIC_SITE_TAG] } });
   if (!res.ok) {
     const err = new Error(`GET /site failed: ${res.status}`);
     (err as Error & { status?: number }).status = res.status;

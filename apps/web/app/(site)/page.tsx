@@ -9,6 +9,11 @@ import {
 
 import { fetchPublicSite } from "@/lib/admin-api";
 import { mergeStoredHomePage } from "@/lib/home-page-content";
+import {
+  PUBLIC_COACHES_TAG,
+  PUBLIC_GALLERY_TAG,
+  PUBLIC_VIDEOS_TAG,
+} from "@/lib/public-cache-tags";
 import { applyPublicSiteToHome } from "@/lib/site-contacts";
 
 export const metadata: Metadata = {
@@ -45,7 +50,7 @@ async function loadCoaches(): Promise<HomeCoach[] | undefined> {
 
 async function loadGallery(): Promise<HomeGallerySlide[] | undefined> {
   try {
-    const res = await fetch(`${INTERNAL_API_BASE}/gallery`, { next: { revalidate: 60 } });
+    const res = await fetch(`${INTERNAL_API_BASE}/gallery`, { next: { tags: [PUBLIC_GALLERY_TAG] } });
     if (!res.ok) return undefined;
     return (await res.json()) as HomeGallerySlide[];
   } catch {
@@ -55,7 +60,7 @@ async function loadGallery(): Promise<HomeGallerySlide[] | undefined> {
 
 async function loadVideos(): Promise<HomeVideoCard[] | undefined> {
   try {
-    const res = await fetch(`${INTERNAL_API_BASE}/videos`, { next: { revalidate: 60 } });
+    const res = await fetch(`${INTERNAL_API_BASE}/videos`, { next: { tags: [PUBLIC_VIDEOS_TAG] } });
     if (!res.ok) return undefined;
     return (await res.json()) as HomeVideoCard[];
   } catch {

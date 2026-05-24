@@ -3,6 +3,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { revalidatePublicSite } from "@/lib/revalidate-public-site";
+
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
 
 const UNSAFE_HTTP = new Set(["POST", "PUT", "PATCH", "DELETE"]);
@@ -183,6 +185,15 @@ async function authedJson<T = unknown>(
   }
 }
 
+async function authedJsonPublic<T = unknown>(
+  path: string,
+  init: RequestInit,
+): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
+  const r = await authedJson<T>(path, init);
+  if (r.ok) revalidatePublicSite();
+  return r;
+}
+
 export async function assignManagerAction(input: { id: string; managerId: string | null }): Promise<{ ok: boolean; error?: string }> {
   const r = await authedJson(`/leads/${input.id}/assign`, {
     method: "PATCH",
@@ -251,7 +262,7 @@ export type SettingsPatch = {
 };
 
 export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/site/admin", {
+  const r = await authedJsonPublic("/site/admin", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(patch),
@@ -262,7 +273,7 @@ export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: 
 export async function updateHomePageContentAction(
   homeContent: Record<string, unknown>,
 ): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/site/admin/home", {
+  const r = await authedJsonPublic("/site/admin/home", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ homeContent }),
@@ -303,7 +314,7 @@ export type CoachInput = {
 };
 
 export async function createCoachAction(input: CoachInput): Promise<{ ok: boolean; error?: string; id?: string }> {
-  const r = await authedJson<{ id: string }>("/coaches", {
+  const r = await authedJsonPublic<{ id: string }>("/coaches", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -313,7 +324,7 @@ export async function createCoachAction(input: CoachInput): Promise<{ ok: boolea
 
 export async function updateCoachAction(input: { id: string } & Partial<CoachInput>): Promise<{ ok: boolean; error?: string }> {
   const { id, ...patch } = input;
-  const r = await authedJson(`/coaches/${id}`, {
+  const r = await authedJsonPublic(`/coaches/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(patch),
@@ -322,12 +333,12 @@ export async function updateCoachAction(input: { id: string } & Partial<CoachInp
 }
 
 export async function deleteCoachAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson(`/coaches/${id}`, { method: "DELETE" });
+  const r = await authedJsonPublic(`/coaches/${id}`, { method: "DELETE" });
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
 export async function reorderCoachesAction(items: Array<{ id: string; order: number }>): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/coaches/reorder", {
+  const r = await authedJsonPublic("/coaches/reorder", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ items }),
@@ -475,6 +486,7 @@ export async function uploadMediaAction(form: FormData): Promise<{ ok: boolean; 
       webpUrl: string | null;
       thumbUrl: string | null;
     };
+    revalidatePublicSite();
     return { ok: true, ...data };
   } catch (e) {
     return { ok: false, error: (e as Error).message };
@@ -482,7 +494,7 @@ export async function uploadMediaAction(form: FormData): Promise<{ ok: boolean; 
 }
 
 export async function deleteMediaAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson(`/media/${id}`, { method: "DELETE" });
+  const r = await authedJsonPublic(`/media/${id}`, { method: "DELETE" });
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
@@ -495,7 +507,7 @@ export type GalleryInput = {
 };
 
 export async function createGalleryItemAction(input: GalleryInput): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/gallery", {
+  const r = await authedJsonPublic("/gallery", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -505,7 +517,7 @@ export async function createGalleryItemAction(input: GalleryInput): Promise<{ ok
 
 export async function updateGalleryItemAction(input: { id: string } & Partial<GalleryInput>): Promise<{ ok: boolean; error?: string }> {
   const { id, ...patch } = input;
-  const r = await authedJson(`/gallery/${id}`, {
+  const r = await authedJsonPublic(`/gallery/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(patch),
@@ -514,12 +526,12 @@ export async function updateGalleryItemAction(input: { id: string } & Partial<Ga
 }
 
 export async function deleteGalleryItemAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson(`/gallery/${id}`, { method: "DELETE" });
+  const r = await authedJsonPublic(`/gallery/${id}`, { method: "DELETE" });
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
 export async function reorderGalleryAction(items: Array<{ id: string; order: number }>): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/gallery/reorder", {
+  const r = await authedJsonPublic("/gallery/reorder", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ items }),
@@ -537,7 +549,7 @@ export type VideoInput = {
 };
 
 export async function createVideoAction(input: VideoInput): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/videos", {
+  const r = await authedJsonPublic("/videos", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
@@ -547,7 +559,7 @@ export async function createVideoAction(input: VideoInput): Promise<{ ok: boolea
 
 export async function updateVideoAction(input: { id: string } & Partial<VideoInput>): Promise<{ ok: boolean; error?: string }> {
   const { id, ...patch } = input;
-  const r = await authedJson(`/videos/${id}`, {
+  const r = await authedJsonPublic(`/videos/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(patch),
@@ -556,12 +568,12 @@ export async function updateVideoAction(input: { id: string } & Partial<VideoInp
 }
 
 export async function deleteVideoAction(id: string): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson(`/videos/${id}`, { method: "DELETE" });
+  const r = await authedJsonPublic(`/videos/${id}`, { method: "DELETE" });
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
 export async function reorderVideosAction(items: Array<{ id: string; order: number }>): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson("/videos/reorder", {
+  const r = await authedJsonPublic("/videos/reorder", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ items }),
@@ -570,7 +582,7 @@ export async function reorderVideosAction(items: Array<{ id: string; order: numb
 }
 
 export async function updateMediaAltAction(input: { id: string; altDefault: string | null }): Promise<{ ok: boolean; error?: string }> {
-  const r = await authedJson(`/media/${input.id}`, {
+  const r = await authedJsonPublic(`/media/${input.id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ altDefault: input.altDefault }),
