@@ -8,6 +8,10 @@ import { cookies } from "next/headers";
 
 import type { LeadStatus, UserRole } from "@fam/types";
 
+import {
+  adminCookieHeader,
+  refreshAdminSession,
+} from "@/lib/admin-session";
 import { PUBLIC_SITE_TAG } from "@/lib/public-cache-tags";
 
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
@@ -21,10 +25,10 @@ function shouldAttachCsrf(method: string | undefined): boolean {
 async function callApi<T>(
   path: string,
   init: RequestInit = {},
-  { json = true }: { json?: boolean } = {},
+  { json = true, retried = false }: { json?: boolean; retried?: boolean } = {},
 ): Promise<T> {
   const jar = await cookies();
-  const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const cookieHeader = await adminCookieHeader();
   const csrf = jar.get("fam_csrf")?.value;
   const withCsrf = shouldAttachCsrf(init.method ?? "GET");
 
@@ -44,6 +48,11 @@ async function callApi<T>(
     const hint = e instanceof Error ? e.message : String(e);
     throw new Error(`${hint} (проверьте INTERNAL_API_URL и доступность API)`);
   }
+
+  if (res.status === 401 && !retried && (await refreshAdminSession())) {
+    return callApi<T>(path, init, { json, retried: true });
+  }
+
   if (!res.ok) {
     let detail: string | undefined;
     try {

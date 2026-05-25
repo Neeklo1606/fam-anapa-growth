@@ -606,6 +606,10 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
   }, [embla]);
 
   const slideKeys = slides.map((s) => s.id).join("-");
+  const mapUrl = home.location.mapUrl?.trim();
+  const hasMapLink = Boolean(mapUrl && isHttpUrl(mapUrl));
+  const embedSrc = home.location.embedSrc?.trim();
+  const hasMapEmbed = Boolean(embedSrc && isHttpUrl(embedSrc));
 
   return (
     <section
@@ -632,37 +636,53 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                 {home.location.body}
               </p>
 
-              <a
-                href={home.location.mapUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-7 block rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md hover:border-flame/40 hover:bg-white/[0.07] transition"
-              >
-                <div className="flex items-start gap-4">
-                  <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
-                    <MapPin className="h-5 w-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
-                    <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug space-y-1">
-                      {home.location.address.split(/\n/).map((ln) => ln.trim()).filter(Boolean).length > 1
-                        ? home.location.address
-                            .split(/\n/)
-                            .map((ln) => ln.trim())
-                            .filter(Boolean)
-                            .map((line) => (
-                              <span key={line} className="block">
-                                {line}
-                              </span>
-                            ))
-                        : home.location.address}
-                    </div>
-                    <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame">
-                      Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+              {hasMapLink ? (
+                <a
+                  href={mapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-7 block rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md hover:border-flame/40 hover:bg-white/[0.07] transition"
+                >
+                  <div className="flex items-start gap-4">
+                    <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
+                      <MapPin className="h-5 w-5" />
                     </span>
+                    <div className="min-w-0">
+                      <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
+                      <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug space-y-1">
+                        {home.location.address.split(/\n/).map((ln) => ln.trim()).filter(Boolean).length > 1
+                          ? home.location.address
+                              .split(/\n/)
+                              .map((ln) => ln.trim())
+                              .filter(Boolean)
+                              .map((line) => (
+                                <span key={line} className="block">
+                                  {line}
+                                </span>
+                              ))
+                          : home.location.address}
+                      </div>
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame">
+                        Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              ) : home.location.address?.trim() ? (
+                <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md">
+                  <div className="flex items-start gap-4">
+                    <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
+                      <MapPin className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
+                      <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug">
+                        {home.location.address}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </a>
+              ) : null}
             </Reveal>
           </div>
 
@@ -723,26 +743,30 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
               </div>
             </div>
 
-            <div className="mt-4">
-              <div className="relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
-                <iframe
-                  title="Карта · ст. Анапская"
-                  src={home.location.embedSrc}
-                  className="absolute inset-0 h-full w-full border-0"
-                  loading="lazy"
-                />
+            {hasMapEmbed ? (
+              <div className="mt-4">
+                <div className="relative rounded-3xl overflow-hidden border border-white/10 h-[260px] md:h-[300px] bg-night">
+                  <iframe
+                    title="Карта · ст. Анапская"
+                    src={embedSrc}
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                  />
+                </div>
+                {hasMapLink ? (
+                  <div className="mt-3 flex justify-end">
+                    <a
+                      href={mapUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
+                    >
+                      Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+                ) : null}
               </div>
-              <div className="mt-3 flex justify-end">
-                <a
-                  href={home.location.mapUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"
-                >
-                  Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
-                </a>
-              </div>
-            </div>
+            ) : null}
           </Reveal>
         </div>
       </div>

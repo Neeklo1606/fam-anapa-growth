@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Unbounded, Bebas_Neue, JetBrains_Mono } from "next/font/google";
 
+import { ChunkLoadRecovery } from "@/components/ChunkLoadRecovery";
 import { SITE_URL } from "@/lib/utils";
 
 import "./globals.css";
@@ -86,7 +87,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="ru"
       className={`${manrope.variable} ${unbounded.variable} ${bebas.variable} ${jetbrains.variable}`}
     >
-      <body className="bg-background text-foreground">{children}</body>
+      <body className="bg-background text-foreground">
+        <ChunkLoadRecovery />
+        {children}
+      </body>
     </html>
   );
 }

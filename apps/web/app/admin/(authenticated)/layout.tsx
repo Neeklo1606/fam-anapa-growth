@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/admin/LogoutButton";
 import { fetchMe } from "@/lib/admin-api";
+import { clearAdminSessionCookies } from "@/lib/admin-session";
 
 export default async function AuthenticatedAdminLayout({
   children,
@@ -10,7 +11,10 @@ export default async function AuthenticatedAdminLayout({
   children: React.ReactNode;
 }) {
   const user = await fetchMe();
-  if (!user) redirect("/admin/login?next=/admin");
+  if (!user) {
+    await clearAdminSessionCookies();
+    redirect("/admin/login?reason=session_expired");
+  }
 
   return (
     <div className="min-h-screen bg-surface text-ink flex">

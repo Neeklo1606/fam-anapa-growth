@@ -3,6 +3,12 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import {
+  adminCookieHeader,
+  applySetCookiesFromResponse,
+  clearAdminSessionCookies,
+  refreshAdminSession,
+} from "@/lib/admin-session";
 import { revalidatePublicSite } from "@/lib/revalidate-public-site";
 
 const INTERNAL_API_BASE = process.env.INTERNAL_API_URL ?? "http://127.0.0.1:4200/api";
@@ -17,30 +23,6 @@ type LoginInput = { email: string; password: string };
 type LoginResult =
   | { ok: true }
   | { ok: false; error: string };
-
-function parseSetCookie(input: string): {
-  name: string;
-  value: string;
-  maxAge?: number;
-  expires?: Date;
-} | null {
-  const [pair, ...attrs] = input.split(";").map((s) => s.trim());
-  if (!pair) return null;
-  const eqIdx = pair.indexOf("=");
-  if (eqIdx === -1) return null;
-  const name = pair.slice(0, eqIdx);
-  const value = pair.slice(eqIdx + 1);
-  let maxAge: number | undefined;
-  let expires: Date | undefined;
-  for (const attr of attrs) {
-    const [rawKey, rawValue = ""] = attr.split("=");
-    if (!rawKey) continue;
-    const key = rawKey.trim().toLowerCase();
-    if (key === "max-age") maxAge = Number(rawValue);
-    else if (key === "expires") expires = new Date(rawValue);
-  }
-  return { name, value, maxAge, expires };
-}
 
 export async function loginAction(input: LoginInput): Promise<LoginResult> {
   try {
@@ -60,21 +42,7 @@ export async function loginAction(input: LoginInput): Promise<LoginResult> {
       return { ok: false, error: msg };
     }
 
-    const jar = await cookies();
-    const getter = (res.headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
-    const list: string[] = typeof getter === "function" ? getter.call(res.headers) : [];
-    for (const sc of list) {
-      const parsed = parseSetCookie(sc);
-      if (!parsed) continue;
-      jar.set(parsed.name, parsed.value, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: parsed.maxAge,
-        expires: parsed.expires,
-      });
-    }
+    await applySetCookiesFromResponse(res);
     return { ok: true };
   } catch (e) {
     return { ok: false, error: (e as Error).message };
@@ -95,9 +63,7 @@ export async function logoutAction(): Promise<void> {
       cache: "no-store",
     });
   } catch {}
-  jar.delete("fam_access");
-  jar.delete("fam_refresh");
-  jar.delete("fam_csrf");
+  await clearAdminSessionCookies();
   redirect("/admin/login");
 }
 
@@ -154,9 +120,10 @@ export async function addLeadCommentAction(input: { id: string; body: string }):
 async function authedJson<T = unknown>(
   path: string,
   init: RequestInit,
+  retried = false,
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   const jar = await cookies();
-  const cookieHeader = jar.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+  const cookieHeader = await adminCookieHeader();
   const csrf = jar.get("fam_csrf")?.value;
   const withCsrf = shouldAttachCsrf(init.method ?? "POST");
   try {
@@ -169,6 +136,13 @@ async function authedJson<T = unknown>(
       },
       cache: "no-store",
     });
+    if (res.status === 401 && !retried && (await refreshAdminSession())) {
+      return authedJson<T>(path, init, true);
+    }
+    if (res.status === 401) {
+      await clearAdminSessionCookies();
+      redirect("/admin/login?reason=session_expired");
+    }
     if (!res.ok) {
       let msg = `HTTP ${res.status}`;
       try {
