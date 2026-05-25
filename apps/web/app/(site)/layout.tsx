@@ -5,6 +5,7 @@ import { ApplyProvider } from "@/components/site/ApplyModal";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SiteContactsProvider } from "@/components/site/SiteContactsContext";
+import { SmoothAnchorScroll } from "@/components/site/SmoothAnchorScroll";
 
 import { fetchPublicSite } from "@/lib/admin-api";
 import { CONTACTS } from "@/content/site";
@@ -143,6 +144,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <ApplyProvider>
       <SiteContactsProvider contacts={contacts}>
+        <SmoothAnchorScroll />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
