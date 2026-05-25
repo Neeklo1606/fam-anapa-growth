@@ -21,7 +21,7 @@ import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton, useApply } from "@/components/site/ApplyModal";
 import { useSiteContacts } from "@/components/site/SiteContactsContext";
 import { COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
-import { isHttpUrl } from "@/lib/site-contacts";
+import { isHttpUrl, resolveYandexMapsLink } from "@/lib/site-contacts";
 import type { HomePageContent } from "@/lib/home-page-content";
 import { trackSiteEvent } from "@/lib/analytics";
 
@@ -606,10 +606,13 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
   }, [embla]);
 
   const slideKeys = slides.map((s) => s.id).join("-");
-  const mapUrl = home.location.mapUrl?.trim();
-  const hasMapLink = Boolean(mapUrl && isHttpUrl(mapUrl));
+  const addressText = home.location.address?.trim() ?? "";
+  const mapUrl = resolveYandexMapsLink(home.location.mapUrl, addressText);
+  const hasAddressLink = Boolean(addressText && mapUrl);
   const embedSrc = home.location.embedSrc?.trim();
   const hasMapEmbed = Boolean(embedSrc && isHttpUrl(embedSrc));
+  const explicitMapUrl = home.location.mapUrl?.trim();
+  const hasExplicitMapLink = Boolean(explicitMapUrl && isHttpUrl(explicitMapUrl));
 
   return (
     <section
@@ -636,12 +639,12 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                 {home.location.body}
               </p>
 
-              {hasMapLink ? (
+              {hasAddressLink ? (
                 <a
-                  href={mapUrl}
+                  href={mapUrl!}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-7 block rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md hover:border-flame/40 hover:bg-white/[0.07] transition"
+                  className="mt-7 block rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md hover:border-flame/40 hover:bg-white/[0.07] transition group"
                 >
                   <div className="flex items-start gap-4">
                     <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
@@ -649,9 +652,9 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                     </span>
                     <div className="min-w-0">
                       <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
-                      <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug space-y-1">
-                        {home.location.address.split(/\n/).map((ln) => ln.trim()).filter(Boolean).length > 1
-                          ? home.location.address
+                      <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug space-y-1 group-hover:text-flame/95 transition-colors">
+                        {addressText.split(/\n/).map((ln) => ln.trim()).filter(Boolean).length > 1
+                          ? addressText
                               .split(/\n/)
                               .map((ln) => ln.trim())
                               .filter(Boolean)
@@ -660,7 +663,7 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                                   {line}
                                 </span>
                               ))
-                          : home.location.address}
+                          : addressText}
                       </div>
                       <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame">
                         Открыть в Яндекс.Картах <ArrowRight className="h-3.5 w-3.5" />
@@ -668,20 +671,6 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                     </div>
                   </div>
                 </a>
-              ) : home.location.address?.trim() ? (
-                <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] p-5 max-w-md">
-                  <div className="flex items-start gap-4">
-                    <span className="h-11 w-11 rounded-xl bg-flame/15 flex items-center justify-center text-flame shrink-0">
-                      <MapPin className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0">
-                      <div className="text-[10px] uppercase tracking-[0.25em] text-white/45">Адрес</div>
-                      <div className="mt-1 font-display text-lg tracking-wide text-white leading-snug">
-                        {home.location.address}
-                      </div>
-                    </div>
-                  </div>
-                </div>
               ) : null}
             </Reveal>
           </div>
@@ -753,10 +742,10 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
                     loading="lazy"
                   />
                 </div>
-                {hasMapLink ? (
+                {hasExplicitMapLink ? (
                   <div className="mt-3 flex justify-end">
                     <a
-                      href={mapUrl}
+                      href={explicitMapUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-flame hover:text-white transition"

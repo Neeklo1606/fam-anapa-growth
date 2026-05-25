@@ -66,12 +66,28 @@ function pickEmail(fromApi: string | null | undefined): string | null {
   return v;
 }
 
+/** URL Яндекс.Карт: из настроек или поиск по адресу. */
+export function resolveYandexMapsLink(
+  explicitUrl: string | null | undefined,
+  address: string | null | undefined,
+): string | null {
+  const url = explicitUrl?.trim();
+  if (url && isHttpUrl(url)) return url;
+  const addr = address?.trim();
+  if (!addr) return null;
+  const query = addr.replace(/\s*\n+\s*/g, ", ");
+  return `https://yandex.ru/maps/?text=${encodeURIComponent(query)}`;
+}
+
 /** Контакты из API; пустые/невалидные поля не попадают в UI (fallback только если API недоступен). */
 export function resolveSiteContacts(pub: PublicSite | null): ResolvedSiteContacts {
   const apiLoaded = pub !== null;
 
   const phone =
     normalizePhone(pub?.phone) ?? (!apiLoaded ? normalizePhone(CONTACTS.phone) : null);
+
+  const address = pickText(pub?.address, CONTACTS.addressFull, apiLoaded);
+  const yandexExplicit = pickUrl(pub?.yandexMapUrl, CONTACTS.yandexMaps, apiLoaded);
 
   return {
     brandName: pub?.brandName?.trim() || DEFAULT_BRAND,
@@ -82,8 +98,8 @@ export function resolveSiteContacts(pub: PublicSite | null): ResolvedSiteContact
     telegram: pickUrl(pub?.telegram, CONTACTS.telegram, apiLoaded),
     max: pickUrl(pub?.maxLink, CONTACTS.max, apiLoaded),
     email: pub ? pickEmail(pub.email) : null,
-    address: pickText(pub?.address, CONTACTS.addressFull, apiLoaded),
-    yandexMaps: pickUrl(pub?.yandexMapUrl, CONTACTS.yandexMaps, apiLoaded),
+    address,
+    yandexMaps: yandexExplicit ?? resolveYandexMapsLink(null, address),
     mapEmbed: pickUrl(pub?.mapEmbed, LOCATION.embedSrc, apiLoaded),
   };
 }
@@ -95,8 +111,8 @@ export function applyPublicSiteToHome(home: HomePageContent, pub: PublicSite): H
   const addr = pub.address?.trim();
   if (addr) location.address = addr;
 
-  const yandex = pub.yandexMapUrl?.trim();
-  location.mapUrl = yandex && isHttpUrl(yandex) ? yandex : "";
+  location.mapUrl =
+    resolveYandexMapsLink(pub.yandexMapUrl, addr || location.address) ?? "";
 
   const embed = pub.mapEmbed?.trim();
   location.embedSrc = embed && isHttpUrl(embed) ? embed : "";
