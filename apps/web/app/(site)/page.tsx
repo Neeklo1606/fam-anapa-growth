@@ -6,6 +6,9 @@ import { fetchPublicSite } from "@/lib/admin-api";
 import { mergeStoredHomePage } from "@/lib/home-page-content";
 import { applyPublicSiteToHome } from "@/lib/site-contacts";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Футбольная академия Морева в Анапе · футбол для детей",
   description:

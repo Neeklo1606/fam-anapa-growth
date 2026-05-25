@@ -8,6 +8,9 @@ import { ApplyButton } from "@/components/site/ApplyModal";
 import { fetchPublicSite } from "@/lib/admin-api";
 import { buildContactCards, isHttpUrl, resolveSiteContacts } from "@/lib/site-contacts";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Контакты",
   description:

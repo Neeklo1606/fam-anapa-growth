@@ -232,7 +232,10 @@ export type PublicSite = {
 
 export async function fetchPublicSite(): Promise<PublicSite> {
   const url = `${INTERNAL_API_BASE}/site`;
-  const res = await fetch(url, { next: { tags: [PUBLIC_SITE_TAG] } });
+  const res = await fetch(url, {
+    cache: "no-store",
+    next: { tags: [PUBLIC_SITE_TAG] },
+  });
   if (!res.ok) {
     const err = new Error(`GET /site failed: ${res.status}`);
     (err as Error & { status?: number }).status = res.status;

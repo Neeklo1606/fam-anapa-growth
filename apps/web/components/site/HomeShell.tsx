@@ -20,7 +20,6 @@ import { HeroVideo } from "@/components/site/HeroVideo";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton, useApply } from "@/components/site/ApplyModal";
 import { useSiteContacts } from "@/components/site/SiteContactsContext";
-import { COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
 import { isHttpUrl, resolveYandexMapsLink } from "@/lib/site-contacts";
 import type { HomePageContent, HomeVideoCardCfg } from "@/lib/home-page-content";
 import { trackSiteEvent } from "@/lib/analytics";
@@ -455,17 +454,7 @@ function Coaches({ home }: { home: HomePageContent }) {
   });
   const [snapIndex, setSnapIndex] = useState(0);
 
-  const rawCards =
-    home.coachesSection.staticCoaches.length > 0
-      ? home.coachesSection.staticCoaches
-      : COACHES_FALLBACK_SRC.map((c) => ({
-          fullName: c.name,
-          role: c.role,
-          photoUrl: c.img,
-          shortDescription: c.info,
-        }));
-
-  const items: HomeCoach[] = rawCards.map((c, i) => ({
+  const items: HomeCoach[] = home.coachesSection.staticCoaches.map((c, i) => ({
     id: `static-${i}`,
     fullName: c.fullName,
     role: c.role,
@@ -482,6 +471,8 @@ function Coaches({ home }: { home: HomePageContent }) {
     embla.on("select", update);
     embla.on("reInit", update);
   }, [embla]);
+
+  if (items.length === 0) return null;
 
   return (
     <section id="coaches" className="relative bg-background py-10 md:py-24 scroll-mt-20">
@@ -561,21 +552,14 @@ function Coaches({ home }: { home: HomePageContent }) {
 }
 
 function Location({ home }: { home: HomePageContent }) {
-  const fromCarousel = home.location.carouselSlides.map((s, i) => ({
-    id: `car-${i}`,
-    src: s.src,
-    label: s.label,
-    alt: s.label,
-  }));
-  const fromSiteGallery = SITE_GALLERY.map((s, i) => ({
-    id: `site-${i}`,
-    src: s.src,
-    label: s.label,
-    alt: s.label,
-  }));
-
-  const slides: HomeGallerySlide[] =
-    fromCarousel.length > 0 ? fromCarousel : fromSiteGallery;
+  const slides: HomeGallerySlide[] = home.location.carouselSlides
+    .filter((s) => s.src.trim())
+    .map((s, i) => ({
+      id: `car-${i}`,
+      src: s.src,
+      label: s.label,
+      alt: s.label,
+    }));
 
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false });
   const [index, setIndex] = useState(0);
@@ -659,61 +643,67 @@ function Location({ home }: { home: HomePageContent }) {
           </div>
 
           <Reveal y={20} delay={0.1} className="lg:col-span-7">
-            <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
-              <div className="overflow-hidden" ref={emblaRef} key={slideKeys}>
-                <div className="flex">
-                  {slides.map((s) => (
-                    <div
-                      key={s.id}
-                      className="shrink-0 w-full relative aspect-[4/3] md:aspect-[16/10]"
-                    >
-                      <SiteImage
-                        src={s.src}
-                        alt={s.alt}
-                        fill
-                        sizes="(min-width: 1024px) 58vw, 100vw"
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />
-                      <div className="absolute bottom-5 left-5 right-5 text-white">
-                        <div className="text-[10px] uppercase tracking-[0.25em] text-flame">
-                          FAM · Поле
+            {slides.length > 0 ? (
+              <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
+                <div className="overflow-hidden" ref={emblaRef} key={slideKeys}>
+                  <div className="flex">
+                    {slides.map((s) => (
+                      <div
+                        key={s.id}
+                        className="shrink-0 w-full relative aspect-[4/3] md:aspect-[16/10]"
+                      >
+                        <SiteImage
+                          src={s.src}
+                          alt={s.alt}
+                          fill
+                          sizes="(min-width: 1024px) 58vw, 100vw"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />
+                        <div className="absolute bottom-5 left-5 right-5 text-white">
+                          <div className="text-[10px] uppercase tracking-[0.25em] text-flame">
+                            FAM · Поле
+                          </div>
+                          <div className="mt-1 font-display text-xl md:text-2xl">{s.label}</div>
                         </div>
-                        <div className="mt-1 font-display text-xl md:text-2xl">{s.label}</div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="absolute top-4 right-4 flex gap-2">
-                <button
-                  onClick={() => embla?.scrollPrev()}
-                  className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
-                  aria-label="Назад"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => embla?.scrollNext()}
-                  className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
-                  aria-label="Далее"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
+                {slides.length > 1 ? (
+                  <>
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      <button
+                        onClick={() => embla?.scrollPrev()}
+                        className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
+                        aria-label="Назад"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => embla?.scrollNext()}
+                        className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
+                        aria-label="Далее"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
 
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                {slides.map((s, i) => (
-                  <button
-                    key={s.id}
-                    onClick={() => embla?.scrollTo(i)}
-                    className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-flame" : "w-1.5 bg-white/40"}`}
-                    aria-label={`Слайд ${i + 1}`}
-                  />
-                ))}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      {slides.map((s, i) => (
+                        <button
+                          key={s.id}
+                          onClick={() => embla?.scrollTo(i)}
+                          className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-flame" : "w-1.5 bg-white/40"}`}
+                          aria-label={`Слайд ${i + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : null}
               </div>
-            </div>
+            ) : null}
 
             {hasMapEmbed ? (
               <div className="mt-4">
