@@ -18,6 +18,11 @@ function resolvePublicLogoUrl(s: {
   return fb || null;
 }
 
+function resolvePublicAssetUrl(fallback: string | null | undefined): string | null {
+  const fb = fallback?.trim();
+  return fb || null;
+}
+
 @Controller("site")
 export class SettingsController {
   constructor(private readonly settings: SettingsService) {}
@@ -39,6 +44,12 @@ export class SettingsController {
       mapEmbed: s.mapEmbed,
       yandexMapUrl: s.yandexMapUrl,
       logoUrl: resolvePublicLogoUrl(s),
+      seoTitle: s.seoTitle,
+      seoDescription: s.seoDescription,
+      seoKeywords: s.seoKeywords,
+      ogImageUrl: resolvePublicAssetUrl(s.ogImageFallbackUrl) ?? "/img/hero-kid.jpg",
+      faviconUrl: resolvePublicAssetUrl(s.faviconFallbackUrl) ?? "/img/logo.webp",
+      copyrightText: s.copyrightText,
       homeContent: s.homeContent,
     };
   }

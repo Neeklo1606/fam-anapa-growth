@@ -10,8 +10,10 @@ const legal = [
   { to: "/legal/consent", label: "Согласие на обработку" },
 ] as const;
 
-export function Footer({ logoSrc }: { logoSrc: string }) {
+export function Footer({ logoSrc, copyrightText }: { logoSrc: string; copyrightText?: string | null }) {
   const year = new Date().getFullYear();
+  const copyright =
+    copyrightText?.trim() || `© ${year} Футбольная академия Морева`;
   return (
     <footer className="relative bg-night text-white overflow-hidden border-t border-white/5">
       <div className="pointer-events-none absolute inset-0 pitch-lines opacity-[0.07]" aria-hidden />
@@ -77,7 +79,7 @@ export function Footer({ logoSrc }: { logoSrc: string }) {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3 justify-between items-baseline text-[11px] text-white/38">
-          <span>© {year} Футбольная академия Морева</span>
+          <span>{copyright}</span>
           <span className="uppercase tracking-[0.2em] font-mono-pro">FAM · ANAPA</span>
         </div>
       </div>

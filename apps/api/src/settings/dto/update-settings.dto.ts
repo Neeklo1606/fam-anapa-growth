@@ -13,4 +13,10 @@ export class UpdateSettingsDto {
   @IsOptional() @IsString() @MaxLength(500) yandexMapUrl?: string;
   @IsOptional() @IsString() @MaxLength(40) logoMediaId?: string | null;
   @IsOptional() @IsString() @MaxLength(500) logoFallbackUrl?: string | null;
+  @IsOptional() @IsString() @MaxLength(200) seoTitle?: string | null;
+  @IsOptional() @IsString() @MaxLength(2000) seoDescription?: string | null;
+  @IsOptional() @IsString() @MaxLength(1000) seoKeywords?: string | null;
+  @IsOptional() @IsString() @MaxLength(500) ogImageFallbackUrl?: string | null;
+  @IsOptional() @IsString() @MaxLength(500) faviconFallbackUrl?: string | null;
+  @IsOptional() @IsString() @MaxLength(200) copyrightText?: string | null;
 }

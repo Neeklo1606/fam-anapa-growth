@@ -180,6 +180,12 @@ export type SiteSettings = {
   yandexMapUrl: string | null;
   logoMediaId: string | null;
   logoFallbackUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoKeywords: string | null;
+  ogImageFallbackUrl: string | null;
+  faviconFallbackUrl: string | null;
+  copyrightText: string | null;
   logoMedia: {
     id: string;
     url: string;
@@ -215,6 +221,12 @@ export type PublicSite = {
   mapEmbed: string | null;
   yandexMapUrl: string | null;
   logoUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoKeywords: string | null;
+  ogImageUrl: string | null;
+  faviconUrl: string | null;
+  copyrightText: string | null;
   homeContent?: unknown | null;
 };
 

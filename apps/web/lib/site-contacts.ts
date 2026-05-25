@@ -15,6 +15,7 @@ export type ResolvedSiteContacts = {
   address: string | null;
   yandexMaps: string | null;
   mapEmbed: string | null;
+  copyrightText: string | null;
 };
 
 const DEFAULT_BRAND = "Футбольная академия Морева";
@@ -101,6 +102,7 @@ export function resolveSiteContacts(pub: PublicSite | null): ResolvedSiteContact
     address,
     yandexMaps: yandexExplicit ?? resolveYandexMapsLink(null, address),
     mapEmbed: pickUrl(pub?.mapEmbed, LOCATION.embedSrc, apiLoaded),
+    copyrightText: pub?.copyrightText?.trim() || null,
   };
 }
 

@@ -233,6 +233,12 @@ export type SettingsPatch = {
   yandexMapUrl?: string;
   logoMediaId?: string | null;
   logoFallbackUrl?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoKeywords?: string | null;
+  ogImageFallbackUrl?: string | null;
+  faviconFallbackUrl?: string | null;
+  copyrightText?: string | null;
 };
 
 export async function updateSettingsAction(patch: SettingsPatch): Promise<{ ok: boolean; error?: string }> {

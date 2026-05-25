@@ -10,28 +10,15 @@ export default async function AdminSettingsPage() {
         <div className="text-[10px] uppercase tracking-[0.3em] text-flame font-mono-pro">
           Сайт
         </div>
-        <h1 className="mt-2 font-display text-3xl tracking-tight">Настройки</h1>
+        <h1 className="mt-2 font-display text-3xl tracking-tight">Настройки сайта</h1>
         <p className="mt-1 text-sm text-ink/55">
-          Бренд, контакты и реквизиты, которые отображаются по всему сайту.
+          Бренд, SEO, контакты и реквизиты — отображаются на лендинге сразу после сохранения.
         </p>
       </header>
 
       <section className="rounded-2xl border border-line bg-white p-5">
         <SettingsForm initial={settings} />
       </section>
-
-      <p className="text-sm text-ink/55">
-        Интеграции (Telegram, webhook заявок):{" "}
-        <a href="/admin/settings/notifications" className="text-flame hover:underline">
-          Настройки уведомлений
-        </a>
-        {" · "}
-        OPENAI (ключ и модель для RAG):{" "}
-        <a href="/admin/settings/ai" className="text-flame hover:underline">
-          настройки ИИ
-        </a>{" "}
-        (только ADMIN).
-      </p>
     </div>
   );
 }

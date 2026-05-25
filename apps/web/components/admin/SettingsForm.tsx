@@ -23,6 +23,12 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
     yandexMapUrl: initial.yandexMapUrl ?? "",
     mapEmbed: initial.mapEmbed ?? "",
     logoFallbackUrl: initial.logoFallbackUrl ?? "",
+    seoTitle: initial.seoTitle ?? "",
+    seoDescription: initial.seoDescription ?? "",
+    seoKeywords: initial.seoKeywords ?? "",
+    ogImageFallbackUrl: initial.ogImageFallbackUrl ?? "",
+    faviconFallbackUrl: initial.faviconFallbackUrl ?? "",
+    copyrightText: initial.copyrightText ?? "",
   });
   const [logoPicked, setLogoPicked] = useState<{
     id: string;
@@ -55,6 +61,12 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
         ...form,
         logoMediaId: logoPicked?.id ?? null,
         logoFallbackUrl: logoPicked ? null : form.logoFallbackUrl?.trim() || null,
+        seoTitle: form.seoTitle.trim() || null,
+        seoDescription: form.seoDescription.trim() || null,
+        seoKeywords: form.seoKeywords.trim() || null,
+        ogImageFallbackUrl: form.ogImageFallbackUrl.trim() || null,
+        faviconFallbackUrl: form.faviconFallbackUrl.trim() || null,
+        copyrightText: form.copyrightText.trim() || null,
       });
       if (!r.ok) {
         toast.error("Не удалось сохранить", { description: r.error });
@@ -67,6 +79,7 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
 
   return (
     <form onSubmit={submit} className="grid sm:grid-cols-2 gap-4">
+      <SectionTitle>Брендинг</SectionTitle>
       <Field label="Название бренда" wide>
         <input className={inputCls} required value={form.brandName} onChange={(e) => set("brandName", e.target.value)} />
       </Field>
@@ -95,6 +108,28 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
           placeholder="/img/logo.webp"
         />
       </Field>
+
+      <SectionTitle>SEO и соцсети</SectionTitle>
+      <Field label="Title (заголовок вкладки)" wide>
+        <input className={inputCls} value={form.seoTitle} onChange={(e) => set("seoTitle", e.target.value)} placeholder="Футбольная академия Морева в Анапе" />
+      </Field>
+      <Field label="Meta description" wide>
+        <textarea className={`${inputCls} min-h-20`} value={form.seoDescription} onChange={(e) => set("seoDescription", e.target.value)} placeholder="Краткое описание для поисковиков" />
+      </Field>
+      <Field label="Keywords (через запятую)" wide>
+        <input className={inputCls} value={form.seoKeywords} onChange={(e) => set("seoKeywords", e.target.value)} placeholder="футбол дети Анапа, футбольная школа" />
+      </Field>
+      <Field label="OG:image (путь или URL)">
+        <input className={inputCls} value={form.ogImageFallbackUrl} onChange={(e) => set("ogImageFallbackUrl", e.target.value)} placeholder="/img/hero-kid.jpg" />
+      </Field>
+      <Field label="Favicon (путь или URL)">
+        <input className={inputCls} value={form.faviconFallbackUrl} onChange={(e) => set("faviconFallbackUrl", e.target.value)} placeholder="/img/logo.webp" />
+      </Field>
+      <Field label="Copyright (футер)" wide>
+        <input className={inputCls} value={form.copyrightText} onChange={(e) => set("copyrightText", e.target.value)} placeholder="© Футбольная академия Морева" />
+      </Field>
+
+      <SectionTitle>Контакты</SectionTitle>
       <Field label="Телефон">
         <input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+79180000000" />
       </Field>
@@ -141,6 +176,14 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
 
 const inputCls =
   "h-10 w-full px-3 rounded-lg border border-line bg-white text-sm focus:outline-none focus:border-flame";
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="sm:col-span-2 pt-2 first:pt-0">
+      <div className="text-[10px] uppercase tracking-[0.25em] text-flame font-mono-pro">{children}</div>
+    </div>
+  );
+}
 
 function Field({ label, wide, children }: { label: string; wide?: boolean; children: React.ReactNode }) {
   return (

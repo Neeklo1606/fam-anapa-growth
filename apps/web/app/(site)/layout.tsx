@@ -10,55 +10,21 @@ import { SmoothAnchorScroll } from "@/components/site/SmoothAnchorScroll";
 import { fetchPublicSite } from "@/lib/admin-api";
 import { CONTACTS } from "@/content/site";
 import { DEFAULT_SITE_LOGO_SRC } from "@/lib/site-defaults";
+import {
+  DEFAULT_OG_IMAGE,
+  buildSiteMetadata,
+} from "@/lib/site-metadata";
 import { resolveSiteContacts, type ResolvedSiteContacts } from "@/lib/site-contacts";
 import { SITE_URL, absUrl } from "@/lib/utils";
 
-const SITE_TITLE = "Футбольная академия Морева в Анапе · футбол для детей";
-const SITE_DESCRIPTION =
-  "Детская футбольная академия Морева в Анапе. Тренировки по футболу для детей, развитие техники, координации, дисциплины и уверенности на поле. Запись на занятия.";
-const OG_IMAGE = "/img/hero-kid.jpg";
-
-export const metadata: Metadata = {
-  title: { default: SITE_TITLE, template: "%s · ФАМ Анапа" },
-  description: SITE_DESCRIPTION,
-  keywords: [
-    "футбольная академия Анапа",
-    "футбольная школа Анапа",
-    "футбольные школы Анапа",
-    "футбол для детей Анапа",
-    "футбольная секция Анапа",
-    "детский футбольный клуб Анапа",
-    "школа вратарей Анапа",
-    "записать ребёнка на футбол Анапа",
-    "тренировки по футболу для детей Анапа",
-    "футбольная школа станица Анапская",
-    "Краснодарский край детский футбол",
-    "пробное занятие футбол дети",
-  ],
-  alternates: { canonical: SITE_URL },
-  openGraph: {
-    type: "website",
-    locale: "ru_RU",
-    url: SITE_URL,
-    siteName: "Футбольная академия Морева",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "ФАМ Анапа" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [OG_IMAGE],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
-  authors: [{ name: "Футбольная академия Морева" }],
-  category: "sports",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  try {
+    const pub = await fetchPublicSite();
+    return buildSiteMetadata(pub);
+  } catch {
+    return buildSiteMetadata(null);
+  }
+}
 
 function schemaAddress(contacts: ResolvedSiteContacts, apiLoaded: boolean) {
   if (contacts.address) {
@@ -94,7 +60,7 @@ function buildLdJson(contacts: ResolvedSiteContacts, logoSrc: string, apiLoaded:
     description:
       "Детская футбольная академия имени А. В. Морева в станице Анапская. Тренировки по футболу для детей, школа вратарей, развитие техники и уверенности на поле.",
     url: SITE_URL,
-    image: absUrl(OG_IMAGE),
+    image: absUrl(DEFAULT_OG_IMAGE),
     ...(address ? { address } : {}),
     ...(contacts.address ? { areaServed: { "@type": "AdministrativeArea", name: contacts.address } } : {}),
     sport: "Football",
@@ -151,7 +117,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         />
         <Header logoSrc={logoSrc} />
         <main>{children}</main>
-        <Footer logoSrc={logoSrc} />
+        <Footer logoSrc={logoSrc} copyrightText={contacts.copyrightText} />
         <Toaster />
       </SiteContactsProvider>
     </ApplyProvider>

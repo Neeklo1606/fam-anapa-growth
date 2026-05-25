@@ -185,40 +185,11 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
       </Field>
 
       <Field label="Дата рождения *" error={errors.birthDate}>
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className={cn(
-                inputCls(!!errors.birthDate),
-                "flex items-center justify-between text-left",
-                !data.birthDate && "text-white/40",
-              )}
-            >
-              <span>
-                {data.birthDate
-                  ? format(data.birthDate, "d MMMM yyyy", { locale: ru })
-                  : "Выберите дату"}
-              </span>
-              <CalendarIcon className="h-4 w-4 opacity-60" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={data.birthDate}
-              onSelect={(d) => update("birthDate", d)}
-              captionLayout="dropdown"
-              fromYear={2005}
-              toYear={new Date().getFullYear()}
-              defaultMonth={data.birthDate ?? new Date(2015, 0)}
-              disabled={(date) => date > new Date() || date < new Date("2005-01-01")}
-              initialFocus
-              locale={ru}
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
+        <BirthDatePicker
+          value={data.birthDate}
+          hasError={Boolean(errors.birthDate)}
+          onChange={(d) => update("birthDate", d)}
+        />
       </Field>
 
       <Field label="Телефон *" error={errors.phone}>
@@ -298,6 +269,71 @@ const inputCls = (err: boolean) =>
   `h-12 w-full px-4 rounded-xl bg-white/5 border text-white placeholder:text-white/35 focus:outline-none focus:border-flame focus:bg-white/[0.07] transition ${
     err ? "border-red-400/70" : "border-white/10"
   }`;
+
+function BirthDatePicker({
+  value,
+  hasError,
+  onChange,
+}: {
+  value?: Date;
+  hasError: boolean;
+  onChange: (d: Date) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen} modal>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-haspopup="dialog"
+          className={cn(
+            inputCls(hasError),
+            "flex items-center justify-between text-left",
+            !value && "text-white/40",
+          )}
+        >
+          <span>
+            {value ? format(value, "d MMMM yyyy", { locale: ru }) : "Выберите дату"}
+          </span>
+          <CalendarIcon className="h-4 w-4 opacity-60 shrink-0" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        align="start"
+        sideOffset={8}
+        className="z-[200] w-auto p-0 border-white/15 bg-night text-white shadow-elevated pointer-events-auto"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <Calendar
+          mode="single"
+          selected={value}
+          onSelect={(d) => {
+            if (!d) return;
+            onChange(d);
+            setOpen(false);
+          }}
+          captionLayout="dropdown"
+          fromYear={2005}
+          toYear={new Date().getFullYear()}
+          defaultMonth={value ?? new Date(2015, 0)}
+          disabled={(date) => date > new Date() || date < new Date("2005-01-01")}
+          locale={ru}
+          className="p-3 bg-night text-white [--cell-size:2.25rem]"
+          classNames={{
+            dropdown_root: "border-white/15 bg-white/5 text-white",
+            caption_label: "text-white",
+            weekday: "text-white/45",
+            outside: "text-white/25",
+            disabled: "text-white/20",
+            today: "bg-white/10 text-white",
+          }}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 function Field({
   label,

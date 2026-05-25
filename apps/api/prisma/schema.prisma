@@ -364,6 +364,12 @@ model SiteSettings {
   logoFallbackUrl String? @map("logo_fallback_url") @db.VarChar(500)
   logoMediaId String? @unique @map("logo_media_id")
   logoMedia    MediaFile? @relation("SiteLogo", fields: [logoMediaId], references: [id], onDelete: SetNull)
+  seoTitle           String? @map("seo_title") @db.VarChar(200)
+  seoDescription     String? @map("seo_description") @db.Text
+  seoKeywords        String? @map("seo_keywords") @db.Text
+  ogImageFallbackUrl String? @map("og_image_fallback_url") @db.VarChar(500)
+  faviconFallbackUrl String? @map("favicon_fallback_url") @db.VarChar(500)
+  copyrightText      String? @map("copyright_text") @db.VarChar(200)
   /// Снимок/оверрайды главной страницы (JSON). Если null — используются значения по умолчанию из кода.
   homeContent  Json? @map("home_content")
   updatedAt    DateTime @updatedAt @default(now())
