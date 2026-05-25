@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/admin/LogoutButton";
 import { fetchMe } from "@/lib/admin-api";
-import { clearAdminSessionCookies } from "@/lib/admin-session";
 
 export default async function AuthenticatedAdminLayout({
   children,
@@ -12,7 +11,6 @@ export default async function AuthenticatedAdminLayout({
 }) {
   const user = await fetchMe();
   if (!user) {
-    await clearAdminSessionCookies();
     redirect("/admin/login?reason=session_expired");
   }
 
