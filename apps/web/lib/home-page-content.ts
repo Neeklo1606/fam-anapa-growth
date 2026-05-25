@@ -19,6 +19,13 @@ export type HomeCoachCard = {
   shortDescription: string;
 };
 
+export type HomeVideoCardCfg = {
+  title: string;
+  url: string;
+  posterUrl: string;
+  description: string;
+};
+
 export type HomePageContent = {
   version: number;
   hero: {
@@ -56,7 +63,6 @@ export type HomePageContent = {
     titleLine1: string;
     titleLine2Accent: string;
     subtitle: string;
-    useCoachesApi: boolean;
     staticCoaches: HomeCoachCard[];
   };
   videosSection: {
@@ -64,7 +70,7 @@ export type HomePageContent = {
     eyebrow: string;
     titleBefore: string;
     titleAccent: string;
-    useVideosApi: boolean;
+    cards: HomeVideoCardCfg[];
   };
   location: {
     title: string;
@@ -72,7 +78,6 @@ export type HomePageContent = {
     address: string;
     mapUrl: string;
     embedSrc: string;
-    useGalleryApi: boolean;
     carouselSlides: GallerySlideCfg[];
   };
   contactsSection: {
@@ -146,7 +151,6 @@ export function buildDefaultHomePageContent(): HomePageContent {
       titleLine1: "Тренерский",
       titleLine2Accent: "штаб",
       subtitle: "Знакомьтесь с тренерами ФАМ.",
-      useCoachesApi: true,
       staticCoaches: COACHES.map((c) => ({
         fullName: c.name,
         role: c.role,
@@ -159,7 +163,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
       eyebrow: "Видео",
       titleBefore: "Смотреть",
       titleAccent: "ролики",
-      useVideosApi: true,
+      cards: [],
     },
     location: {
       title: LOCATION.title,
@@ -167,7 +171,6 @@ export function buildDefaultHomePageContent(): HomePageContent {
       address: LOCATION.address,
       mapUrl: LOCATION.mapUrl,
       embedSrc: LOCATION.embedSrc,
-      useGalleryApi: true,
       carouselSlides: GALLERY.map((g) => ({ src: g.src, label: g.label })),
     },
     contactsSection: {

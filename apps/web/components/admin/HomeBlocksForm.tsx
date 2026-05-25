@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 
-import type { GallerySlideCfg, HomeCoachCard, HomePageContent, PrincipleItem } from "@/lib/home-page-content";
+import type {
+  GallerySlideCfg,
+  HomeCoachCard,
+  HomePageContent,
+  HomeVideoCardCfg,
+  PrincipleItem,
+} from "@/lib/home-page-content";
 import { buildDefaultHomePageContent } from "@/lib/home-page-content";
 import { updateHomePageContentAction } from "@/lib/auth-actions";
 import { MediaPicker } from "@/components/admin/MediaPicker";
@@ -58,15 +64,20 @@ function validateHomeBeforeSave(h: HomePageContent): string[] {
   need(isAllowedHomeAssetUrl(h.goalkeeper.videoMp4Src), "Школа вратарей: укажите URL MP4.");
   need(isAllowedHomeAssetUrl(h.goalkeeper.videoPoster), "Школа вратарей: укажите URL постера видео.");
 
-  if (!h.coachesSection.useCoachesApi) {
-    h.coachesSection.staticCoaches.forEach((c, i) => {
-      need(isAllowedHomeAssetUrl(c.photoUrl), `Тренеры · карточка ${i + 1}: укажите URL фото.`);
-    });
-  }
+  h.coachesSection.staticCoaches.forEach((c, i) => {
+    need(isAllowedHomeAssetUrl(c.photoUrl), `Тренеры · карточка ${i + 1}: укажите URL фото.`);
+  });
 
-  if (!h.location.useGalleryApi) {
-    h.location.carouselSlides.forEach((s, i) => {
-      need(isAllowedHomeAssetUrl(s.src), `Локация · слайд ${i + 1}: укажите URL изображения.`);
+  h.location.carouselSlides.forEach((s, i) => {
+    need(isAllowedHomeAssetUrl(s.src), `Локация · слайд ${i + 1}: укажите URL изображения.`);
+  });
+
+  if (h.videosSection.show) {
+    h.videosSection.cards.forEach((v, i) => {
+      need(Boolean(v.url.trim()), `Видео · карточка ${i + 1}: укажите ссылку на ролик.`);
+      if (v.posterUrl.trim()) {
+        need(isAllowedHomeAssetUrl(v.posterUrl), `Видео · карточка ${i + 1}: некорректный URL постера.`);
+      }
     });
   }
 
@@ -131,6 +142,9 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
   const setStaticCoaches = (staticCoaches: HomeCoachCard[]) =>
     setForm((f) => ({ ...f, coachesSection: { ...f.coachesSection, staticCoaches } }));
 
+  const setVideoCards = (cards: HomeVideoCardCfg[]) =>
+    setForm((f) => ({ ...f, videosSection: { ...f.videosSection, cards } }));
+
   return (
     <div className="space-y-8 max-w-4xl">
       <div className="flex flex-wrap gap-3 justify-between">
@@ -159,84 +173,10 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </button>
       </div>
 
-      <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed space-y-2">
-        <span className="block">
-          Медиа для героя, блоков и статичных карточек можно задать путями сайта (<code className="text-[10px]">/img/…</code>,{" "}
-          <code className="text-[10px]">/hero.mp4</code> и т.д.) или выбрать загрузки из вкладки «Медиа» (
-          <code className="text-[10px]">/uploads/…</code>). Уже подставленные из сборки файлы есть в том же каталоге с меткой{" "}
-          <strong className="font-medium text-ink/65">«Сборка»</strong>.
-        </span>
-        <span className="block">
-          После нажатия «Сохранить» конфиг записывается в базу и сразу влияет на отображение главной (слияние с дефолтами из кода).
-        </span>
+      <p className="text-[11px] text-ink/50 max-w-3xl leading-relaxed">
+        Изображения и видео выбирайте из «Медиа» или вставляйте путь сайта (<code className="text-[10px]">/img/…</code>,{" "}
+        <code className="text-[10px]">/uploads/…</code>). После «Сохранить» изменения попадают на лендинг сразу.
       </p>
-
-      <fieldset className="rounded-2xl border border-line bg-white p-5 space-y-4">
-        <legend className="text-[10px] uppercase tracking-[0.25em] text-flame font-mono-pro px-1">
-          Подключение коллекций
-        </legend>
-        <p className="text-xs text-ink/55 leading-relaxed">
-          Данные из разделов «Тренеры», «Галерея», «Видео». При отключении подставляются поля блоков ниже — карусель локации и
-          статичные карточки тренеров; изображения всех слайдов и фото тренеров — только из медиатеки.
-        </p>
-        <label className="flex items-start gap-2 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 rounded border-line"
-            checked={form.coachesSection.useCoachesApi}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                coachesSection: { ...f.coachesSection, useCoachesApi: e.target.checked },
-              }))
-            }
-          />
-          Тренеры с API («Тренеры»)
-        </label>
-        <label className="flex items-start gap-2 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 rounded border-line"
-            checked={form.location.useGalleryApi}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                location: { ...f.location, useGalleryApi: e.target.checked },
-              }))
-            }
-          />
-          Карусель локации с API («Галерея»)
-        </label>
-        <label className="flex items-start gap-2 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 rounded border-line"
-            checked={form.videosSection.show}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                videosSection: { ...f.videosSection, show: e.target.checked },
-              }))
-            }
-          />
-          Показывать блок видео
-        </label>
-        <label className="flex items-start gap-2 text-sm cursor-pointer">
-          <input
-            type="checkbox"
-            className="mt-1 rounded border-line"
-            disabled={!form.videosSection.show}
-            checked={form.videosSection.useVideosApi}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                videosSection: { ...f.videosSection, useVideosApi: e.target.checked },
-              }))
-            }
-          />
-          Ролики с API («Видео»)
-        </label>
-      </fieldset>
 
       <Section title="Hero (видео)">
         <div className="grid sm:grid-cols-2 gap-4">
@@ -617,7 +557,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </div>
       </Section>
 
-      <Section title="Тренеры (тексты и статические карточки)">
+      <Section title="Тренеры">
         <div className="grid sm:grid-cols-2 gap-4">
           <Field label="Первая строка заголовка">
             <input
@@ -657,7 +597,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
         <p className="text-xs text-ink/50">
-          Статические карточки используются, когда отключено API или API недоступно.
+          Карточки тренеров, которые показываются на главной. Порядок — как в списке.
         </p>
         {form.coachesSection.staticCoaches.map((c, idx) => (
           <div key={idx} className="rounded-xl border border-line p-4 space-y-2">
@@ -731,9 +671,23 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
         </button>
       </Section>
 
-      <Section title="Видео (заголовки блока)">
+      <Section title="Видео">
+        <label className="flex items-start gap-2 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            className="mt-1 rounded border-line"
+            checked={form.videosSection.show}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                videosSection: { ...f.videosSection, show: e.target.checked },
+              }))
+            }
+          />
+          Показывать блок «Видео» на главной
+        </label>
         <div className="grid sm:grid-cols-2 gap-4">
-          <Field label="Eyebrow">
+          <Field label="Eyebrow (подпись над заголовком)">
             <input
               className={inputCls}
               value={form.videosSection.eyebrow}
@@ -741,6 +695,18 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
                 setForm((f) => ({
                   ...f,
                   videosSection: { ...f.videosSection, eyebrow: e.target.value },
+                }))
+              }
+            />
+          </Field>
+          <Field label="Часть заголовка до акцента">
+            <input
+              className={inputCls}
+              value={form.videosSection.titleBefore}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  videosSection: { ...f.videosSection, titleBefore: e.target.value },
                 }))
               }
             />
@@ -757,19 +723,83 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Часть до акцента">
-            <input
-              className={inputCls}
-              value={form.videosSection.titleBefore}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  videosSection: { ...f.videosSection, titleBefore: e.target.value },
-                }))
-              }
-            />
-          </Field>
         </div>
+        <p className="text-xs text-ink/50">
+          Карточки роликов. Поддерживаются ссылки YouTube (вставляется плеер) или внешние ссылки.
+        </p>
+        {form.videosSection.cards.map((v, idx) => (
+          <div key={idx} className="rounded-xl border border-line p-4 space-y-3">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <input
+                className={inputCls}
+                value={v.title}
+                placeholder="Заголовок ролика"
+                onChange={(e) => {
+                  const next = [...form.videosSection.cards];
+                  next[idx] = { ...v, title: e.target.value };
+                  setVideoCards(next);
+                }}
+              />
+              <input
+                className={inputCls}
+                value={v.url}
+                placeholder="https://youtu.be/… или прямой URL"
+                onChange={(e) => {
+                  const next = [...form.videosSection.cards];
+                  next[idx] = { ...v, url: e.target.value };
+                  setVideoCards(next);
+                }}
+              />
+            </div>
+            <div>
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-ink/45 mb-1.5">
+                Постер (используется, если ссылка — не YouTube)
+              </span>
+              <MediaPicker
+                assetKind="IMAGE"
+                includeBundles
+                value={null}
+                clearableFallback
+                fallbackPreviewUrl={v.posterUrl || null}
+                hint="«Медиа», «Сборка» или путь /img/…"
+                onChange={(picked) => {
+                  const next = [...form.videosSection.cards];
+                  next[idx] = { ...v, posterUrl: picked?.url ?? "" };
+                  setVideoCards(next);
+                }}
+              />
+            </div>
+            <textarea
+              className={taCls}
+              value={v.description}
+              placeholder="Краткое описание (необязательно)"
+              onChange={(e) => {
+                const next = [...form.videosSection.cards];
+                next[idx] = { ...v, description: e.target.value };
+                setVideoCards(next);
+              }}
+            />
+            <button
+              type="button"
+              className="text-xs text-red-600 hover:underline"
+              onClick={() => setVideoCards(form.videosSection.cards.filter((_, i) => i !== idx))}
+            >
+              Удалить ролик
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-flame"
+          onClick={() =>
+            setVideoCards([
+              ...form.videosSection.cards,
+              { title: "", url: "", posterUrl: "", description: "" },
+            ])
+          }
+        >
+          <Plus className="h-3 w-3" /> Добавить ролик
+        </button>
       </Section>
 
       <Section title="Локация">
@@ -836,7 +866,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
         <p className="text-xs text-ink/50">
-          Слайды ниже — только когда галерея с API выключена. Изображение: загрузки, «Сборка» или путь /img/…
+          Слайды для карусели локации. Изображения: загрузки, «Сборка» или путь /img/…
         </p>
         {form.location.carouselSlides.map((s, idx) => (
           <div key={idx} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start border border-line rounded-xl p-4">

@@ -22,7 +22,7 @@ import { ApplyButton, useApply } from "@/components/site/ApplyModal";
 import { useSiteContacts } from "@/components/site/SiteContactsContext";
 import { COACHES as COACHES_FALLBACK_SRC, GALLERY as SITE_GALLERY } from "@/content/site";
 import { isHttpUrl, resolveYandexMapsLink } from "@/lib/site-contacts";
-import type { HomePageContent } from "@/lib/home-page-content";
+import type { HomePageContent, HomeVideoCardCfg } from "@/lib/home-page-content";
 import { trackSiteEvent } from "@/lib/analytics";
 
 export type HomeCoach = {
@@ -63,34 +63,25 @@ function youtubeEmbedSrc(raw: string): string | null {
   return null;
 }
 
-export function HomeShell({
-  home,
-  coaches,
-  gallery,
-  videos,
-}: {
-  home: HomePageContent;
-  coaches?: HomeCoach[];
-  gallery?: HomeGallerySlide[];
-  videos?: HomeVideoCard[];
-}) {
+export function HomeShell({ home }: { home: HomePageContent }) {
   return (
     <div className="overflow-hidden">
       <Hero home={home} />
       <About home={home} />
       <GoalkeeperSchool home={home} />
       <Principles home={home} />
-      <Coaches home={home} coaches={coaches} />
-      <VideosStrip home={home} videos={videos} />
-      <Location home={home} gallery={gallery} />
+      <Coaches home={home} />
+      <VideosStrip home={home} />
+      <Location home={home} />
       <ApplySection home={home} />
     </div>
   );
 }
 
-function VideosStrip({ home, videos }: { home: HomePageContent; videos?: HomeVideoCard[] }) {
+function VideosStrip({ home }: { home: HomePageContent }) {
   if (!home.videosSection.show) return null;
-  if (!home.videosSection.useVideosApi || !videos?.length) return null;
+  const cards: HomeVideoCardCfg[] = home.videosSection.cards.filter((c) => c.url.trim());
+  if (cards.length === 0) return null;
   return (
     <section id="videos" className="bg-background py-14 md:py-24 border-t border-line scroll-mt-20">
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
@@ -109,16 +100,17 @@ function VideosStrip({ home, videos }: { home: HomePageContent; videos?: HomeVid
         </Reveal>
 
         <div className="mt-10 flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory">
-          {videos.map((v) => {
+          {cards.map((v, i) => {
             const embed = youtubeEmbedSrc(v.url);
+            const title = v.title?.trim() || `Ролик ${i + 1}`;
             return (
               <article
-                key={v.id}
+                key={`${v.url}-${i}`}
                 className="snap-start shrink-0 w-[min(92vw,400px)] rounded-2xl overflow-hidden border border-line bg-white shadow-soft"
               >
                 <div className="relative bg-night aspect-video">
                   {embed ? (
-                    <iframe src={embed} title={v.title} className="absolute inset-0 h-full w-full" allowFullScreen loading="lazy" />
+                    <iframe src={embed} title={title} className="absolute inset-0 h-full w-full" allowFullScreen loading="lazy" />
                   ) : (
                     <a href={v.url} target="_blank" rel="noreferrer" className="absolute inset-0 group block">
                       {v.posterUrl ? (
@@ -135,7 +127,7 @@ function VideosStrip({ home, videos }: { home: HomePageContent; videos?: HomeVid
                   )}
                 </div>
                 <div className="p-4 md:p-5">
-                  <h3 className="font-display text-lg md:text-xl tracking-tight">{v.title}</h3>
+                  <h3 className="font-display text-lg md:text-xl tracking-tight">{title}</h3>
                   {v.description ? (
                     <p className="mt-2 text-sm text-ink/65 line-clamp-3">{v.description}</p>
                   ) : (
@@ -454,7 +446,7 @@ function Principles({ home }: { home: HomePageContent }) {
   );
 }
 
-function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach[] }) {
+function Coaches({ home }: { home: HomePageContent }) {
   const [emblaRef, embla] = useEmblaCarousel({
     align: "start",
     loop: false,
@@ -473,16 +465,13 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
           shortDescription: c.info,
         }));
 
-  const items: HomeCoach[] =
-    home.coachesSection.useCoachesApi && coaches && coaches.length > 0
-      ? coaches
-      : rawCards.map((c, i) => ({
-          id: `static-${i}`,
-          fullName: c.fullName,
-          role: c.role,
-          photoUrl: c.photoUrl,
-          shortDescription: c.shortDescription,
-        }));
+  const items: HomeCoach[] = rawCards.map((c, i) => ({
+    id: `static-${i}`,
+    fullName: c.fullName,
+    role: c.role,
+    photoUrl: c.photoUrl,
+    shortDescription: c.shortDescription,
+  }));
 
   useEffect(() => {
     if (!embla) return;
@@ -571,7 +560,7 @@ function Coaches({ home, coaches }: { home: HomePageContent; coaches?: HomeCoach
   );
 }
 
-function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGallerySlide[] }) {
+function Location({ home }: { home: HomePageContent }) {
   const fromCarousel = home.location.carouselSlides.map((s, i) => ({
     id: `car-${i}`,
     src: s.src,
@@ -585,14 +574,8 @@ function Location({ home, gallery }: { home: HomePageContent; gallery?: HomeGall
     alt: s.label,
   }));
 
-  let slides: HomeGallerySlide[];
-  if (home.location.useGalleryApi && gallery && gallery.length > 0) {
-    slides = gallery;
-  } else if (fromCarousel.length > 0) {
-    slides = fromCarousel;
-  } else {
-    slides = fromSiteGallery;
-  }
+  const slides: HomeGallerySlide[] =
+    fromCarousel.length > 0 ? fromCarousel : fromSiteGallery;
 
   const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false });
   const [index, setIndex] = useState(0);
