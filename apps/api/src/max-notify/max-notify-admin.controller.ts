@@ -55,6 +55,13 @@ export class MaxNotifyAdminController {
     return this.integration.syncWebhookSubscription();
   }
 
+  @Post("test")
+  @HttpCode(HttpStatus.OK)
+  @Roles("ADMIN", "EDITOR", "MANAGER")
+  sendTest() {
+    return this.integration.sendTestMessage();
+  }
+
   @Patch("subscribers/:id")
   @Roles("ADMIN", "EDITOR", "MANAGER")
   async reviewSubscriber(

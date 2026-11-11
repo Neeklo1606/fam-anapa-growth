@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://morev.neeklo.ru";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://footballacademymorev.ru";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

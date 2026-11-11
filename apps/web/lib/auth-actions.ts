@@ -669,6 +669,25 @@ export async function syncMaxWebhookAction(): Promise<{ ok: boolean; error?: str
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
+export async function testMaxNotifyAction(): Promise<{
+  ok: boolean;
+  error?: string;
+  results?: { maxUserId: string; ok: boolean; error?: string }[];
+}> {
+  const r = await authedJson<{
+    ok: boolean;
+    error?: string;
+    results: { maxUserId: string; ok: boolean; error?: string }[];
+  }>("/notifications/max/test", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  if (!r.ok) return { ok: false, error: r.error };
+  const firstErr = r.data.results?.find((x) => !x.ok)?.error;
+  return { ok: r.data.ok, error: r.data.error ?? firstErr, results: r.data.results };
+}
+
 export async function reviewMaxSubscriberAction(input: {
   id: string;
   decision: "approve" | "reject";

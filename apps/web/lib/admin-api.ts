@@ -469,6 +469,17 @@ export type MaxNotifyAdminState = {
     webhookUrl: string | null;
     lastWebhookError: string | null;
   };
+  /** Может отсутствовать, если API ещё не обновлён. */
+  diagnostics?: {
+    bot: { userId: string | null; name: string | null; username: string | null } | null;
+    tokenError: string | null;
+    webhookActive: boolean;
+    foreignWebhooks: string[];
+    lastSendAt: string | null;
+    lastSendOk: boolean | null;
+    lastSendError: string | null;
+    warnings: string[];
+  };
   subscriptions: Record<string, unknown>[] | null;
   subscribersPending: MaxNotifySubscriberDto[];
   subscribersApproved: MaxNotifySubscriberDto[];

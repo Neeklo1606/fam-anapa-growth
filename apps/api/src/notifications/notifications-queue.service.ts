@@ -102,8 +102,26 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
   }
 
   async enqueueLeadCreated(leadId: string): Promise<void> {
-    if (!this.queue) return;
-    await this.queue.add(LEAD_CREATED_JOB, { leadId }, { jobId: `lead-${leadId}` });
+    if (this.queue) {
+      try {
+        // maxRetriesPerRequest: null → при упавшем Redis add() может висеть бесконечно.
+        await Promise.race([
+          this.queue.add(LEAD_CREATED_JOB, { leadId }, { jobId: `lead-${leadId}` }),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("timeout 5s")), 5000).unref(),
+          ),
+        ]);
+        return;
+      } catch (e) {
+        this.logger.error(
+          `Redis/BullMQ недоступен (${(e as Error).message}) — отправляем уведомление напрямую`,
+        );
+      }
+    } else {
+      this.logger.warn("Очередь не настроена (REDIS_URL) — отправляем уведомление напрямую");
+    }
+    // Без очереди заявка не должна теряться: шлём синхронно (без ретраев).
+    await this.processLeadCreated({ leadId });
   }
 
   private formatLeadHtml(lead: Lead, adminBase: string): string {
@@ -278,6 +296,10 @@ export class NotificationsQueueService implements OnModuleInit, OnModuleDestroy 
           this.logger.warn(`MAX uid ${uid}: ${maxErr.message}`);
         }
       }
+      await this.maxNotify.recordSendResult(maxSent, maxErr?.message);
+    } else if (maxToken) {
+      this.logger.warn(`MAX: токен задан, но нет одобренных получателей — заявка ${lead.id} в MAX не отправлена`);
+      await this.maxNotify.recordSendResult(false, "Нет одобренных получателей MAX");
     }
 
     const wantTelegram = Boolean(token && chatTargets.length > 0);

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, RefreshCw, Save, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Save, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { MaxNotifyAdminState } from "@/lib/admin-api";
@@ -10,6 +10,7 @@ import {
   reviewMaxSubscriberAction,
   revokeMaxSubscriberAction,
   syncMaxWebhookAction,
+  testMaxNotifyAction,
   updateMaxNotifyAction,
 } from "@/lib/auth-actions";
 
@@ -74,6 +75,21 @@ export function MaxNotificationsSection({
     });
   };
 
+  const sendTest = () => {
+    startTransition(async () => {
+      const r = await testMaxNotifyAction();
+      if (!r.ok) {
+        toast.error("MAX: тест не дошёл", { description: r.error });
+      } else {
+        const okCount = r.results?.filter((x) => x.ok).length ?? 0;
+        toast.success("Тест отправлен", { description: `Доставлено получателям: ${okCount}` });
+      }
+      router.refresh();
+    });
+  };
+
+  const diag = initial.diagnostics;
+
   const review = (id: string, decision: "approve" | "reject") => {
     startTransition(async () => {
       const r = await reviewMaxSubscriberAction({ id, decision });
@@ -116,6 +132,63 @@ export function MaxNotificationsSection({
           . В MAX-приложении пользователь отправляет <code className="text-ink/80">notify</code> или{" "}
           <code className="text-ink/80">/notify</code> или <code className="text-ink/80">/start notify</code>.
         </p>
+
+        {diag && (
+          <div className="rounded-lg border border-line bg-surface p-3 space-y-2 text-sm">
+            <div className="font-medium">Диагностика</div>
+            <ul className="space-y-1 text-ink/70">
+              <li>
+                Бот:{" "}
+                {diag.bot ? (
+                  <span className="text-emerald-700">
+                    {diag.bot.name ?? "—"} {diag.bot.username ? `@${diag.bot.username}` : ""} — токен рабочий
+                  </span>
+                ) : (
+                  <span className="text-red-700">{diag.tokenError ?? "токен не задан"}</span>
+                )}
+              </li>
+              <li>
+                Webhook на этот сайт:{" "}
+                {diag.webhookActive ? (
+                  <span className="text-emerald-700">подключён</span>
+                ) : (
+                  <span className="text-red-700">не подключён</span>
+                )}
+              </li>
+              <li>Одобренных получателей: {initial.subscribersApproved.length}</li>
+              <li>
+                Последняя отправка:{" "}
+                {diag.lastSendAt
+                  ? `${new Date(diag.lastSendAt).toLocaleString("ru-RU")} — ${diag.lastSendOk ? "успешно" : `ошибка: ${diag.lastSendError ?? "—"}`}`
+                  : "ещё не было"}
+              </li>
+            </ul>
+            {diag.warnings.length > 0 ? (
+              <ul className="space-y-1">
+                {diag.warnings.map((w) => (
+                  <li key={w} className="flex gap-2 text-red-800">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{w}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="flex gap-2 text-emerald-700">
+                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                Всё настроено — заявки будут приходить в MAX.
+              </div>
+            )}
+            <button
+              type="button"
+              disabled={pending || initial.subscribersApproved.length === 0}
+              onClick={sendTest}
+              className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-flame text-white text-[11px] font-semibold uppercase tracking-wider disabled:opacity-50"
+            >
+              {pending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
+              Отправить тестовое сообщение
+            </button>
+          </div>
+        )}
 
         {initial.integration.webhookUrl && (
           <div className="text-xs font-mono-pro break-all bg-surface rounded-lg p-3 border border-line">
@@ -161,7 +234,7 @@ export function MaxNotificationsSection({
                 className={inputCls}
                 value={pub}
                 onChange={(e) => setPub(e.target.value)}
-                placeholder="https://morev.neeklo.ru"
+                placeholder="https://footballacademymorev.ru"
               />
             </label>
             <div className="flex flex-wrap gap-3">

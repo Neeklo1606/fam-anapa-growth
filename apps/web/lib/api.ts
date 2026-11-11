@@ -5,7 +5,7 @@
  */
 
 const BROWSER_API_BASE = "/api";
-const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://morev.neeklo.ru/api";
+const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://footballacademymorev.ru/api";
 
 function getApiBase(): string {
   return typeof window === "undefined" ? SERVER_API_BASE : BROWSER_API_BASE;

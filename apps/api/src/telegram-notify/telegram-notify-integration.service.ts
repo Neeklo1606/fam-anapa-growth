@@ -73,7 +73,7 @@ export class TelegramNotifyIntegrationService {
     const u =
       c.publicAppUrl?.trim() ||
       this.config.get<string>("ADMIN_PUBLIC_BASE_URL")?.trim() ||
-      "https://morev.neeklo.ru";
+      "https://footballacademymorev.ru";
     return normBaseUrl(u);
   }
 

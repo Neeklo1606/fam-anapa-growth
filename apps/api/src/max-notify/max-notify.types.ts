@@ -9,6 +9,10 @@ export type MaxLeadIntegrationConfig = {
   /** Same HTTPS site root as Telegram: https://domain */
   publicAppUrl?: string;
   lastWebhookError?: string | null;
+  /** Результат последней исходящей отправки (заявка/тест). */
+  lastSendAt?: string | null;
+  lastSendOk?: boolean | null;
+  lastSendError?: string | null;
 };
 
 export type MaxSubscriberPublic = {
@@ -27,6 +31,16 @@ export type MaxNotifyAdminState = {
     publicAppUrl: string | null;
     webhookUrl: string | null;
     lastWebhookError: string | null;
+  };
+  diagnostics: {
+    bot: { userId: string | null; name: string | null; username: string | null } | null;
+    tokenError: string | null;
+    webhookActive: boolean;
+    foreignWebhooks: string[];
+    lastSendAt: string | null;
+    lastSendOk: boolean | null;
+    lastSendError: string | null;
+    warnings: string[];
   };
   subscriptions: Record<string, unknown>[] | null;
   subscribersPending: MaxSubscriberPublic[];
