@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -64,7 +64,7 @@ function ApplyDialog({ onClose }: { onClose: () => void }) {
   }, [pathname]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -73,14 +73,14 @@ function ApplyDialog({ onClose }: { onClose: () => void }) {
       aria-modal="true"
       aria-label="Запись в академию"
     >
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-night/80 backdrop-blur-sm"
       />
-      <motion.div
+      <m.div
         initial={{ y: "100%", opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: "100%", opacity: 0 }}
@@ -113,8 +113,8 @@ function ApplyDialog({ onClose }: { onClose: () => void }) {
           <div className="sm:hidden mx-auto -mt-2 mb-3 h-1 w-10 rounded-full bg-white/20" />
           <ApplicationForm onClose={onClose} />
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }
 

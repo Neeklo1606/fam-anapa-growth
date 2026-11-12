@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 import { SITE_NAV } from "@/content/site";
@@ -50,7 +50,7 @@ export function MobileMenu() {
         createPortal(
           <AnimatePresence>
             {open && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -62,7 +62,7 @@ export function MobileMenu() {
                   onClick={() => setOpen(false)}
                   className="absolute inset-0 bg-night/85 backdrop-blur-sm"
                 />
-                <motion.div
+                <m.div
                   initial={{ x: "100%" }}
                   animate={{ x: 0 }}
                   exit={{ x: "100%" }}
@@ -88,7 +88,7 @@ export function MobileMenu() {
                     <ul className="flex flex-col">
                       {SITE_NAV.map((item, i) =>
                         item.kind === "apply" ? (
-                          <motion.li
+                          <m.li
                             key="apply-row"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -103,9 +103,9 @@ export function MobileMenu() {
                               <span>{item.label}</span>
                               <span className="text-flame opacity-80">→</span>
                             </button>
-                          </motion.li>
+                          </m.li>
                         ) : (
-                          <motion.li
+                          <m.li
                             key={item.href}
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -120,7 +120,7 @@ export function MobileMenu() {
                               <span>{item.label}</span>
                               <span className="text-flame opacity-0 group-hover:opacity-100 transition">→</span>
                             </a>
-                          </motion.li>
+                          </m.li>
                         ),
                       )}
                     </ul>
@@ -139,8 +139,8 @@ export function MobileMenu() {
                       FAM · ANAPA
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
           </AnimatePresence>,
           document.body,

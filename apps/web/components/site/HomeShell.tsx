@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Phone,
@@ -14,7 +14,7 @@ import {
 import useEmblaCarousel from "embla-carousel-react";
 import Link from "next/link";
 
-import { SiteImage } from "@/components/site/SiteImage";
+import { SiteImage, optimizedPosterUrl } from "@/components/site/SiteImage";
 
 import { HeroVideo } from "@/components/site/HeroVideo";
 import { Reveal } from "@/components/site/Reveal";
@@ -179,12 +179,8 @@ function Hero({ home }: { home: HomePageContent }) {
           paddingBottom: "clamp(2.5rem, 7vw, 6rem)",
         }}
       >
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-4xl"
-        >
+        {/* CSS-анимация вместо framer-motion: заголовок виден без ожидания JS (LCP). */}
+        <div className="max-w-4xl hero-enter">
           <h1
             className="font-display text-white text-balance"
             style={{
@@ -210,7 +206,7 @@ function Hero({ home }: { home: HomePageContent }) {
           <div className="mt-9 lg:mt-10">
             <ApplyButton>{home.hero.ctaLabel}</ApplyButton>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -323,7 +319,7 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
             >
               <video
                 ref={videoRef}
-                poster={home.goalkeeper.videoPoster}
+                poster={optimizedPosterUrl(home.goalkeeper.videoPoster)}
                 playsInline
                 loop
                 muted
@@ -338,7 +334,7 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
               />
               <AnimatePresence>
                 {!playing && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
@@ -350,7 +346,7 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
                         <Play className="h-8 w-8 md:h-10 md:w-10 ml-1" fill="white" />
                       </span>
                     </span>
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
               <div className="absolute bottom-5 left-5 right-5">
@@ -414,7 +410,7 @@ function Principles({ home }: { home: HomePageContent }) {
                     </div>
                     <AnimatePresence initial={false}>
                       {isOpen && (
-                        <motion.div
+                        <m.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
@@ -424,17 +420,17 @@ function Principles({ home }: { home: HomePageContent }) {
                           <p className="mt-4 max-w-2xl text-white/65 text-sm md:text-base leading-relaxed">
                             {p.text}
                           </p>
-                        </motion.div>
+                        </m.div>
                       )}
                     </AnimatePresence>
                   </div>
-                  <motion.div
+                  <m.div
                     animate={{ rotate: isOpen ? 45 : 0 }}
                     transition={{ duration: 0.3 }}
                     className={`shrink-0 h-10 w-10 md:h-12 md:w-12 rounded-full border flex items-center justify-center transition ${isOpen ? "bg-flame border-flame text-white" : "border-white/20 text-white/70 group-hover:border-white/50"}`}
                   >
                     <Plus className="h-4 w-4 md:h-5 md:w-5" />
-                  </motion.div>
+                  </m.div>
                 </button>
               </Reveal>
             );
@@ -499,7 +495,7 @@ function Coaches({ home }: { home: HomePageContent }) {
                   key={c.id}
                   className="min-w-0 shrink-0 basis-[82%] sm:basis-[70%] md:basis-[calc((100%-2.5rem)/3)]"
                 >
-                  <motion.article
+                  <m.article
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
@@ -529,20 +525,22 @@ function Coaches({ home }: { home: HomePageContent }) {
                         {c.shortDescription}
                       </p>
                     </div>
-                  </motion.article>
+                  </m.article>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-center gap-1.5 md:hidden">
+          <div className="mt-3 flex items-center justify-center md:hidden">
             {items.map((c, i) => (
               <button
                 key={c.id}
                 type="button"
                 aria-label={`Слайд ${i + 1}`}
                 onClick={() => embla?.scrollTo(i)}
-                className={`h-1 rounded-full transition-all ${i === snapIndex ? "w-5 bg-flame" : "w-1 bg-ink/25"}`}
-              />
+                className="flex h-6 min-w-6 items-center justify-center"
+              >
+                <span className={`block h-1 rounded-full transition-all ${i === snapIndex ? "w-5 bg-flame" : "w-1 bg-ink/25"}`} />
+              </button>
             ))}
           </div>
         </div>
@@ -690,14 +688,17 @@ function Location({ home }: { home: HomePageContent }) {
                       </button>
                     </div>
 
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex">
                       {slides.map((s, i) => (
                         <button
                           key={s.id}
+                          type="button"
                           onClick={() => embla?.scrollTo(i)}
-                          className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-flame" : "w-1.5 bg-white/40"}`}
+                          className="flex h-6 min-w-6 items-center justify-center"
                           aria-label={`Слайд ${i + 1}`}
-                        />
+                        >
+                          <span className={`block h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-flame" : "w-1.5 bg-white/40"}`} />
+                        </button>
                       ))}
                     </div>
                   </>

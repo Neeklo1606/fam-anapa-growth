@@ -4,6 +4,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { trackSiteEvent } from "@/lib/analytics";
 
+/** Готовые WebP-варианты для статичных постеров из public/img (обычный <img>, без /_next/image). */
+const POSTER_VARIANTS: Record<string, { webp: string; mobile: string }> = {
+  "/img/hero-kid.jpg": { webp: "/img/hero-kid.webp", mobile: "/img/hero-kid-m.webp" },
+  "/img/hero.jpg": { webp: "/img/hero.webp", mobile: "/img/hero-m.webp" },
+};
+
 type Props = {
   videoSrc: string;
   posterSrc: string;
@@ -23,6 +29,30 @@ export function HeroVideo({
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const playTracked = useRef(false);
+  const variant = POSTER_VARIANTS[posterSrc];
+  // Видео монтируем после load + idle, чтобы оно не конкурировало с постером (LCP) и JS.
+  const [mountVideo, setMountVideo] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    let idleId: number | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const start = () => {
+      if (cancelled) return;
+      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+      if (w.requestIdleCallback) idleId = w.requestIdleCallback(() => !cancelled && setMountVideo(true), { timeout: 2500 });
+      else timer = setTimeout(() => !cancelled && setMountVideo(true), 800);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      cancelled = true;
+      window.removeEventListener("load", start);
+      if (timer) clearTimeout(timer);
+      const w = window as Window & { cancelIdleCallback?: (id: number) => void };
+      if (idleId !== undefined) w.cancelIdleCallback?.(idleId);
+    };
+  }, []);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -39,22 +69,27 @@ export function HeroVideo({
       v.removeEventListener("loadeddata", onReady);
       v.removeEventListener("error", onError);
     };
-  }, []);
+  }, [mountVideo]);
 
   return (
     <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`} aria-hidden="true">
-      <img
-        src={posterSrc}
-        alt={alt}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition }}
-        loading="eager"
-        decoding="async"
-      />
-      {!failed && (
+      <picture>
+        {variant && <source media="(max-width: 767px)" srcSet={variant.mobile} type="image/webp" />}
+        {variant && <source srcSet={variant.webp} type="image/webp" />}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={posterSrc}
+          alt={alt}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition }}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
+      {mountVideo && !failed && (
         <video
           ref={videoRef}
-          poster={posterSrc}
           autoPlay
           muted
           loop
@@ -72,7 +107,8 @@ export function HeroVideo({
           {...({ "webkit-playsinline": "true" } as Record<string, string>)}
           disablePictureInPicture
           disableRemotePlayback
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+          // inset 1px: видео не «больше» постера под ним → LCP остаётся на постере, а не на позднем видео.
+          className={`absolute left-px top-px h-[calc(100%-2px)] w-[calc(100%-2px)] object-cover transition-opacity duration-700 ${
             ready ? "opacity-100" : "opacity-0"
           }`}
           style={{ objectPosition }}

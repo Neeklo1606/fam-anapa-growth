@@ -23,12 +23,14 @@ const bebas = Bebas_Neue({
   weight: ["400"],
   variable: "--font-condensed-loaded",
   display: "swap",
+  preload: false,
 });
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono-loaded",
   display: "swap",
+  preload: false,
 });
 
 export const viewport: Viewport = {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { CalendarIcon, CheckCircle2, Send } from "lucide-react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -100,7 +100,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
 
   if (done) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
         className="text-center py-6"
@@ -122,7 +122,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
             Закрыть
           </button>
         )}
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -134,7 +134,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           aria-label="Опыт занятий футболом"
           className="relative grid grid-cols-2 p-1 rounded-xl bg-white/5 border border-white/10"
         >
-          <motion.div
+          <m.div
             aria-hidden
             className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-flame shadow-flame"
             animate={{ left: data.experience === "none" ? 4 : "calc(50% + 0px)" }}

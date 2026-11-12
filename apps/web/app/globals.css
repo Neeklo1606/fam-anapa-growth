@@ -183,3 +183,13 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Появление hero без JS — не задерживает LCP. */
+@keyframes hero-enter {
+  from { opacity: 0.01; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-enter { animation: hero-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter { animation: none; }
+}

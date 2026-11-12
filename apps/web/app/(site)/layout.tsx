@@ -6,6 +6,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SiteContactsProvider } from "@/components/site/SiteContactsContext";
 import { SmoothAnchorScroll } from "@/components/site/SmoothAnchorScroll";
+import { MotionProvider } from "@/components/site/MotionProvider";
 
 import { fetchPublicSite } from "@/lib/admin-api";
 import { CONTACTS } from "@/content/site";
@@ -108,6 +109,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const ldJson = buildLdJson(contacts, logoSrc, apiLoaded);
 
   return (
+    <MotionProvider>
     <ApplyProvider>
       <SiteContactsProvider contacts={contacts}>
         <SmoothAnchorScroll />
@@ -121,5 +123,6 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <Toaster />
       </SiteContactsProvider>
     </ApplyProvider>
+    </MotionProvider>
   );
 }
