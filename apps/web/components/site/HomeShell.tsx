@@ -72,6 +72,7 @@ export function HomeShell({ home }: { home: HomePageContent }) {
       <Coaches home={home} />
       <VideosStrip home={home} />
       <Location home={home} />
+      <Faq home={home} />
       <ApplySection home={home} />
     </div>
   );
@@ -731,6 +732,41 @@ function Location({ home }: { home: HomePageContent }) {
               </div>
             ) : null}
           </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Faq({ home }: { home: HomePageContent }) {
+  const faq = home.faq;
+  const items = (faq?.items ?? []).filter((x) => x.q?.trim() && x.a?.trim());
+  if (!faq?.show || items.length === 0) return null;
+  return (
+    <section id="faq" className="relative bg-white py-16 md:py-24 scroll-mt-20">
+      <div className="mx-auto max-w-4xl px-5 lg:px-8">
+        <Reveal>
+          <h2
+            className="font-display tracking-tight text-deep"
+            style={{ fontSize: "clamp(2rem, 6vw, 4rem)", lineHeight: 0.95 }}
+          >
+            {faq.titleBefore} <span className="text-gradient-brand">{faq.titleAccent}</span>
+          </h2>
+        </Reveal>
+        <div className="mt-8 md:mt-12 divide-y divide-ink/10 border-y border-ink/10">
+          {items.map((item, i) => (
+            <details key={item.q} className="group py-5 md:py-6" open={i === 0}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                <h3 className="font-display text-lg md:text-2xl tracking-tight text-ink">{item.q}</h3>
+                <span className="shrink-0 h-10 w-10 rounded-full border border-ink/15 flex items-center justify-center text-ink/70 transition group-open:rotate-45 group-open:bg-flame group-open:border-flame group-open:text-night">
+                  <Plus className="h-4 w-4" />
+                </span>
+              </summary>
+              <p className="mt-3 max-w-3xl text-ink/70 text-sm md:text-base leading-relaxed whitespace-pre-line">
+                {item.a}
+              </p>
+            </details>
+          ))}
         </div>
       </div>
     </section>

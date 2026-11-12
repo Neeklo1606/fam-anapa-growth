@@ -32,6 +32,8 @@ function schemaAddress(contacts: ResolvedSiteContacts, apiLoaded: boolean) {
     return {
       "@type": "PostalAddress" as const,
       streetAddress: contacts.address,
+      addressLocality: CONTACTS.addressLocality,
+      addressRegion: CONTACTS.addressRegion,
       addressCountry: "RU",
     };
   }
@@ -63,7 +65,11 @@ function buildLdJson(contacts: ResolvedSiteContacts, logoSrc: string, apiLoaded:
     url: SITE_URL,
     image: absUrl(DEFAULT_OG_IMAGE),
     ...(address ? { address } : {}),
-    ...(contacts.address ? { areaServed: { "@type": "AdministrativeArea", name: contacts.address } } : {}),
+    areaServed: [
+      { "@type": "City", name: "Анапа" },
+      { "@type": "AdministrativeArea", name: "Краснодарский край" },
+    ],
+    audience: { "@type": "PeopleAudience", suggestedMinAge: 6, suggestedMaxAge: 14 },
     sport: "Football",
     ...(contacts.phoneTel ? { telephone: contacts.phoneTel } : {}),
     ...(sameAs.length ? { sameAs } : {}),

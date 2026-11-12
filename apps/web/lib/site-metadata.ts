@@ -42,7 +42,8 @@ export function buildSiteMetadata(pub: PublicSite | null): Metadata {
   const favicon = pub?.faviconUrl?.trim() || DEFAULT_FAVICON;
 
   return {
-    title: { default: title, template: "%s · ФАМ Анапа" },
+    // absolute: на главной без хвоста шаблона (иначе «… · ФАМ Анапа» дублируется)
+    title: { absolute: title, template: "%s · ФАМ Анапа" },
     description,
     keywords,
     alternates: { canonical: SITE_URL },

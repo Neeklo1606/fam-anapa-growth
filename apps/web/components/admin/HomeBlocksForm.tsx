@@ -969,6 +969,84 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
       </Section>
+
+      <Section title="Вопросы и ответы (FAQ)">
+        <p className="text-sm text-ink/55">
+          Блок на главной перед формой записи. Эти же вопросы попадают в разметку FAQPage — по ней Яндекс,
+          Google и ИИ-поисковики показывают ответы прямо в выдаче.
+        </p>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={form.faq.show}
+            onChange={(e) => setForm((f) => ({ ...f, faq: { ...f.faq, show: e.target.checked } }))}
+          />
+          Показывать блок на сайте
+        </label>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="Заголовок (до акцента)">
+            <input
+              className={inputCls}
+              value={form.faq.titleBefore}
+              onChange={(e) => setForm((f) => ({ ...f, faq: { ...f.faq, titleBefore: e.target.value } }))}
+            />
+          </Field>
+          <Field label="Акцент">
+            <input
+              className={inputCls}
+              value={form.faq.titleAccent}
+              onChange={(e) => setForm((f) => ({ ...f, faq: { ...f.faq, titleAccent: e.target.value } }))}
+            />
+          </Field>
+        </div>
+        <div className="space-y-3">
+          {form.faq.items.map((item, idx) => (
+            <div key={idx} className="rounded-xl border border-line p-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div className="grid gap-2">
+                <input
+                  className={inputCls}
+                  value={item.q}
+                  placeholder="Вопрос"
+                  onChange={(e) => {
+                    const items = [...form.faq.items];
+                    items[idx] = { ...item, q: e.target.value };
+                    setForm((f) => ({ ...f, faq: { ...f.faq, items } }));
+                  }}
+                />
+                <textarea
+                  className={taCls}
+                  value={item.a}
+                  placeholder="Ответ"
+                  onChange={(e) => {
+                    const items = [...form.faq.items];
+                    items[idx] = { ...item, a: e.target.value };
+                    setForm((f) => ({ ...f, faq: { ...f.faq, items } }));
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                aria-label="Удалить вопрос"
+                className="h-10 w-10 rounded-lg border border-line text-red-600 hover:bg-red-50 shrink-0"
+                onClick={() =>
+                  setForm((f) => ({ ...f, faq: { ...f.faq, items: f.faq.items.filter((_, i) => i !== idx) } }))
+                }
+              >
+                <Trash2 className="h-4 w-4 mx-auto" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setForm((f) => ({ ...f, faq: { ...f.faq, items: [...f.faq.items, { q: "", a: "" }] } }))
+            }
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-flame hover:underline"
+          >
+            <Plus className="h-3 w-3" /> Добавить вопрос
+          </button>
+        </div>
+      </Section>
     </div>
   );
 }

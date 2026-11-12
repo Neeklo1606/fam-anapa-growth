@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/((?!_next/static|_next/image|uploads|img|hero|favicon|manifest|robots|sitemap|icon).*)",
+        source: "/((?!_next/static|_next/image|uploads|img|hero|favicon|manifest|robots|sitemap|llms|icon).*)",
         headers: [
           { key: "Cache-Control", value: "private, no-cache, must-revalidate" },
         ],
