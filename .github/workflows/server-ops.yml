@@ -107,12 +107,18 @@ jobs:
 
       - name: Detect site folder
         run: |
+          # PM2 на сервере запущен не от root (например, от admin) — команды pm2/сборки выполняем от его имени.
+          PM2_USER=$(ssh prod "ps -eo user=,args= | grep -E 'PM2 v[0-9]' | grep -v grep | awk '{print \$1}' | head -1")
+          PM2_USER="${PM2_USER:-root}"
+          echo "PM2_USER=$PM2_USER" >> "$GITHUB_ENV"
+          echo "pm2 user: $PM2_USER"
           if [ -z "$REPO_PATH" ]; then
-            REPO_PATH=$(ssh prod 'bash -s' <<'EOS'
+            REPO_PATH=$(ssh prod "PM2_USER='$PM2_USER' bash -s" <<'EOS'
+          pm2u() { if [ "$PM2_USER" = root ]; then pm2 "$@"; else sudo -u "$PM2_USER" -H pm2 "$@"; fi; }
           # 1) рабочая папка процесса Next/API в PM2 → корень git-клона
           for name in fam-web fam-api; do
-            cwd=$(pm2 jlist 2>/dev/null | jq -r --arg n "$name" '.[] | select(.name==$n) | .pm2_env.pm_cwd' | head -1)
-            if [ -n "$cwd" ] && root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null); then echo "$root"; exit 0; fi
+            cwd=$(pm2u jlist 2>/dev/null | jq -r --arg n "$name" '.[] | select(.name==$n) | .pm2_env.pm_cwd' | head -1)
+            if [ -n "$cwd" ] && root=$(git -c safe.directory='*' -C "$cwd" rev-parse --show-toplevel 2>/dev/null); then echo "$root"; exit 0; fi
           done
           # 2) любой git-клон с apps/web
           for g in $(find /var/www /srv /opt /root /home -maxdepth 5 -type d -name .git 2>/dev/null); do
@@ -130,19 +136,20 @@ jobs:
 
       - name: Inspect (read-only)
         run: |
-          ssh prod "REPO_PATH='$REPO_PATH' bash -s" <<'EOS'
+          ssh prod "REPO_PATH='$REPO_PATH' PM2_USER='$PM2_USER' bash -s" <<'EOS'
           set +e
+          pm2u() { if [ "$PM2_USER" = root ]; then pm2 "$@"; else sudo -u "$PM2_USER" -H pm2 "$@"; fi; }
           echo "== host"; hostname; hostname -I; uptime
           echo "== /var/www"; ls -la /var/www 2>/dev/null
           echo "== git clones"
           for d in /var/www/*/repo /var/www/* /srv/* /opt/* /root/* /home/*/* /home/*/*/*; do
             [ -d "$d/.git" ] || continue
             echo "---- $d"
-            (cd "$d" && git remote -v | head -2 && echo "branch: $(git branch --show-current)" && git log --oneline -5 && echo "status:" && git status --short | head -60)
+            (cd "$d" && echo "owner: $(stat -c %U .)" && git -c safe.directory='*' remote -v | head -2 && echo "branch: $(git -c safe.directory='*' branch --show-current)" && git -c safe.directory='*' log --oneline -5 && echo "status:" && git -c safe.directory='*' status --short | head -60)
           done
           echo "== configured REPO_PATH: $REPO_PATH"; ls -la "$REPO_PATH" 2>/dev/null | head -5
-          echo "== pm2"; pm2 list 2>/dev/null || true
-          pm2 jlist 2>/dev/null | jq -r '.[] | "\(.name)\tcwd=\(.pm2_env.pm_cwd)\tstatus=\(.pm2_env.status)"' 2>/dev/null || true
+          echo "== pm2 (user $PM2_USER)"; pm2u list 2>/dev/null || true
+          pm2u jlist 2>/dev/null | jq -r '.[] | "\(.name)\tcwd=\(.pm2_env.pm_cwd)\tstatus=\(.pm2_env.status)"' 2>/dev/null || true
           echo "== nginx"; nginx -T 2>/dev/null | grep -E "server_name|root |proxy_pass|listen" | sort -u | head -40
           echo "== local site"; curl -s -o /dev/null -w "next:%{http_code}\n" http://127.0.0.1:3000/ ; curl -s -o /dev/null -w "api:%{http_code}\n" http://127.0.0.1:4200/health
           echo "== disk"; df -h / | tail -1
@@ -151,7 +158,7 @@ jobs:
       - name: Snapshot server code → branch
         if: env.MODE == 'snapshot'
         run: |
-          SHA=$(ssh prod "cd '$REPO_PATH' && git rev-parse HEAD")
+          SHA=$(ssh prod "cd '$REPO_PATH' && git -c safe.directory='*' rev-parse HEAD")
           echo "server HEAD: $SHA"
           SNAP="server-snapshot-$(date -u +%Y%m%d-%H%M)"
           git fetch origin "$SHA" 2>/dev/null || true
@@ -176,9 +183,12 @@ jobs:
       - name: Deploy
         if: env.MODE == 'deploy'
         run: |
-          ssh prod "REPO_PATH='$REPO_PATH' BRANCH='$BRANCH' bash -s" <<'EOS'
+          ssh prod "REPO_PATH='$REPO_PATH' BRANCH='$BRANCH' PM2_USER='$PM2_USER' bash -s" <<'EOS'
           set -euo pipefail
           cd "$REPO_PATH"
+          OWNER=$(stat -c %U "$REPO_PATH")
+          echo "==> repo owner: $OWNER, pm2 user: $PM2_USER"
+          asowner() { if [ "$OWNER" = root ]; then bash -c "$1"; else sudo -u "$OWNER" -H bash -c "$1"; fi; }
           mkdir -p /var/backups/fam-deploy
           TS=$(date -u +%Y%m%d-%H%M%S)
           echo "==> backup code → /var/backups/fam-deploy/repo-$TS.tgz"
@@ -187,9 +197,9 @@ jobs:
             DBURL=$(grep -E '^DATABASE_URL=' apps/api/.env | head -1 | cut -d= -f2- | tr -d '"' | sed 's/?schema=.*//')
             pg_dump "$DBURL" -Fc -f "/var/backups/fam-deploy/db-$TS.dump" && echo "==> db backup ok" || echo "WARN: db backup failed"
           fi
-          git fetch origin "$BRANCH"
-          git checkout -B "$BRANCH" "origin/$BRANCH"
-          GIT_BRANCH="$BRANCH" GIT_RESET_HARD=1 PM2_RESTART="fam-api fam-web" bash deploy/server-git-deploy.sh
+          # Код, сборка и PM2 — от владельца папки (тот же пользователь, что держит PM2), без дублей процессов под root.
+          asowner "cd '$REPO_PATH' && git fetch origin '$BRANCH' && git checkout -B '$BRANCH' 'origin/$BRANCH' \
+            && GIT_BRANCH='$BRANCH' GIT_RESET_HARD=1 PM2_RESTART='fam-api fam-web' bash deploy/server-git-deploy.sh"
           EOS
 
       - name: Ensure admin user
@@ -202,7 +212,8 @@ jobs:
           # Пароль передаётся через stdin, не через аргументы командной строки.
           printf '%s\n%s\n' "$ADMIN_EMAIL" "$ADMIN_PASSWORD" | ssh prod "REPO_PATH='$REPO_PATH' bash -c '
             set -e; read -r E; read -r P; cd \"\$REPO_PATH/apps/api\"; set -a; . ./.env; set +a;
-            ADMIN_EMAIL=\"\$E\" ADMIN_PASSWORD=\"\$P\" ADMIN_NAME=\"Администратор\" node scripts/ensure-admin-user.cjs'"
+            O=\$(stat -c %U .); export ADMIN_EMAIL=\"\$E\" ADMIN_PASSWORD=\"\$P\" ADMIN_NAME=\"Администратор\";
+            if [ \"\$O\" = root ]; then node scripts/ensure-admin-user.cjs; else sudo -E -u \"\$O\" node scripts/ensure-admin-user.cjs; fi'"
           code=$(curl -s -o /dev/null -w "%{http_code}" -X POST https://footballacademymorev.ru/api/auth/login \
             -H 'Content-Type: application/json' \
             -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
