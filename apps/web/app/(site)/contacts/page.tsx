@@ -14,7 +14,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
   title: "Контакты",
   description:
-    "Контакты футбольной академии Морева в Анапе. Запись ребёнка на футбольные тренировки, WhatsApp, Telegram, телефон.",
+    "Контакты Футбольной академии Морева в Анапе: телефон +7 (915) 030-31-41, MAX, ВКонтакте, адрес стадиона. Запись ребёнка на футбольные тренировки.",
   openGraph: {
     title: "Контакты · Футбольная академия Морева",
     description: "Свяжитесь с нами для записи ребёнка.",
@@ -27,6 +27,7 @@ const ICONS: Record<string, LucideIcon> = {
   wa: MessageCircle,
   tg: Send,
   max: MessageCircle,
+  vk: Send,
   email: Mail,
   map: MapPin,
 };
@@ -46,7 +47,6 @@ export default async function ContactsPage() {
   return (
     <div className="pb-safe-nav lg:pb-0">
       <section className="relative bg-night text-white pt-24 lg:pt-32 pb-12 lg:pb-20 overflow-hidden">
-        <div className="absolute inset-0 pitch-lines opacity-25" />
         <div className="absolute -top-32 right-0 h-[400px] w-[400px] bg-royal/30 blur-[120px] rounded-full" />
 
         <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
@@ -166,7 +166,6 @@ export default async function ContactsPage() {
           <div
             className={`${showMap ? "md:col-span-5" : ""} rounded-2xl bg-night text-white p-7 md:p-9 relative overflow-hidden border border-white/5 flex flex-col justify-between gap-6`}
           >
-            <div className="absolute inset-0 pitch-lines opacity-20" />
             <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/15 blur-3xl rounded-full" />
             <div className="relative">
               <div className="text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">

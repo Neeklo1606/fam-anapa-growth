@@ -26,7 +26,6 @@ export function LegalLayout({
   return (
     <div className="bg-background pb-safe-nav lg:pb-0">
       <section className="relative bg-night text-white pt-24 lg:pt-32 pb-12 overflow-hidden">
-        <div className="absolute inset-0 pitch-lines opacity-25" />
         <div className="absolute -top-32 right-0 h-[400px] w-[400px] bg-royal/25 blur-[120px] rounded-full" />
         <div className="relative mx-auto max-w-4xl px-5 lg:px-8">
           <Link

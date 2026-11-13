@@ -42,6 +42,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  // Коды подтверждения прав: Яндекс.Вебмастер / Google Search Console (задаются в .env на сервере).
+  verification: {
+    ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION ? { yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION } : {}),
+    ...(process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION } : {}),
+  },
   title: { default: "Футбольная академия Морева", template: "%s · ФАМ Анапа" },
   description:
     "Детская футбольная школа в Анапе для детей 6–14 лет: профессиональная подготовка, опытные тренеры, записи на пробное занятие.",

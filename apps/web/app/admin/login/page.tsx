@@ -22,7 +22,6 @@ async function LoginPageInner({
   const sp = await searchParams;
   return (
     <div className="min-h-screen flex items-center justify-center bg-night text-white px-4 relative overflow-hidden">
-      <div className="absolute inset-0 pitch-lines opacity-25" />
       <div className="absolute -top-32 -right-32 h-96 w-96 bg-flame/15 blur-3xl rounded-full" />
       <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-night/80 backdrop-blur-2xl p-8">
         <div className="text-[10px] uppercase tracking-[0.3em] text-flame font-mono-pro">

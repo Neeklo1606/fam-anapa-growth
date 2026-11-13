@@ -5,6 +5,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const routes = [
     { path: "/", priority: 1, changeFrequency: "weekly" as const },
+    { path: "/futbol-dlya-detej", priority: 0.9, changeFrequency: "monthly" as const },
+    { path: "/shkola-vratarej", priority: 0.9, changeFrequency: "monthly" as const },
+    { path: "/trenery", priority: 0.8, changeFrequency: "monthly" as const },
+    { path: "/o-akademii", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/contacts", priority: 0.9, changeFrequency: "monthly" as const },
     { path: "/legal/privacy", priority: 0.3, changeFrequency: "yearly" as const },
     { path: "/legal/terms", priority: 0.3, changeFrequency: "yearly" as const },

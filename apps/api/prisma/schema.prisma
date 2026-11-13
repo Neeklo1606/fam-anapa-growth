@@ -357,6 +357,7 @@ model SiteSettings {
   whatsapp     String?
   telegram     String?
   maxLink      String?  @map("max_link")
+  vkLink       String?  @map("vk_link") @db.VarChar(200)
   email        String?
   address      String?
   mapEmbed     String?  @db.Text

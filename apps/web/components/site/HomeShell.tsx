@@ -85,7 +85,6 @@ function VideosStrip({ home }: { home: HomePageContent }) {
   return (
     <section id="videos" className="bg-background py-14 md:py-24 border-t border-line scroll-mt-20">
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="absolute inset-0 club-stripes-dark opacity-30 pointer-events-none" />
         <Reveal>
           <div className="text-[11px] uppercase tracking-[0.3em] text-flame font-semibold">
             {home.videosSection.eyebrow}
@@ -167,8 +166,6 @@ function Hero({ home }: { home: HomePageContent }) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-night/85 via-night/50 to-night lg:from-night/90 lg:via-night/40 lg:to-night/70" />
         <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/30" />
-        <div className="absolute inset-0 pitch-lines opacity-25" />
-        <div className="absolute inset-0 club-stripes opacity-50" />
       </div>
 
       <div
@@ -219,28 +216,28 @@ function About({ home }: { home: HomePageContent }) {
       id="about"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
-      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute -top-32 right-0 h-[500px] w-[500px] bg-royal/30 blur-[140px] rounded-full pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <Reveal y={20} className="lg:col-span-6 order-2 lg:order-1">
-            <div className="relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5] rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
-              <SiteImage
-                src={home.about.imageUrl}
-                alt={home.about.imageAlt}
-                fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent" />
-              <div className="absolute inset-0 pitch-lines opacity-15 mix-blend-overlay pointer-events-none" />
-              <div className="absolute bottom-5 left-5 right-5">
-                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">{home.about.cardEyebrow}</div>
-                <div className="font-display text-2xl md:text-3xl mt-1">{home.about.cardTitle}</div>
+            <figure className="relative rounded-3xl overflow-hidden bg-white ring-1 ring-white/10 shadow-elevated">
+              {/* Пропорции карточки = пропорции фото: object-cover ничего не обрезает (голова и руки целиком). */}
+              <div className="relative aspect-[1148/1072]">
+                <SiteImage
+                  src={home.about.imageUrl}
+                  alt={home.about.imageAlt}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover object-center"
+                />
               </div>
-            </div>
+              <figcaption className="relative bg-night px-5 py-4 md:px-6 md:py-5">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-flame via-flame/40 to-transparent" />
+                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">{home.about.cardEyebrow}</div>
+                <div className="font-display text-xl md:text-2xl mt-1">{home.about.cardTitle}</div>
+              </figcaption>
+            </figure>
           </Reveal>
 
           <div className="lg:col-span-6 order-1 lg:order-2">
@@ -291,7 +288,6 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
       id="goalkeeper"
       className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20"
     >
-      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           <div className="lg:col-span-5">
@@ -371,8 +367,6 @@ function Principles({ home }: { home: HomePageContent }) {
       id="principles"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
-      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="absolute top-1/2 -left-32 h-[400px] w-[400px] bg-flame/15 blur-[140px] rounded-full -translate-y-1/2 pointer-events-none" />
 
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
@@ -473,15 +467,14 @@ function Coaches({ home }: { home: HomePageContent }) {
 
   return (
     <section id="coaches" className="relative bg-background py-10 md:py-24 scroll-mt-20">
-      <div className="absolute inset-0 club-stripes-dark opacity-40 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="max-w-xl">
             <h2 className="font-display font-bold tracking-[0.18em] text-deep uppercase text-2xl sm:text-3xl md:text-4xl">
-              Тренеры
+              Тренерский <span className="text-flame">штаб</span>
             </h2>
             {home.coachesSection.subtitle.trim() ? (
-              <p className="mt-2 md:mt-3 text-ink/60 max-w-md text-[13px] md:text-sm leading-snug line-clamp-3 md:line-clamp-none">
+              <p className="mt-2 md:mt-3 text-ink/60 max-w-md text-[13px] md:text-sm leading-snug">
                 {home.coachesSection.subtitle}
               </p>
             ) : null}
@@ -512,7 +505,16 @@ function Coaches({ home }: { home: HomePageContent }) {
                         className="object-cover object-[center_18%] transition duration-500 group-hover:scale-[1.02]"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-night" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-deep via-night to-night">
+                        <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-flame/20 blur-3xl" />
+                        <span className="relative font-display text-6xl md:text-7xl tracking-tight text-white/90 -mt-16">
+                          {c.fullName
+                            .split(/\s+/)
+                            .slice(0, 2)
+                            .map((w) => w[0])
+                            .join("")}
+                        </span>
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent pointer-events-none" />
                     <div className="absolute bottom-0 left-0 right-0 bg-night px-4 py-3 md:px-5 md:py-4">
@@ -522,9 +524,11 @@ function Coaches({ home }: { home: HomePageContent }) {
                       <p className="mt-1 text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">
                         {c.role}
                       </p>
-                      <p className="mt-2 hidden md:block text-sm text-white/70 leading-snug line-clamp-2">
-                        {c.shortDescription}
-                      </p>
+                      {c.shortDescription ? (
+                        <p className="mt-1.5 text-[12px] md:text-sm text-white/70 leading-snug line-clamp-2">
+                          {c.shortDescription}
+                        </p>
+                      ) : null}
                     </div>
                   </m.article>
                 </div>
@@ -585,8 +589,6 @@ function Location({ home }: { home: HomePageContent }) {
       id="location"
       className="relative bg-night text-white py-16 md:py-28 overflow-hidden border-t border-white/5 scroll-mt-20"
     >
-      <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
-      <div className="absolute inset-0 club-stripes opacity-40 pointer-events-none" />
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           <div className="lg:col-span-5">
@@ -781,7 +783,6 @@ function ApplySection({ home }: { home: HomePageContent }) {
       id="contacts"
       className="relative bg-surface text-deep py-16 md:py-28 overflow-hidden scroll-mt-20"
     >
-      <div className="absolute inset-0 club-stripes-dark opacity-60 pointer-events-none" />
       <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <Reveal>
@@ -815,7 +816,6 @@ function ApplySection({ home }: { home: HomePageContent }) {
               onClick={open}
               className="group block w-full text-left rounded-3xl border border-deep/10 bg-white p-6 md:p-8 shadow-soft hover:shadow-elevated transition relative overflow-hidden"
             >
-              <div className="absolute inset-0 club-stripes-dark opacity-50 pointer-events-none" />
               <div className="absolute -top-24 -right-24 h-56 w-56 bg-flame/15 blur-3xl rounded-full pointer-events-none" />
               <div className="relative">
                 <div className="text-[10px] uppercase tracking-[0.3em] text-flame font-semibold">

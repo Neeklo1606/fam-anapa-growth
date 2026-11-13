@@ -18,6 +18,7 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
     whatsapp: initial.whatsapp ?? "",
     telegram: initial.telegram ?? "",
     maxLink: initial.maxLink ?? "",
+    vkLink: initial.vkLink ?? "",
     email: initial.email ?? "",
     address: initial.address ?? "",
     yandexMapUrl: initial.yandexMapUrl ?? "",
@@ -144,6 +145,9 @@ export function SettingsForm({ initial }: { initial: SiteSettings }) {
       </Field>
       <Field label="MAX link">
         <input className={inputCls} value={form.maxLink} onChange={(e) => set("maxLink", e.target.value)} placeholder="https://max.ru/fam_anapa" />
+      </Field>
+      <Field label="ВКонтакте">
+        <input className={inputCls} value={form.vkLink} onChange={(e) => set("vkLink", e.target.value)} placeholder="https://vk.ru/f.a.morev" />
       </Field>
       <Field label="Яндекс.Карты URL">
         <input className={inputCls} value={form.yandexMapUrl} onChange={(e) => set("yandexMapUrl", e.target.value)} placeholder="https://yandex.ru/maps/..." />

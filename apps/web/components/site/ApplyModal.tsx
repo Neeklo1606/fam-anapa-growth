@@ -117,7 +117,6 @@ function ApplyDialog({ onClose }: { onClose: () => void }) {
         transition={{ type: "spring", damping: 30, stiffness: 280 }}
         className="relative w-full sm:max-w-lg bg-night text-white sm:rounded-3xl rounded-t-3xl border border-white/10 overflow-hidden shadow-elevated max-h-[94svh] flex flex-col"
       >
-        <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
         <div className="absolute -top-24 -right-24 h-64 w-64 bg-flame/20 blur-3xl rounded-full pointer-events-none" />
 
         <div className="relative flex items-center justify-between px-5 pt-5 pb-2 shrink-0">

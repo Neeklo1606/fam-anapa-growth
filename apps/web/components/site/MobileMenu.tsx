@@ -69,7 +69,6 @@ export function MobileMenu() {
                   transition={{ type: "spring", damping: 28, stiffness: 260 }}
                   className="absolute right-0 top-0 h-full w-[88vw] max-w-[420px] bg-night text-white border-l border-white/10 flex flex-col overflow-hidden shadow-elevated"
                 >
-                  <div className="absolute inset-0 pitch-lines opacity-15 pointer-events-none" />
                   <div className="absolute -top-32 -right-32 h-80 w-80 bg-flame/15 blur-3xl rounded-full pointer-events-none" />
 
                   <div className="relative flex items-center justify-between p-5 pt-safe">

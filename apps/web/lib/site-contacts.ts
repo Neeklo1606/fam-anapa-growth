@@ -11,6 +11,7 @@ export type ResolvedSiteContacts = {
   whatsapp: string | null;
   telegram: string | null;
   max: string | null;
+  vk: string | null;
   email: string | null;
   address: string | null;
   yandexMaps: string | null;
@@ -98,6 +99,7 @@ export function resolveSiteContacts(pub: PublicSite | null): ResolvedSiteContact
     whatsapp: pickUrl(pub?.whatsapp, CONTACTS.whatsapp, apiLoaded),
     telegram: pickUrl(pub?.telegram, CONTACTS.telegram, apiLoaded),
     max: pickUrl(pub?.maxLink, CONTACTS.max, apiLoaded),
+    vk: pickUrl(pub?.vkLink, CONTACTS.vk, apiLoaded),
     email: pub ? pickEmail(pub.email) : null,
     address,
     yandexMaps: yandexExplicit ?? resolveYandexMapsLink(null, address),
@@ -151,8 +153,8 @@ export function buildContactCards(c: ResolvedSiteContacts): ContactCard[] {
   if (c.max) {
     cards.push({ key: "max", label: "MAX", value: "Написать", href: c.max, external: true });
   }
-  if (c.max) {
-    cards.push({ key: "max", label: "MAX", value: "Написать", href: c.max, external: true });
+  if (c.vk) {
+    cards.push({ key: "vk", label: "ВКонтакте", value: "Перейти", href: c.vk, external: true });
   }
   if (c.email) {
     cards.push({

@@ -227,6 +227,7 @@ export type SettingsPatch = {
   whatsapp?: string;
   telegram?: string;
   maxLink?: string;
+  vkLink?: string;
   email?: string;
   address?: string;
   mapEmbed?: string;

@@ -4,12 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { m } from "framer-motion";
-import { CalendarIcon, CheckCircle2, Send } from "lucide-react";
-import { format } from "date-fns";
-import { ru } from "date-fns/locale";
+import { CheckCircle2, ChevronDown, Send } from "lucide-react";
 
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trackSiteEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { submitLead, LeadSubmitError } from "@/lib/api";
@@ -19,7 +15,8 @@ type Experience = "none" | "yes";
 type FormState = {
   experience: Experience;
   childName: string;
-  birthDate?: Date;
+  /** YYYY-MM-DD (без часового пояса) или "" */
+  birthDate: string;
   parentName: string;
   phone: string;
   comment: string;
@@ -29,7 +26,7 @@ type FormState = {
 const initial: FormState = {
   experience: "none",
   childName: "",
-  birthDate: undefined,
+  birthDate: "",
   parentName: "",
   phone: "",
   comment: "",
@@ -49,9 +46,9 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!data.parentName.trim()) e.parentName = "Укажите ФИО опекуна";
-    if (!data.childName.trim()) e.childName = "Укажите ФИО ученика";
-    if (!data.birthDate) e.birthDate = "Выберите дату рождения";
+    if (data.parentName.trim().length < 2) e.parentName = "Укажите ФИО родителя (минимум 2 буквы)";
+    if (data.childName.trim().length < 2) e.childName = "Укажите ФИО ребёнка (минимум 2 буквы)";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(data.birthDate)) e.birthDate = "Укажите день, месяц и год рождения";
     const digits = data.phone.replace(/\D/g, "");
     if (digits.length !== 11 || !/^[78]/.test(digits))
       e.phone = "Введите телефон в формате +7 (___) ___-__-__";
@@ -66,9 +63,10 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     setLoading(true);
     try {
       await submitLead({
-        parentName: data.parentName,
-        childName: data.childName,
-        childBirthDate: data.birthDate?.toISOString(),
+        parentName: data.parentName.trim(),
+        childName: data.childName.trim(),
+        // Строка YYYY-MM-DD: без сдвига на день из-за часового пояса (toISOString от полуночи МСК = вчера в UTC).
+        childBirthDate: data.birthDate,
         phone: data.phone,
         experienceLevel: data.experience === "yes" ? "YES" : "NONE",
         comment: data.comment || undefined,
@@ -86,7 +84,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
     } catch (err) {
       if (err instanceof LeadSubmitError) {
         toast.error("Не удалось отправить заявку", {
-          description: err.details[0] ?? err.message,
+          description: humanizeLeadError(err.details[0] ?? err.message),
         });
       } else {
         toast.error("Сервер недоступен", {
@@ -156,7 +154,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
                 onClick={() => update("experience", opt.v)}
                 className={cn(
                   "relative z-10 h-10 rounded-lg text-sm font-medium transition-colors",
-                  active ? "text-white" : "text-white/65 hover:text-white",
+                  active ? "text-night font-semibold" : "text-white/65 hover:text-white",
                 )}
               >
                 {opt.label}
@@ -184,7 +182,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
         />
       </Field>
 
-      <Field label="Дата рождения *" error={errors.birthDate}>
+      <Field label="Дата рождения *" error={errors.birthDate} group>
         <BirthDatePicker
           value={data.birthDate}
           hasError={Boolean(errors.birthDate)}
@@ -229,7 +227,11 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
           className="mt-1 h-4 w-4 rounded border-white/20 bg-white/5 accent-flame shrink-0"
         />
         <span className="text-[12px] leading-relaxed text-white/70">
-          Согласен(на) на обработку персональных данных в соответствии с указанными в анкете сведениями.
+          Я согласен на{" "}
+          <Link href="/legal/consent" target="_blank" className="underline underline-offset-2 hover:text-white">
+            обработку персональных данных
+          </Link>{" "}
+          и подтверждаю, что являюсь родителем / законным представителем ребёнка.
         </span>
       </label>
       {errors.consent && <span className="text-[11px] text-red-300 -mt-2">{errors.consent}</span>}
@@ -270,68 +272,108 @@ const inputCls = (err: boolean) =>
     err ? "border-red-400/70" : "border-white/10"
   }`;
 
+const MONTHS_RU = [
+  "января", "февраля", "марта", "апреля", "мая", "июня",
+  "июля", "августа", "сентября", "октября", "ноября", "декабря",
+];
+
+/** Ошибки валидации API (class-validator, англ.) → понятный русский текст. */
+function humanizeLeadError(msg: string): string {
+  if (/parentName/.test(msg)) return "ФИО родителя: минимум 2 буквы";
+  if (/childName/.test(msg)) return "ФИО ребёнка: минимум 2 буквы";
+  if (/phone/.test(msg)) return "Проверьте номер телефона: +7 (___) ___-__-__";
+  if (/childBirthDate/.test(msg)) return "Проверьте дату рождения";
+  if (/privacyAccepted/.test(msg)) return "Нужно согласие на обработку данных";
+  if (/too many|throttl/i.test(msg)) return "Слишком много попыток. Подождите минуту и попробуйте снова.";
+  return /[а-яё]/i.test(msg) ? msg : "Проверьте заполнение полей и попробуйте снова.";
+}
+
+/**
+ * Дата рождения тремя нативными списками: на телефоне открывается системное «колесо»
+ * (удобнее календаря для дат 5–15 лет назад). Значение — строка YYYY-MM-DD.
+ */
 function BirthDatePicker({
   value,
   hasError,
   onChange,
 }: {
-  value?: Date;
+  value: string;
   hasError: boolean;
-  onChange: (d: Date) => void;
+  onChange: (v: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const nowYear = new Date().getFullYear();
+  const years = Array.from({ length: 18 }, (_, i) => nowYear - 2 - i); // дети от 2 до 19 лет
+  const parts = value ? value.split("-") : [];
+  const [day, setDay] = useState(parts[2] ? String(Number(parts[2])) : "");
+  const [month, setMonth] = useState(parts[1] ? String(Number(parts[1])) : "");
+  const [year, setYear] = useState(parts[0] ?? "");
+
+  // 2016 — високосный: пока год не выбран, 29 февраля доступно.
+  const daysInMonth = (yy: string, mm: string) =>
+    mm ? new Date(Number(yy) || 2016, Number(mm), 0).getDate() : 31;
+
+  const apply = (dd: string, mm: string, yy: string) => {
+    const max = daysInMonth(yy, mm);
+    const dFixed = dd && Number(dd) > max ? String(max) : dd;
+    setDay(dFixed);
+    setMonth(mm);
+    setYear(yy);
+    onChange(
+      dFixed && mm && yy ? `${yy}-${mm.padStart(2, "0")}-${dFixed.padStart(2, "0")}` : "",
+    );
+  };
+
+  const selCls = (empty: boolean) =>
+    cn(inputCls(hasError), "appearance-none pr-8 cursor-pointer", empty && "text-white/40");
+  const chevron = (
+    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 opacity-50" />
+  );
 
   return (
-    <Popover open={open} onOpenChange={setOpen} modal>
-      <PopoverTrigger asChild>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-haspopup="dialog"
-          className={cn(
-            inputCls(hasError),
-            "flex items-center justify-between text-left",
-            !value && "text-white/40",
-          )}
+    <div className="grid grid-cols-[1fr_1.6fr_1.2fr] gap-2" role="group" aria-label="Дата рождения">
+      <span className="relative">
+        <select
+          aria-label="День"
+          className={selCls(!day)}
+          value={day}
+          onChange={(e) => apply(e.target.value, month, year)}
         >
-          <span>
-            {value ? format(value, "d MMMM yyyy", { locale: ru }) : "Выберите дату"}
-          </span>
-          <CalendarIcon className="h-4 w-4 opacity-60 shrink-0" />
-        </button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        sideOffset={8}
-        className="z-[200] w-auto p-0 border-white/15 bg-night text-white shadow-elevated pointer-events-auto"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <Calendar
-          mode="single"
-          selected={value}
-          onSelect={(d) => {
-            if (!d) return;
-            onChange(d);
-            setOpen(false);
-          }}
-          captionLayout="dropdown"
-          fromYear={2005}
-          toYear={new Date().getFullYear()}
-          defaultMonth={value ?? new Date(2015, 0)}
-          disabled={(date) => date > new Date() || date < new Date("2005-01-01")}
-          locale={ru}
-          className="p-3 bg-night text-white [--cell-size:2.25rem]"
-          classNames={{
-            dropdown_root: "border-white/15 bg-white/5 text-white",
-            caption_label: "text-white",
-            weekday: "text-white/45",
-            outside: "text-white/25",
-            disabled: "text-white/20",
-            today: "bg-white/10 text-white",
-          }}
-        />
-      </PopoverContent>
-    </Popover>
+          <option value="" disabled>День</option>
+          {Array.from({ length: daysInMonth(year, month) }, (_, i) => String(i + 1)).map((d) => (
+            <option key={d} value={d} className="text-ink">{d}</option>
+          ))}
+        </select>
+        {chevron}
+      </span>
+      <span className="relative">
+        <select
+          aria-label="Месяц"
+          className={selCls(!month)}
+          value={month}
+          onChange={(e) => apply(day, e.target.value, year)}
+        >
+          <option value="" disabled>Месяц</option>
+          {MONTHS_RU.map((name, i) => (
+            <option key={name} value={String(i + 1)} className="text-ink">{name}</option>
+          ))}
+        </select>
+        {chevron}
+      </span>
+      <span className="relative">
+        <select
+          aria-label="Год"
+          className={selCls(!year)}
+          value={year}
+          onChange={(e) => apply(day, month, e.target.value)}
+        >
+          <option value="" disabled>Год</option>
+          {years.map((yy) => (
+            <option key={yy} value={String(yy)} className="text-ink">{yy}</option>
+          ))}
+        </select>
+        {chevron}
+      </span>
+    </div>
   );
 }
 
@@ -339,19 +381,23 @@ function Field({
   label,
   error,
   children,
+  group = false,
 }: {
   label: string;
   error?: string;
   children: React.ReactNode;
+  /** Несколько контролов внутри (дата рождения) — div вместо label. */
+  group?: boolean;
 }) {
+  const Tag = group ? "div" : "label";
   return (
-    <label className="block">
+    <Tag className="block">
       <span className="block text-[10px] uppercase tracking-[0.2em] text-white/55 mb-1.5 font-medium">
         {label}
       </span>
       {children}
       {error && <span className="block mt-1 text-[11px] text-red-300">{error}</span>}
-    </label>
+    </Tag>
   );
 }
 

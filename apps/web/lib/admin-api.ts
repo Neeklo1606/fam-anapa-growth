@@ -174,6 +174,7 @@ export type SiteSettings = {
   whatsapp: string | null;
   telegram: string | null;
   maxLink: string | null;
+  vkLink: string | null;
   email: string | null;
   address: string | null;
   mapEmbed: string | null;
@@ -216,6 +217,7 @@ export type PublicSite = {
   whatsapp: string | null;
   telegram: string | null;
   maxLink: string | null;
+  vkLink: string | null;
   email: string | null;
   address: string | null;
   mapEmbed: string | null;

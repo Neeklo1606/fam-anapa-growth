@@ -50,7 +50,7 @@ function schemaAddress(contacts: ResolvedSiteContacts, apiLoaded: boolean) {
 }
 
 function buildLdJson(contacts: ResolvedSiteContacts, logoSrc: string, apiLoaded: boolean) {
-  const sameAs = [contacts.whatsapp, contacts.telegram, contacts.max, contacts.yandexMaps].filter(
+  const sameAs = [contacts.vk, contacts.whatsapp, contacts.telegram, contacts.max, contacts.yandexMaps].filter(
     (u): u is string => Boolean(u),
   );
   const address = schemaAddress(contacts, apiLoaded);

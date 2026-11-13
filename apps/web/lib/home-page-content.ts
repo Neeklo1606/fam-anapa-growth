@@ -122,9 +122,15 @@ function deepMerge<T extends Record<string, unknown>>(target: T, src: Record<str
   return out;
 }
 
+/**
+ * Версия текстов по умолчанию. При повышении старые сохранённые в БД тексты
+ * (из списка ниже) заменяются новыми — см. migrateStoredHome.
+ */
+export const HOME_CONTENT_VERSION = 2;
+
 export function buildDefaultHomePageContent(): HomePageContent {
   return {
-    version: 1,
+    version: HOME_CONTENT_VERSION,
     hero: {
       videoSrc: HERO.media.src,
       posterSrc: HERO.media.poster,
@@ -138,7 +144,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
       titleBefore: "Об",
       titleAccent: "Академии",
       imageUrl: ABOUT.image,
-      imageAlt: "Команда футбольной академии Морева в Анапе",
+      imageAlt: "Воспитанник Футбольной академии Морева в клубной форме",
       paragraphs: [...ABOUT.body],
     },
     goalkeeper: {
@@ -159,7 +165,8 @@ export function buildDefaultHomePageContent(): HomePageContent {
     coachesSection: {
       titleLine1: "Тренерский",
       titleLine2Accent: "штаб",
-      subtitle: "Знакомьтесь с тренерами ФАМ.",
+      subtitle:
+        "Тренеры нашей академии — это не только профессионалы и наставники, но и настоящие друзья для каждого ребёнка. Мы поддерживаем, вдохновляем и вместе идём к успеху!",
       staticCoaches: COACHES.map((c) => ({
         fullName: c.name,
         role: c.role,
@@ -227,11 +234,54 @@ export function buildDefaultHomePageContent(): HomePageContent {
   };
 }
 
+/**
+ * v1 → v2 (13.11.2026): тексты «Об академии», «Школа вратарей», принципы, тренеры, локация
+ * заменены на утверждённые заказчиком. Из старого сохранения убираем эти поля, чтобы взялись
+ * новые дефолты; загруженные фото тренеров сохраняем (сопоставление по ФИО).
+ */
+function migrateStoredHome(stored: Record<string, unknown>): Record<string, unknown> {
+  const version = typeof stored.version === "number" ? stored.version : 1;
+  if (version >= HOME_CONTENT_VERSION) return stored;
+  const out = clone(stored);
+  const drop = (section: string, key: string) => {
+    const sec = out[section];
+    if (isPlainObject(sec)) delete sec[key];
+  };
+  drop("about", "paragraphs");
+  drop("about", "imageUrl"); // новое фото блока «Об академии» (по просьбе заказчика)
+  drop("about", "imageAlt");
+  drop("goalkeeper", "body");
+  drop("principles", "items");
+  drop("coachesSection", "subtitle");
+  drop("location", "body");
+
+  const oldCoaches = isPlainObject(out.coachesSection) ? out.coachesSection.staticCoaches : undefined;
+  const photoByName = new Map<string, string>();
+  if (Array.isArray(oldCoaches)) {
+    for (const c of oldCoaches) {
+      if (isPlainObject(c) && typeof c.fullName === "string" && typeof c.photoUrl === "string" && c.photoUrl) {
+        photoByName.set(c.fullName.trim().toLowerCase(), c.photoUrl);
+      }
+    }
+  }
+  if (isPlainObject(out.coachesSection)) {
+    out.coachesSection.staticCoaches = COACHES.map((c) => ({
+      fullName: c.name,
+      role: c.role,
+      photoUrl: photoByName.get(c.name.toLowerCase()) || c.img,
+      shortDescription: c.info,
+    }));
+  }
+  out.version = HOME_CONTENT_VERSION;
+  return out;
+}
+
 /** Слить сохранённые в БД данные поверх кодовых дефолтов. */
 export function mergeStoredHomePage(stored: unknown): HomePageContent {
   const base = buildDefaultHomePageContent();
-  if (!stored || typeof stored !== "object") return base;
-  return deepMerge(base as unknown as Record<string, unknown>, stored as Record<string, unknown>) as unknown as HomePageContent;
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return base;
+  const migrated = migrateStoredHome(stored as Record<string, unknown>);
+  return deepMerge(base as unknown as Record<string, unknown>, migrated) as unknown as HomePageContent;
 }
 
 /** Нормализует импорт с бэкенда перед merge (на случай «обёрток» или устаревшего вида). */

@@ -14,6 +14,7 @@ export function FooterContactsSection() {
     c.phoneTel ||
     messengers.length > 0 ||
     c.max ||
+    c.vk ||
     c.email ||
     (c.yandexMaps && c.address);
 
@@ -21,7 +22,7 @@ export function FooterContactsSection() {
 
   return (
     <div className="md:col-span-4">
-      <div className="text-[10px] uppercase tracking-[0.22em] text-white/35 font-mono-pro">Связь</div>
+      <div className="text-[10px] uppercase tracking-[0.22em] text-flame font-mono-pro">Связь</div>
       <ul className="mt-4 space-y-3 text-[13px] text-white/[0.8]">
         {c.phoneTel && c.phoneDisplay ? (
           <li>
@@ -89,6 +90,14 @@ export function FooterContactsSection() {
               }
             >
               Написать в MAX
+            </a>
+          </li>
+        ) : null}
+
+        {c.vk ? (
+          <li>
+            <a href={c.vk} target="_blank" rel="noreferrer" className="hover:text-flame transition">
+              Мы во ВКонтакте
             </a>
           </li>
         ) : null}

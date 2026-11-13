@@ -33,6 +33,7 @@ export async function GET() {
   if (contacts.whatsapp) lines.push(`- WhatsApp: ${contacts.whatsapp}`);
   if (contacts.telegram) lines.push(`- Telegram: ${contacts.telegram}`);
   if (contacts.max) lines.push(`- MAX: ${contacts.max}`);
+  if (contacts.vk) lines.push(`- ВКонтакте: ${contacts.vk}`);
   if (contacts.yandexMaps) lines.push(`- На карте: ${contacts.yandexMaps}`);
 
   lines.push(
@@ -40,6 +41,10 @@ export async function GET() {
     "## Страницы",
     `- [Главная](${SITE_URL}/): об академии, школа вратарей, тренеры, место тренировок, запись`,
     `- [Записаться на пробное занятие](${SITE_URL}/#contacts): форма заявки`,
+    `- [Футбол для детей 6–14 лет](${SITE_URL}/futbol-dlya-detej)`,
+    `- [Школа вратарей](${SITE_URL}/shkola-vratarej)`,
+    `- [Тренеры](${SITE_URL}/trenery)`,
+    `- [Об академии](${SITE_URL}/o-akademii)`,
     `- [Контакты](${SITE_URL}/contacts)`,
     `- [Политика конфиденциальности](${SITE_URL}/legal/privacy)`,
   );

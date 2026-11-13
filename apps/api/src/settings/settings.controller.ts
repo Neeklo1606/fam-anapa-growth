@@ -39,6 +39,7 @@ export class SettingsController {
       whatsapp: s.whatsapp,
       telegram: s.telegram,
       maxLink: s.maxLink,
+      vkLink: s.vkLink,
       email: s.email,
       address: s.address,
       mapEmbed: s.mapEmbed,
