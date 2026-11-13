@@ -10,6 +10,7 @@
 #              чтобы не потерять правки, сделанные прямо на сервере.
 #   deploy   — бэкап текущей папки → выкладка ветки → сборка, миграции, перезапуск PM2 → проверка сайта.
 #   admin    — создать/обновить пользователя ADMIN из секретов ADMIN_EMAIL / ADMIN_PASSWORD.
+#   maxcheck — вход в админку, диагностика MAX (только счётчики), тест-сообщение и тестовая заявка через сайт.
 #
 # Нужные секреты репозитория (Settings → Secrets and variables → Actions):
 #   DEPLOY_SSH_KEY  — приватный ключ (ed25519), публичная часть в ~/.ssh/authorized_keys на сервере. Обязателен.
@@ -24,7 +25,7 @@ on:
       mode:
         description: "inspect | snapshot | deploy | admin"
         type: choice
-        options: [inspect, snapshot, deploy, admin]
+        options: [inspect, snapshot, deploy, admin, maxcheck]
         default: inspect
       branch:
         description: "Ветка для deploy"
@@ -64,7 +65,7 @@ jobs:
           fi
           MODE="${MODE:-inspect}"
           BRANCH="${BRANCH:-${GITHUB_REF_NAME}}"
-          case "$MODE" in inspect|snapshot|deploy|admin) ;; *) echo "Unknown mode $MODE"; exit 1;; esac
+          case "$MODE" in inspect|snapshot|deploy|admin|maxcheck) ;; *) echo "Unknown mode $MODE"; exit 1;; esac
           echo "MODE=$MODE" >> "$GITHUB_ENV"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
           echo "mode=$MODE branch=$BRANCH host=$HOST path=$REPO_PATH"
@@ -146,18 +147,16 @@ jobs:
           ssh prod "REPO_PATH='$REPO_PATH' PM2_USER='$PM2_USER' bash -s" <<'EOS'
           set +e
           pm2u() { if [ "$PM2_USER" = root ]; then pm2 "$@"; else sudo -u "$PM2_USER" -H pm2 "$@"; fi; }
-          echo "== host"; hostname; hostname -I; uptime
-          echo "== /var/www"; ls -la /var/www 2>/dev/null
-          echo "== git clones"
-          for d in /var/www/*/repo /var/www/* /srv/* /opt/* /root/* /home/*/* /home/*/*/*; do
-            [ -d "$d/.git" ] || continue
-            echo "---- $d"
-            (cd "$d" && echo "owner: $(stat -c %U .)" && git -c safe.directory='*' remote -v | head -2 && echo "branch: $(git -c safe.directory='*' branch --show-current)" && git -c safe.directory='*' log --oneline -5 && echo "status:" && git -c safe.directory='*' status --short | head -60)
-          done
+          # Логи публичного репозитория видны всем — выводим только то, что касается сайта академии.
+          echo "== uptime"; uptime
+          d="$REPO_PATH"
+          if [ -d "$d/.git" ]; then
+            echo "---- $d (owner: $(stat -c %U "$d"))"
+            (cd "$d" && echo "branch: $(git -c safe.directory='*' branch --show-current)" && git -c safe.directory='*' log --oneline -3 && echo "status:" && git -c safe.directory='*' status --short | head -40)
+          fi
           echo "== configured REPO_PATH: $REPO_PATH"; ls -la "$REPO_PATH" 2>/dev/null | head -5
-          echo "== pm2 (user $PM2_USER)"; pm2u list 2>/dev/null || true
-          pm2u jlist 2>/dev/null | jq -r '.[] | "\(.name)\tcwd=\(.pm2_env.pm_cwd)\tstatus=\(.pm2_env.status)"' 2>/dev/null || true
-          echo "== nginx"; nginx -T 2>/dev/null | grep -E "server_name|root |proxy_pass|listen" | sort -u | head -40
+          echo "== pm2 (user $PM2_USER)"
+          pm2u jlist 2>/dev/null | jq -r '.[] | select(.name|startswith("fam-")) | "\(.name)\tstatus=\(.pm2_env.status)\trestarts=\(.pm2_env.restart_time)\tuptime_ms=\(now*1000 - .pm2_env.pm_uptime | floor)"' 2>/dev/null || true
           echo "== fam upstreams"; grep -rhA3 "upstream fam_" /etc/nginx/ 2>/dev/null | grep -E "upstream|server " | sort -u
           WEB_PORT=$(grep -rhA3 "upstream fam_next_upstream" /etc/nginx/ 2>/dev/null | grep -oE "127\.0\.0\.1:[0-9]+" | head -1 | cut -d: -f2)
           echo "fam web port: ${WEB_PORT:-?}"
@@ -165,7 +164,7 @@ jobs:
             curl -s -o /dev/null -w "local ${u} → %{http_code}\n" "http://127.0.0.1:${WEB_PORT:-3000}$u"
           done
           curl -s -o /dev/null -w "api:%{http_code}\n" http://127.0.0.1:4200/health
-          curl -s http://127.0.0.1:4200/api/site | head -c 400; echo
+          curl -s http://127.0.0.1:4200/api/site | jq -c '{phone, vkLink, maxLink, yandexMapUrl, homeContentVersion: (.homeContent.version // null)}' 
           echo "== disk"; df -h / | tail -1
           EOS
 
@@ -235,6 +234,36 @@ jobs:
             -H 'Content-Type: application/json' \
             -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
           echo "login check: HTTP $code"; [ "$code" = "200" ] || [ "$code" = "201" ]
+
+      - name: MAX check (login → diagnostics → test message → test lead)
+        if: env.MODE == 'maxcheck'
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          B=https://footballacademymorev.ru/api
+          J=/tmp/jar
+          code=$(curl -s -c $J -b $J -o /tmp/login.json -w "%{http_code}" -X POST "$B/auth/login" -H 'Content-Type: application/json' \
+            -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
+          echo "admin login: HTTP $code"; [ "$code" = "200" ] || { echo "::error::Вход в админку не удался"; exit 1; }
+          CSRF=$(awk '$6=="fam_csrf"{print $7}' $J | tail -1)
+          diag() { curl -s -b $J "$B/notifications/max" | jq -c '{
+            botOk: (.diagnostics.bot != null), tokenError: .diagnostics.tokenError,
+            webhookActive: .diagnostics.webhookActive, foreignWebhooks: (.diagnostics.foreignWebhooks|length),
+            approved: (.subscribersApproved|length), pending: (.subscribersPending|length),
+            lastSendAt: .diagnostics.lastSendAt, lastSendOk: .diagnostics.lastSendOk, lastSendError: .diagnostics.lastSendError,
+            warnings: .diagnostics.warnings }'; }
+          echo "== MAX diagnostics (before)"; diag
+          echo "== MAX test message"
+          curl -s -b $J -c $J -X POST "$B/notifications/max/test" -H 'Content-Type: application/json' -H "X-CSRF-Token: $CSRF" -d '{}' \
+            | jq -c '{ok, error, delivered: ([.results[]? | select(.ok)] | length), failed: ([.results[]? | select(.ok|not) | .error])}'
+          echo "== test lead via public form API"
+          curl -s -X POST "$B/leads" -H 'Content-Type: application/json' -d '{
+            "parentName":"ТЕСТ проверка MAX","childName":"Тест Тестович","childBirthDate":"2017-07-02",
+            "phone":"+79990000000","comment":"Автотест уведомлений (GitHub Actions). Можно удалить.",
+            "privacyAccepted":true,"source":"test","landingPage":"/"}' | jq -c '{id, status}'
+          sleep 15
+          echo "== MAX diagnostics (after lead)"; diag
 
       - name: Verify site
         if: always() && env.MODE == 'deploy'
