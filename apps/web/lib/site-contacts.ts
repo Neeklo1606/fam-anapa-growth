@@ -138,7 +138,7 @@ export function buildContactCards(c: ResolvedSiteContacts): ContactCard[] {
   if (c.phoneTel && c.phoneDisplay) {
     cards.push({
       key: "phone",
-      label: "Телефон",
+      label: c.max ? "Телефон" : "Телефон · MAX",
       value: c.phoneDisplay,
       href: `tel:${c.phoneTel}`,
       external: false,

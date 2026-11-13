@@ -39,6 +39,11 @@ export function FooterContactsSection() {
             >
               {c.phoneDisplay}
             </a>
+            {!c.max ? (
+              <span className="block text-[11px] uppercase tracking-[0.14em] text-white/55 mt-0.5">
+                звонки · MAX по этому номеру
+              </span>
+            ) : null}
           </li>
         ) : null}
 
