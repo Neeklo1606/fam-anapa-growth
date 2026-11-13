@@ -13,9 +13,9 @@
 #
 # Нужные секреты репозитория (Settings → Secrets and variables → Actions):
 #   DEPLOY_SSH_KEY  — приватный ключ (ed25519), публичная часть в ~/.ssh/authorized_keys на сервере. Обязателен.
-#   DEPLOY_HOST     — по умолчанию 83.222.26.13
+#   DEPLOY_HOST     — по умолчанию 31.192.111.33 (новый сервер footballacademymorev.ru)
 #   DEPLOY_USER     — по умолчанию root
-#   DEPLOY_PATH     — по умолчанию /var/www/footballacademymorev/repo
+#   DEPLOY_PATH     — необязателен: папка сайта определяется автоматически (pm2 cwd / поиск клона с apps/web)
 name: Server ops
 
 on:
@@ -45,9 +45,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     env:
-      HOST: ${{ secrets.DEPLOY_HOST || '83.222.26.13' }}
+      HOST: ${{ secrets.DEPLOY_HOST || '31.192.111.33' }}
       SSH_USER: ${{ secrets.DEPLOY_USER || 'root' }}
-      REPO_PATH: ${{ secrets.DEPLOY_PATH || '/var/www/footballacademymorev/repo' }}
+      REPO_PATH: ${{ secrets.DEPLOY_PATH }}
       HAS_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' }}
     steps:
       - uses: actions/checkout@v4
@@ -91,6 +91,29 @@ jobs:
           EOF
           ssh prod 'echo "connected: $(hostname) $(hostname -I 2>/dev/null)"'
 
+      - name: Detect site folder
+        run: |
+          if [ -z "$REPO_PATH" ]; then
+            REPO_PATH=$(ssh prod 'bash -s' <<'EOS'
+          # 1) рабочая папка процесса Next/API в PM2 → корень git-клона
+          for name in fam-web fam-api; do
+            cwd=$(pm2 jlist 2>/dev/null | jq -r --arg n "$name" '.[] | select(.name==$n) | .pm2_env.pm_cwd' | head -1)
+            if [ -n "$cwd" ] && root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null); then echo "$root"; exit 0; fi
+          done
+          # 2) любой git-клон с apps/web
+          for g in $(find /var/www /srv /opt /root /home -maxdepth 5 -type d -name .git 2>/dev/null); do
+            d=$(dirname "$g"); [ -d "$d/apps/web" ] && { echo "$d"; exit 0; }
+          done
+          EOS
+            )
+          fi
+          if [ -z "$REPO_PATH" ]; then
+            echo "::warning::Папка сайта не найдена автоматически — см. вывод Inspect (можно задать секрет DEPLOY_PATH)"
+            [ "$MODE" = "inspect" ] || { echo "::error::Без папки сайта режим $MODE невозможен"; exit 1; }
+          fi
+          echo "REPO_PATH=$REPO_PATH" >> "$GITHUB_ENV"
+          echo "site folder: ${REPO_PATH:-<not found>}"
+
       - name: Inspect (read-only)
         run: |
           ssh prod "REPO_PATH='$REPO_PATH' bash -s" <<'EOS'
@@ -98,7 +121,7 @@ jobs:
           echo "== host"; hostname; hostname -I; uptime
           echo "== /var/www"; ls -la /var/www 2>/dev/null
           echo "== git clones"
-          for d in /var/www/*/repo /var/www/* /root/* /home/*/*; do
+          for d in /var/www/*/repo /var/www/* /srv/* /opt/* /root/* /home/*/* /home/*/*/*; do
             [ -d "$d/.git" ] || continue
             echo "---- $d"
             (cd "$d" && git remote -v | head -2 && echo "branch: $(git branch --show-current)" && git log --oneline -5 && echo "status:" && git status --short | head -60)
