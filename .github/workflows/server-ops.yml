@@ -343,7 +343,8 @@ jobs:
               mp4|mov|m4v|webm|mkv|avi)
                 echo "== video: $(basename "$f") ($(du -h "$f" | cut -f1)) → $base"
                 ffprobe -v error -show_entries format=duration:stream=width,height,codec_name -of compact "$f" | head -3
-                D="${MAX_SECONDS:-20}"
+                # hero — короткий луп (20 c); клип вратарей (в имени vrat/goal/klip/clip) — целиком.
+                case "$base" in *vrat*|*goal*|*klip*|*clip*) D=100000;; *) D="${MAX_SECONDS:-20}";; esac
                 ffmpeg -nostdin -loglevel error -y -i "$f" -t "$D" -an -vf "scale=-2:'min(720,ih)':flags=lanczos,fps=30" \
                   -c:v libx264 -preset slow -crf 27 -profile:v high -pix_fmt yuv420p -movflags +faststart "/tmp/out/$base-720.mp4"
                 ffmpeg -nostdin -loglevel error -y -i "$f" -t "$D" -an -vf "scale=-2:'min(480,ih)':flags=lanczos,fps=30" \
