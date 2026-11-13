@@ -158,7 +158,14 @@ jobs:
           echo "== pm2 (user $PM2_USER)"; pm2u list 2>/dev/null || true
           pm2u jlist 2>/dev/null | jq -r '.[] | "\(.name)\tcwd=\(.pm2_env.pm_cwd)\tstatus=\(.pm2_env.status)"' 2>/dev/null || true
           echo "== nginx"; nginx -T 2>/dev/null | grep -E "server_name|root |proxy_pass|listen" | sort -u | head -40
-          echo "== local site"; curl -s -o /dev/null -w "next:%{http_code}\n" http://127.0.0.1:3000/ ; curl -s -o /dev/null -w "api:%{http_code}\n" http://127.0.0.1:4200/health
+          echo "== fam upstreams"; grep -rhA3 "upstream fam_" /etc/nginx/ 2>/dev/null | grep -E "upstream|server " | sort -u
+          WEB_PORT=$(grep -rhA3 "upstream fam_next_upstream" /etc/nginx/ 2>/dev/null | grep -oE "127\.0\.0\.1:[0-9]+" | head -1 | cut -d: -f2)
+          echo "fam web port: ${WEB_PORT:-?}"
+          for u in / /llms.txt /shkola-vratarej /robots.txt; do
+            curl -s -o /dev/null -w "local ${u} → %{http_code}\n" "http://127.0.0.1:${WEB_PORT:-3000}$u"
+          done
+          curl -s -o /dev/null -w "api:%{http_code}\n" http://127.0.0.1:4200/health
+          curl -s http://127.0.0.1:4200/api/site | head -c 400; echo
           echo "== disk"; df -h / | tail -1
           EOS
 
@@ -206,8 +213,10 @@ jobs:
           fi
           # CI=true: pnpm не ждёт подтверждения в TTY при пересоздании node_modules.
           # Код, сборка и PM2 — от владельца папки (тот же пользователь, что держит PM2), без дублей процессов под root.
+          WEB_PORT=$(grep -rhA3 "upstream fam_next_upstream" /etc/nginx/ 2>/dev/null | grep -oE "127\.0\.0\.1:[0-9]+" | head -1 | cut -d: -f2)
+          echo "==> fam web port: ${WEB_PORT:-3000}"
           asowner "cd '$REPO_PATH' && git fetch origin '$BRANCH' && git checkout -B '$BRANCH' 'origin/$BRANCH' \
-            && CI=true GIT_BRANCH='$BRANCH' GIT_RESET_HARD=1 PM2_RESTART='fam-api fam-web' bash deploy/server-git-deploy.sh"
+            && WEB_PORT=${WEB_PORT:-3000} CI=true GIT_BRANCH='$BRANCH' GIT_RESET_HARD=1 PM2_RESTART='fam-api fam-web' bash deploy/server-git-deploy.sh"
           EOS
 
       - name: Ensure admin user
@@ -228,7 +237,7 @@ jobs:
           echo "login check: HTTP $code"; [ "$code" = "200" ] || [ "$code" = "201" ]
 
       - name: Verify site
-        if: env.MODE == 'deploy'
+        if: always() && env.MODE == 'deploy'
         run: |
           sleep 10
           for u in / /llms.txt /shkola-vratarej /robots.txt /sitemap.xml /api/site; do
