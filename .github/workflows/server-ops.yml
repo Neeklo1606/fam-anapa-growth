@@ -113,7 +113,9 @@ jobs:
             HostName $HOST
             User $SSH_USER
             IdentityFile ~/.ssh/id_deploy
-            ServerAliveInterval 30
+            ServerAliveInterval 20
+            ServerAliveCountMax 30
+            TCPKeepAlive yes
           EOF
           ssh prod 'echo "connected: $(hostname) $(hostname -I 2>/dev/null)"'
 
