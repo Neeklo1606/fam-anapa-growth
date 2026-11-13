@@ -85,9 +85,16 @@ jobs:
           import os, re
           k = os.environ.get("KEY", "").replace("\r", "").strip()
           m = re.search(r"-----BEGIN ([A-Z ]+)-----(.*?)-----END \1-----", k, re.S)
-          if not m:
-              raise SystemExit("::error::DEPLOY_SSH_KEY: нет строк BEGIN/END PRIVATE KEY — скопирован не приватный ключ (или не целиком)")
-          kind, body = m.group(1), re.sub(r"\s+", "", m.group(2))
+          compact = re.sub(r"\s+", "", k)
+          if m:
+              kind, body = m.group(1), re.sub(r"\s+", "", m.group(2))
+          elif compact.startswith("b3BlbnNzaC1rZXktdjE"):  # base64("openssh-key-v1") — тело без строк BEGIN/END
+              kind, body = "OPENSSH PRIVATE KEY", re.sub(r"[^A-Za-z0-9+/=]", "", compact)
+          else:
+              start = ("публичный ключ ssh-…" if k.startswith("ssh-") else
+                       "пусто" if not k else "неизвестный формат (не выводим содержимое)")
+              print(f"::error::DEPLOY_SSH_KEY не похож на приватный ключ: длина {len(k)}, строк {k.count(chr(10)) + 1}, {start}")
+              raise SystemExit(1)
           lines = [body[i:i + 70] for i in range(0, len(body), 70)]
           out = f"-----BEGIN {kind}-----\n" + "\n".join(lines) + f"\n-----END {kind}-----\n"
           path = os.path.expanduser("~/.ssh/id_deploy")
