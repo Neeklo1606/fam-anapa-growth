@@ -55,6 +55,13 @@ export class MaxNotifyAdminController {
     return this.integration.syncWebhookSubscription();
   }
 
+  @Post("link")
+  @HttpCode(HttpStatus.OK)
+  @Roles("ADMIN", "EDITOR", "MANAGER")
+  createLink() {
+    return this.integration.createLinkInvite();
+  }
+
   @Post("test")
   @HttpCode(HttpStatus.OK)
   @Roles("ADMIN", "EDITOR", "MANAGER")

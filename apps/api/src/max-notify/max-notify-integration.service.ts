@@ -256,6 +256,41 @@ export class MaxNotifyIntegrationService {
     }
   }
 
+  /**
+   * Одноразовая ссылка на бота: https://max.ru/<bot>?start=<code>.
+   * Кто откроет её и нажмёт «Начать», сразу становится одобренным получателем.
+   */
+  async createLinkInvite(): Promise<{ url: string; code: string; expiresAt: string }> {
+    const tok = await this.getBotTokenForOutbound();
+    if (!tok) throw new BadRequestException("Не задан токен бота MAX");
+    const me = await maxJson<Record<string, unknown>>(tok, `/me`);
+    const username = typeof me.username === "string" ? me.username : null;
+    if (!username) throw new BadRequestException("У бота MAX нет username — ссылку не построить");
+    const code = `fam${crypto.randomBytes(9).toString("hex")}`;
+    const expiresAt = new Date(Date.now() + 30 * 60_000).toISOString();
+    const c = await this.loadConfig();
+    c.linkCode = code;
+    c.linkCodeExpiresAt = expiresAt;
+    await this.saveConfigJson(c);
+    return { url: `https://max.ru/${username}?start=${code}`, code, expiresAt };
+  }
+
+  /** true, если код совпал и не истёк; код одноразовый — сразу гасим. */
+  async consumeLinkCode(code: string): Promise<boolean> {
+    const c = await this.loadConfig();
+    const ok =
+      Boolean(c.linkCode) &&
+      code === c.linkCode &&
+      Boolean(c.linkCodeExpiresAt) &&
+      Date.parse(c.linkCodeExpiresAt!) > Date.now();
+    if (ok) {
+      c.linkCode = null;
+      c.linkCodeExpiresAt = null;
+      await this.saveConfigJson(c);
+    }
+    return ok;
+  }
+
   /** Тестовое сообщение всем одобренным получателям. */
   async sendTestMessage(): Promise<{
     ok: boolean;

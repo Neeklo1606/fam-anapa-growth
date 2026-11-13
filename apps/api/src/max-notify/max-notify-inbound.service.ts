@@ -21,6 +21,11 @@ export class MaxNotifyInboundService {
 
     if (type === "bot_started") {
       const uid = extractMaxUserNumericId(payload);
+      const startCode = typeof payload.payload === "string" ? payload.payload.trim() : "";
+      if (uid != null && startCode && (await this.integration.consumeLinkCode(startCode))) {
+        await this.approveByLink(payload, uid, token);
+        return;
+      }
       if (uid != null) {
         await this.integration.sendDmText(
           token,
@@ -36,6 +41,16 @@ export class MaxNotifyInboundService {
     const text = extractMessageText(payload).trim();
     if (!text) return;
 
+    // Код из ссылки «Подключить мой MAX», если клиент прислал его текстом («/start fam…» или «fam…»).
+    const codeMatch = /^(?:\/start\s+)?(fam[0-9a-f]{18})$/i.exec(text);
+    if (codeMatch) {
+      const uidC = extractMaxUserNumericId(payload);
+      if (uidC != null && (await this.integration.consumeLinkCode(codeMatch[1]!.toLowerCase()))) {
+        await this.approveByLink(payload, uidC, token);
+        return;
+      }
+    }
+
     if (!this.isNotifyIntent(text)) return;
 
     const uid = extractMaxUserNumericId(payload);
@@ -45,6 +60,22 @@ export class MaxNotifyInboundService {
     }
 
     await this.persistPending(payload, uid, token, undefined);
+  }
+
+  private async approveByLink(payload: Record<string, unknown>, uidNum: number, token: string) {
+    const maxUserId = String(uidNum);
+    const { name, username } = metaFromSender(payload);
+    await this.prisma.maxNotifySubscriber.upsert({
+      where: { maxUserId },
+      create: { maxUserId, name, username, status: "APPROVED", reviewedAt: new Date() },
+      update: { name, username, status: "APPROVED", reviewedAt: new Date() },
+    });
+    await this.integration.sendDmText(
+      token,
+      maxUserId,
+      "✅ Готово! Этот чат подключён к уведомлениям о новых заявках с сайта академии.",
+    );
+    this.logger.log(`MAX notify approved by link user=${maxUserId}`);
   }
 
   private isNotifyIntent(text: string): boolean {

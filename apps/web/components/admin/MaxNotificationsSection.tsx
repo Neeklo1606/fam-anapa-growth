@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Save, Send, Trash2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Link2, Loader2, RefreshCw, Save, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { MaxNotifyAdminState } from "@/lib/admin-api";
 import {
   reviewMaxSubscriberAction,
   revokeMaxSubscriberAction,
+  createMaxLinkAction,
   syncMaxWebhookAction,
   testMaxNotifyAction,
   updateMaxNotifyAction,
@@ -89,6 +90,18 @@ export function MaxNotificationsSection({
   };
 
   const diag = initial.diagnostics;
+  const [invite, setInvite] = useState<{ url: string; code: string; expiresAt: string } | null>(null);
+
+  const makeLink = () => {
+    startTransition(async () => {
+      const r = await createMaxLinkAction();
+      if (!r.ok) {
+        toast.error("Не удалось создать ссылку", { description: r.error });
+        return;
+      }
+      setInvite({ url: r.url, code: r.code, expiresAt: r.expiresAt });
+    });
+  };
 
   const review = (id: string, decision: "approve" | "reject") => {
     startTransition(async () => {
@@ -178,6 +191,37 @@ export function MaxNotificationsSection({
                 Всё настроено — заявки будут приходить в MAX.
               </div>
             )}
+            <div className="rounded-lg border border-line bg-white p-3 space-y-2">
+              <div className="font-medium">Подключить получателя за 10 секунд</div>
+              <p className="text-ink/60">
+                Нажмите кнопку, откройте ссылку на телефоне с MAX (или отправьте её сотруднику) и нажмите «Начать» в
+                боте. Чат сразу появится в «подключены». Ссылка одноразовая, действует 30 минут.
+              </p>
+              <button
+                type="button"
+                disabled={pending || !diag.bot}
+                onClick={makeLink}
+                className="inline-flex items-center gap-2 h-9 px-4 rounded-full bg-night text-white text-[11px] font-semibold uppercase tracking-wider disabled:opacity-50"
+              >
+                <Link2 className="h-3 w-3" />
+                Подключить мой MAX
+              </button>
+              {invite && (
+                <div className="space-y-1">
+                  <a href={invite.url} target="_blank" rel="noreferrer" className="block break-all text-flame hover:underline font-mono-pro text-xs">
+                    {invite.url}
+                  </a>
+                  <p className="text-xs text-ink/60">
+                    Если ссылка не открыла бота — найдите бота в MAX и отправьте ему код{" "}
+                    <code className="font-mono-pro text-ink select-all">{invite.code}</code>
+                  </p>
+                  <p className="text-xs text-ink/50">
+                    Действует до {new Date(invite.expiresAt).toLocaleTimeString("ru-RU")}. После «Начать» обновите
+                    страницу.
+                  </p>
+                </div>
+              )}
+            </div>
             <button
               type="button"
               disabled={pending || initial.subscribersApproved.length === 0}

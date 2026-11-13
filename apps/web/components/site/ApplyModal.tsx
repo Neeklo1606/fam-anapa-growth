@@ -10,10 +10,23 @@ import {
 } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { trackSiteEvent } from "@/lib/analytics";
-import { ApplicationForm } from "./ApplicationForm";
+
+// Форма (календарь, date-fns, popover) — отдельный чанк: не грузится на старте страницы.
+const loadForm = () => import("./ApplicationForm").then((mod) => mod.ApplicationForm);
+const ApplicationForm = dynamic(loadForm, {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-3 animate-pulse" aria-hidden="true">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="h-12 rounded-xl bg-ink/5" />
+      ))}
+    </div>
+  ),
+});
 
 function BallIcon({ className = "" }: { className?: string }) {
   return <img src="/img/ball.svg" alt="" className={className} aria-hidden="true" />;
@@ -30,6 +43,23 @@ export function ApplyProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
+
+  // Подгружаем форму в фоне после загрузки страницы — модалка откроется мгновенно.
+  useEffect(() => {
+    const prefetch = () => void loadForm().catch(() => undefined);
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const start = () => {
+      if (w.requestIdleCallback) w.requestIdleCallback(prefetch, { timeout: 4000 });
+      else timer = setTimeout(prefetch, 2000);
+    };
+    if (document.readyState === "complete") start();
+    else window.addEventListener("load", start, { once: true });
+    return () => {
+      window.removeEventListener("load", start);
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {

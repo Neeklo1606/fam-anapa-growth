@@ -13,6 +13,9 @@ export type MaxLeadIntegrationConfig = {
   lastSendAt?: string | null;
   lastSendOk?: boolean | null;
   lastSendError?: string | null;
+  /** Одноразовый код ссылки «Подключить мой MAX» (deep link ?start=code). */
+  linkCode?: string | null;
+  linkCodeExpiresAt?: string | null;
 };
 
 export type MaxSubscriberPublic = {

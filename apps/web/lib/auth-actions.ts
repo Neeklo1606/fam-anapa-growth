@@ -669,6 +669,19 @@ export async function syncMaxWebhookAction(): Promise<{ ok: boolean; error?: str
   return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
 
+export async function createMaxLinkAction(): Promise<
+  { ok: true; url: string; code: string; expiresAt: string } | { ok: false; error: string }
+> {
+  const r = await authedJson<{ url: string; code: string; expiresAt: string }>("/notifications/max/link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{}",
+  });
+  return r.ok
+    ? { ok: true, url: r.data.url, code: r.data.code, expiresAt: r.data.expiresAt }
+    : { ok: false, error: r.error };
+}
+
 export async function testMaxNotifyAction(): Promise<{
   ok: boolean;
   error?: string;
