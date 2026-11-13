@@ -6,8 +6,15 @@ import { trackSiteEvent } from "@/lib/analytics";
 
 /** Готовые WebP-варианты для статичных постеров из public/img (обычный <img>, без /_next/image). */
 const POSTER_VARIANTS: Record<string, { webp: string; mobile: string }> = {
+  "/img/hero-video.jpg": { webp: "/img/hero-video.webp", mobile: "/img/hero-video-m.webp" },
   "/img/hero-kid.jpg": { webp: "/img/hero-kid.webp", mobile: "/img/hero-kid-m.webp" },
   "/img/hero.jpg": { webp: "/img/hero.webp", mobile: "/img/hero-m.webp" },
+};
+
+/** Сжатые версии hero-видео: WebM (VP9) для десктопа и лёгкий MP4 для телефонов. */
+const VIDEO_VARIANTS: Record<string, { webm?: string; mobile?: string }> = {
+  "/hero-v2.mp4": { webm: "/hero-v2.webm", mobile: "/hero-v2-mobile.mp4" },
+  "/hero.mp4": { webm: "/hero-720.webm" },
 };
 
 type Props = {
@@ -30,6 +37,9 @@ export function HeroVideo({
   const [failed, setFailed] = useState(false);
   const playTracked = useRef(false);
   const variant = POSTER_VARIANTS[posterSrc];
+  const videoVariant = VIDEO_VARIANTS[videoSrc] ?? {};
+  // Выбираем файл один раз при монтировании видео: телефон — лёгкая версия (≈1,4 МБ).
+  const [isMobile, setIsMobile] = useState(false);
   // Видео монтируем после load + idle, чтобы оно не конкурировало с постером (LCP) и JS.
   const [mountVideo, setMountVideo] = useState(false);
 
@@ -43,6 +53,7 @@ export function HeroVideo({
       if (w.requestIdleCallback) idleId = w.requestIdleCallback(() => !cancelled && setMountVideo(true), { timeout: 2500 });
       else timer = setTimeout(() => !cancelled && setMountVideo(true), 800);
     };
+    setIsMobile(window.matchMedia("(max-width: 767px)").matches);
     if (document.readyState === "complete") start();
     else window.addEventListener("load", start, { once: true });
     return () => {
@@ -113,8 +124,14 @@ export function HeroVideo({
           }`}
           style={{ objectPosition }}
         >
-          <source src="/hero-720.webm" type="video/webm" />
-          <source src={videoSrc} type="video/mp4" />
+          {isMobile && videoVariant.mobile ? (
+            <source src={videoVariant.mobile} type="video/mp4" />
+          ) : (
+            <>
+              {videoVariant.webm ? <source src={videoVariant.webm} type="video/webm" /> : null}
+              <source src={videoSrc} type="video/mp4" />
+            </>
+          )}
         </video>
       )}
     </div>

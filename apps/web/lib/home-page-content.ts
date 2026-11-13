@@ -240,6 +240,13 @@ export function buildDefaultHomePageContent(): HomePageContent {
  * новые дефолты; загруженные фото тренеров сохраняем (сопоставление по ФИО).
  */
 function migrateStoredHome(stored: Record<string, unknown>): Record<string, unknown> {
+  const out0 = clone(stored);
+  // Старое hero-видео/постер по умолчанию → новое (13.11.2026). Своё видео из админки не трогаем.
+  if (isPlainObject(out0.hero)) {
+    if (out0.hero.videoSrc === "/hero.mp4") delete out0.hero.videoSrc;
+    if (out0.hero.posterSrc === "/img/hero-kid.jpg") delete out0.hero.posterSrc;
+  }
+  stored = out0;
   const version = typeof stored.version === "number" ? stored.version : 1;
   if (version >= HOME_CONTENT_VERSION) return stored;
   const out = clone(stored);

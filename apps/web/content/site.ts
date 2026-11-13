@@ -5,7 +5,6 @@
 
 const ASSETS = "/img";
 
-const heroImg = `${ASSETS}/hero-kid.jpg`;
 const aboutImg = `${ASSETS}/about-boy.webp`;
 const goalkeeperPoster = `${ASSETS}/p-ballwork.jpg`;
 const fieldImg = `${ASSETS}/fam-training.jpg`;
@@ -37,7 +36,7 @@ export const CONTACTS = {
 } as const;
 
 export const HERO = {
-  media: { type: "video" as const, src: "/hero.mp4", poster: heroImg },
+  media: { type: "video" as const, src: "/hero-v2.mp4", poster: "/img/hero-video.jpg" },
 };
 
 export const ABOUT = {

@@ -164,8 +164,9 @@ function Hero({ home }: { home: HomePageContent }) {
           alt="Футбольная академия Морева в Анапе"
           objectPosition="65% center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-night/85 via-night/50 to-night lg:from-night/90 lg:via-night/40 lg:to-night/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-night/85 via-night/30 to-transparent lg:from-night/95 lg:via-night/30" />
+        {/* Видео тёмное само по себе — затемнение лёгкое: сверху под шапку, снизу под переход к следующему блоку. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-night/45 via-night/10 to-night/90 lg:from-night/50 lg:via-night/15 lg:to-night/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-night/55 via-night/10 to-transparent lg:from-night/70 lg:via-night/20" />
       </div>
 
       <div
