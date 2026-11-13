@@ -9,7 +9,6 @@ const heroImg = `${ASSETS}/hero-kid.jpg`;
 const aboutImg = `${ASSETS}/about-boy.webp`;
 const goalkeeperPoster = `${ASSETS}/p-ballwork.jpg`;
 const fieldImg = `${ASSETS}/fam-training.jpg`;
-const coachGubin = `${ASSETS}/coach-gubin.jpg`;
 const famTraining = `${ASSETS}/fam-training.jpg`;
 const famCupCelebration = `${ASSETS}/fam-cup-celebration.jpg`;
 
@@ -64,13 +63,13 @@ export const PRINCIPLES = [
   { n: "05", title: "Радость от игры", text: "Игровой метод — основа наших тренировок. Мы создаём интересную и вдохновляющую среду для детей!" },
 ];
 
-/** Фото без `img` — карточка с монограммой; фото загружаются в админке (Главная → Тренеры). */
+/** Фото тренеров (13.11.2026); можно заменить в админке (Главная → Тренеры). */
 export const COACHES = [
-  { name: "Губин Алексей Олегович", role: "Главный тренер", info: "Лицензия «С-УЕФА»", img: coachGubin },
-  { name: "Макоев Владислав Русланович", role: "Тренер", info: "Высшее спортивное образование", img: "" },
-  { name: "Андреев Константин Петрович", role: "Тренер", info: "Высшее спортивное образование", img: "" },
-  { name: "Аветисян Грачья Вачаганович", role: "Тренер", info: "", img: "" },
-  { name: "Строков Никита Игоревич", role: "Тренер", info: "", img: "" },
+  { name: "Губин Алексей Олегович", role: "Главный тренер", info: "Лицензия «С-УЕФА»", img: `${ASSETS}/coach-gubin.webp` },
+  { name: "Макоев Владислав Русланович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-makoev.webp` },
+  { name: "Андреев Константин Петрович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-andreev.webp` },
+  { name: "Аветисян Грачья Вачаганович", role: "Тренер", info: "", img: `${ASSETS}/coach-avetisyan.webp` },
+  { name: "Строков Никита Игоревич", role: "Тренер", info: "", img: `${ASSETS}/coach-strokov.webp` },
 ];
 
 /** Точка карты около ул. Тбилисская, 1Г, ст. Анапская (виджет Яндекс) */

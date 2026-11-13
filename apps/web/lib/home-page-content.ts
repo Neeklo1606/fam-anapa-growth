@@ -259,7 +259,8 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
   const photoByName = new Map<string, string>();
   if (Array.isArray(oldCoaches)) {
     for (const c of oldCoaches) {
-      if (isPlainObject(c) && typeof c.fullName === "string" && typeof c.photoUrl === "string" && c.photoUrl) {
+      // Старые фото-заглушки из /img/ не переносим — берутся новые фото тренеров.
+      if (isPlainObject(c) && typeof c.fullName === "string" && typeof c.photoUrl === "string" && c.photoUrl && !c.photoUrl.startsWith("/img/")) {
         photoByName.set(c.fullName.trim().toLowerCase(), c.photoUrl);
       }
     }
