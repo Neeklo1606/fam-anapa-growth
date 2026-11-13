@@ -243,9 +243,14 @@ jobs:
         run: |
           B=https://footballacademymorev.ru/api
           J=/tmp/jar
-          code=$(curl -s -c $J -b $J -o /tmp/login.json -w "%{http_code}" -X POST "$B/auth/login" -H 'Content-Type: application/json' \
-            -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
-          echo "admin login: HTTP $code"; [ "$code" = "200" ] || { echo "::error::Вход в админку не удался"; exit 1; }
+          LOGGED=0
+          if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
+            code=$(curl -s -c $J -b $J -o /tmp/login.json -w "%{http_code}" -X POST "$B/auth/login" -H 'Content-Type: application/json' \
+              -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
+            echo "admin login: HTTP $code"; [ "$code" = "200" ] && LOGGED=1
+          else
+            echo "::warning::Секретов ADMIN_EMAIL/ADMIN_PASSWORD нет — только тестовая заявка, без диагностики"
+          fi
           CSRF=$(awk '$6=="fam_csrf"{print $7}' $J | tail -1)
           diag() { curl -s -b $J "$B/notifications/max" | jq -c '{
             botOk: (.diagnostics.bot != null), tokenError: .diagnostics.tokenError,
@@ -253,17 +258,19 @@ jobs:
             approved: (.subscribersApproved|length), pending: (.subscribersPending|length),
             lastSendAt: .diagnostics.lastSendAt, lastSendOk: .diagnostics.lastSendOk, lastSendError: .diagnostics.lastSendError,
             warnings: .diagnostics.warnings }'; }
-          echo "== MAX diagnostics (before)"; diag
-          echo "== MAX test message"
-          curl -s -b $J -c $J -X POST "$B/notifications/max/test" -H 'Content-Type: application/json' -H "X-CSRF-Token: $CSRF" -d '{}' \
-            | jq -c '{ok, error, delivered: ([.results[]? | select(.ok)] | length), failed: ([.results[]? | select(.ok|not) | .error])}'
+          if [ "$LOGGED" = 1 ]; then
+            echo "== MAX diagnostics (before)"; diag
+            echo "== MAX test message"
+            curl -s -b $J -c $J -X POST "$B/notifications/max/test" -H 'Content-Type: application/json' -H "X-CSRF-Token: $CSRF" -d '{}' \
+              | jq -c '{ok, error, delivered: ([.results[]? | select(.ok)] | length), failed: ([.results[]? | select(.ok|not) | .error])}'
+          fi
           echo "== test lead via public form API"
           curl -s -X POST "$B/leads" -H 'Content-Type: application/json' -d '{
             "parentName":"ТЕСТ проверка MAX","childName":"Тест Тестович","childBirthDate":"2017-07-02",
             "phone":"+79990000000","comment":"Автотест уведомлений (GitHub Actions). Можно удалить.",
             "privacyAccepted":true,"source":"test","landingPage":"/"}' | jq -c '{id, status}'
           sleep 15
-          echo "== MAX diagnostics (after lead)"; diag
+          if [ "$LOGGED" = 1 ]; then echo "== MAX diagnostics (after lead)"; diag; fi
 
       - name: Verify site
         if: always() && env.MODE == 'deploy'
