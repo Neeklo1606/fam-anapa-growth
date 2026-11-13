@@ -1,0 +1,182 @@
+# Операции на боевом сервере footballacademymorev.ru через SSH из GitHub Actions.
+#
+# Запуск:
+#   • вручную: Actions → «Server ops» → Run workflow (выбрать mode);
+#   • пушем файла .deploy/request.json в рабочую ветку: {"mode": "inspect" | "snapshot" | "deploy"}.
+#
+# Режимы:
+#   inspect  — только чтение: где лежит сайт, git-состояние, pm2, nginx, ответы сайта.
+#   snapshot — копия кода с сервера (без .env/секретов/node_modules/uploads) в ветку server-snapshot-*,
+#              чтобы не потерять правки, сделанные прямо на сервере.
+#   deploy   — бэкап текущей папки → выкладка ветки → сборка, миграции, перезапуск PM2 → проверка сайта.
+#   admin    — создать/обновить пользователя ADMIN из секретов ADMIN_EMAIL / ADMIN_PASSWORD.
+#
+# Нужные секреты репозитория (Settings → Secrets and variables → Actions):
+#   DEPLOY_SSH_KEY  — приватный ключ (ed25519), публичная часть в ~/.ssh/authorized_keys на сервере. Обязателен.
+#   DEPLOY_HOST     — по умолчанию 83.222.26.13
+#   DEPLOY_USER     — по умолчанию root
+#   DEPLOY_PATH     — по умолчанию /var/www/footballacademymorev/repo
+name: Server ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "inspect | snapshot | deploy | admin"
+        type: choice
+        options: [inspect, snapshot, deploy, admin]
+        default: inspect
+      branch:
+        description: "Ветка для deploy"
+        default: claude/sleepy-brown-rst71s
+  push:
+    branches: [claude/sleepy-brown-rst71s]
+    paths: [".deploy/request.json"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: server-ops
+  cancel-in-progress: false
+
+jobs:
+  ops:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST || '83.222.26.13' }}
+      SSH_USER: ${{ secrets.DEPLOY_USER || 'root' }}
+      REPO_PATH: ${{ secrets.DEPLOY_PATH || '/var/www/footballacademymorev/repo' }}
+      HAS_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve mode
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          BRANCH="${{ github.event.inputs.branch }}"
+          if [ -z "$MODE" ] && [ -f .deploy/request.json ]; then
+            MODE=$(jq -r '.mode // "inspect"' .deploy/request.json)
+            BRANCH=$(jq -r '.branch // empty' .deploy/request.json)
+          fi
+          MODE="${MODE:-inspect}"
+          BRANCH="${BRANCH:-${GITHUB_REF_NAME}}"
+          case "$MODE" in inspect|snapshot|deploy|admin) ;; *) echo "Unknown mode $MODE"; exit 1;; esac
+          echo "MODE=$MODE" >> "$GITHUB_ENV"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+          echo "mode=$MODE branch=$BRANCH host=$HOST path=$REPO_PATH"
+
+      - name: Check secret
+        if: env.HAS_KEY != 'true'
+        run: |
+          echo "::error::Нет секрета DEPLOY_SSH_KEY. Добавьте приватный ключ в Settings → Secrets and variables → Actions."
+          exit 1
+
+      - name: SSH setup
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -T 15 -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          cat >> ~/.ssh/config <<EOF
+          Host prod
+            HostName $HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/id_deploy
+            ServerAliveInterval 30
+          EOF
+          ssh prod 'echo "connected: $(hostname) $(hostname -I 2>/dev/null)"'
+
+      - name: Inspect (read-only)
+        run: |
+          ssh prod "REPO_PATH='$REPO_PATH' bash -s" <<'EOS'
+          set +e
+          echo "== host"; hostname; hostname -I; uptime
+          echo "== /var/www"; ls -la /var/www 2>/dev/null
+          echo "== git clones"
+          for d in /var/www/*/repo /var/www/* /root/* /home/*/*; do
+            [ -d "$d/.git" ] || continue
+            echo "---- $d"
+            (cd "$d" && git remote -v | head -2 && echo "branch: $(git branch --show-current)" && git log --oneline -5 && echo "status:" && git status --short | head -60)
+          done
+          echo "== configured REPO_PATH: $REPO_PATH"; ls -la "$REPO_PATH" 2>/dev/null | head -5
+          echo "== pm2"; pm2 list 2>/dev/null || true
+          pm2 jlist 2>/dev/null | jq -r '.[] | "\(.name)\tcwd=\(.pm2_env.pm_cwd)\tstatus=\(.pm2_env.status)"' 2>/dev/null || true
+          echo "== nginx"; nginx -T 2>/dev/null | grep -E "server_name|root |proxy_pass|listen" | sort -u | head -40
+          echo "== local site"; curl -s -o /dev/null -w "next:%{http_code}\n" http://127.0.0.1:3000/ ; curl -s -o /dev/null -w "api:%{http_code}\n" http://127.0.0.1:4200/health
+          echo "== disk"; df -h / | tail -1
+          EOS
+
+      - name: Snapshot server code → branch
+        if: env.MODE == 'snapshot'
+        run: |
+          SHA=$(ssh prod "cd '$REPO_PATH' && git rev-parse HEAD")
+          echo "server HEAD: $SHA"
+          SNAP="server-snapshot-$(date -u +%Y%m%d-%H%M)"
+          git fetch origin "$SHA" 2>/dev/null || true
+          if git cat-file -e "$SHA^{commit}" 2>/dev/null; then git checkout -b "$SNAP" "$SHA"; else git checkout -b "$SNAP" origin/main; fi
+          mkdir -p /tmp/srv
+          # Без секретов и тяжёлых артефактов: .env*, credentials, ключи, node_modules, сборки, загрузки.
+          ssh prod "cd '$REPO_PATH' && tar czf - \
+            --exclude=.git --exclude=node_modules --exclude=.next --exclude=dist --exclude=.turbo \
+            --exclude=uploads --exclude='*.env' --exclude='.env*' --exclude='credentials*' \
+            --exclude='*.pem' --exclude='*.key' --exclude='*.log' --exclude='*.mp4' --exclude='*.webm' ." \
+            | tar xzf - -C /tmp/srv
+          rsync -a --delete --exclude=.git --exclude=node_modules --exclude=uploads \
+            --exclude='*.mp4' --exclude='*.webm' /tmp/srv/ ./
+          git config user.name "server-ops"; git config user.email "server-ops@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Сервер совпадает с коммитом $SHA — локальных правок нет."; exit 0; fi
+          git diff --cached --stat | tail -40
+          git commit -q -m "snapshot: код с сервера ($HOST, HEAD $SHA)"
+          git push origin "$SNAP"
+          echo "::notice::Снимок сервера: ветка $SNAP"
+
+      - name: Deploy
+        if: env.MODE == 'deploy'
+        run: |
+          ssh prod "REPO_PATH='$REPO_PATH' BRANCH='$BRANCH' bash -s" <<'EOS'
+          set -euo pipefail
+          cd "$REPO_PATH"
+          mkdir -p /var/backups/fam-deploy
+          TS=$(date -u +%Y%m%d-%H%M%S)
+          echo "==> backup code → /var/backups/fam-deploy/repo-$TS.tgz"
+          tar czf "/var/backups/fam-deploy/repo-$TS.tgz" --exclude=node_modules --exclude=.next --exclude=uploads -C "$REPO_PATH" . || true
+          if command -v pg_dump >/dev/null && [ -f apps/api/.env ]; then
+            DBURL=$(grep -E '^DATABASE_URL=' apps/api/.env | head -1 | cut -d= -f2- | tr -d '"' | sed 's/?schema=.*//')
+            pg_dump "$DBURL" -Fc -f "/var/backups/fam-deploy/db-$TS.dump" && echo "==> db backup ok" || echo "WARN: db backup failed"
+          fi
+          git fetch origin "$BRANCH"
+          git checkout -B "$BRANCH" "origin/$BRANCH"
+          GIT_BRANCH="$BRANCH" GIT_RESET_HARD=1 PM2_RESTART="fam-api fam-web" bash deploy/server-git-deploy.sh
+          EOS
+
+      - name: Ensure admin user
+        if: env.MODE == 'admin'
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          if [ -z "$ADMIN_EMAIL" ] || [ -z "$ADMIN_PASSWORD" ]; then echo "::error::Нужны секреты ADMIN_EMAIL и ADMIN_PASSWORD"; exit 1; fi
+          # Пароль передаётся через stdin, не через аргументы командной строки.
+          printf '%s\n%s\n' "$ADMIN_EMAIL" "$ADMIN_PASSWORD" | ssh prod "REPO_PATH='$REPO_PATH' bash -c '
+            set -e; read -r E; read -r P; cd \"\$REPO_PATH/apps/api\"; set -a; . ./.env; set +a;
+            ADMIN_EMAIL=\"\$E\" ADMIN_PASSWORD=\"\$P\" ADMIN_NAME=\"Администратор\" node scripts/ensure-admin-user.cjs'"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST https://footballacademymorev.ru/api/auth/login \
+            -H 'Content-Type: application/json' \
+            -d "$(jq -n --arg e "$ADMIN_EMAIL" --arg p "$ADMIN_PASSWORD" '{email:$e,password:$p}')")
+          echo "login check: HTTP $code"; [ "$code" = "200" ] || [ "$code" = "201" ]
+
+      - name: Verify site
+        if: env.MODE == 'deploy'
+        run: |
+          sleep 10
+          for u in / /llms.txt /shkola-vratarej /robots.txt /sitemap.xml /api/site; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "https://footballacademymorev.ru$u")
+            echo "$code $u"
+          done
+          curl -s https://footballacademymorev.ru/api/site | jq '{phone, vkLink, yandexMapUrl}'
