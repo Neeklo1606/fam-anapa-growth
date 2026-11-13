@@ -204,9 +204,10 @@ jobs:
             DBURL=$(grep -E '^DATABASE_URL=' apps/api/.env | head -1 | cut -d= -f2- | tr -d '"' | sed 's/?schema=.*//')
             pg_dump "$DBURL" -Fc -f "/var/backups/fam-deploy/db-$TS.dump" && echo "==> db backup ok" || echo "WARN: db backup failed"
           fi
+          # CI=true: pnpm не ждёт подтверждения в TTY при пересоздании node_modules.
           # Код, сборка и PM2 — от владельца папки (тот же пользователь, что держит PM2), без дублей процессов под root.
           asowner "cd '$REPO_PATH' && git fetch origin '$BRANCH' && git checkout -B '$BRANCH' 'origin/$BRANCH' \
-            && GIT_BRANCH='$BRANCH' GIT_RESET_HARD=1 PM2_RESTART='fam-api fam-web' bash deploy/server-git-deploy.sh"
+            && CI=true GIT_BRANCH='$BRANCH' GIT_RESET_HARD=1 PM2_RESTART='fam-api fam-web' bash deploy/server-git-deploy.sh"
           EOS
 
       - name: Ensure admin user
