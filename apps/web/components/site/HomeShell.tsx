@@ -438,14 +438,6 @@ function Principles({ home }: { home: HomePageContent }) {
 }
 
 function Coaches({ home }: { home: HomePageContent }) {
-  const [emblaRef, embla] = useEmblaCarousel({
-    align: "start",
-    loop: false,
-    dragFree: false,
-    containScroll: "trimSnaps",
-  });
-  const [snapIndex, setSnapIndex] = useState(0);
-
   const items: HomeCoach[] = home.coachesSection.staticCoaches.map((c, i) => ({
     id: `static-${i}`,
     fullName: c.fullName,
@@ -453,16 +445,6 @@ function Coaches({ home }: { home: HomePageContent }) {
     photoUrl: c.photoUrl,
     shortDescription: c.shortDescription,
   }));
-
-  useEffect(() => {
-    if (!embla) return;
-    const update = () => {
-      setSnapIndex(embla.selectedScrollSnap());
-    };
-    update();
-    embla.on("select", update);
-    embla.on("reInit", update);
-  }, [embla]);
 
   if (items.length === 0) return null;
 
@@ -482,51 +464,56 @@ function Coaches({ home }: { home: HomePageContent }) {
           </div>
         </Reveal>
 
-        <div className="mt-5 md:mt-10 -mx-5 md:mx-0">
-          <div className="overflow-hidden pl-5 pr-3 md:pl-0 md:pr-0" ref={emblaRef}>
-            <div className="flex touch-pan-y gap-3 md:gap-5">
+        {/* Все тренеры видны сразу: 2 колонки на телефоне, 3 на планшете, 5 на десктопе. */}
+        <div className="mt-6 md:mt-10">
+          <div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5 md:gap-5 max-md:[&>*:last-child:nth-child(odd)]:col-span-2 max-md:[&>*:last-child:nth-child(odd)]:mx-auto max-md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-0.375rem)]">
               {items.map((c, i) => (
                 <div
                   key={c.id}
-                  className="min-w-0 shrink-0 basis-[82%] sm:basis-[70%] md:basis-[calc((100%-2.5rem)/3)]"
+                  className="min-w-0"
                 >
                   <m.article
                     initial={{ opacity: 0, y: 12 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.4, delay: i * 0.03 }}
-                    className="group relative aspect-[3/4] max-h-[min(52vh,420px)] md:max-h-none w-full overflow-hidden rounded-2xl md:rounded-3xl bg-night shadow-soft ring-1 ring-line/25"
+                    className="group flex h-full w-full flex-col overflow-hidden rounded-2xl md:rounded-3xl bg-night shadow-soft ring-1 ring-line/25"
                   >
-                    {c.photoUrl ? (
-                      <SiteImage
-                        src={c.photoUrl}
-                        alt={c.fullName}
-                        fill
-                        sizes="(min-width: 768px) 28vw, 82vw"
-                        className="object-cover object-[center_18%] transition duration-500 group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-deep via-night to-night">
-                        <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-flame/20 blur-3xl" />
-                        <span className="relative font-display text-6xl md:text-7xl tracking-tight text-white/90 -mt-16">
-                          {c.fullName
-                            .split(/\s+/)
-                            .slice(0, 2)
-                            .map((w) => w[0])
-                            .join("")}
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-night px-4 py-3 md:px-5 md:py-4">
-                      <h3 className="font-display text-[15px] md:text-lg leading-tight text-white tracking-wide">
+                    {/* Фото отдельно от подписи: кадр 4:5 целиком, карточки одной высоты. */}
+                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                      {c.photoUrl ? (
+                        <SiteImage
+                          src={c.photoUrl}
+                          alt={c.fullName}
+                          fill
+                          sizes="(min-width: 1024px) 20vw, (min-width: 768px) 30vw, 82vw"
+                          className="object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-deep via-night to-night">
+                          <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-flame/20 blur-3xl" />
+                          <span className="relative font-display text-6xl md:text-7xl tracking-tight text-white/90">
+                            {c.fullName
+                              .split(/\s+/)
+                              .slice(0, 2)
+                              .map((w) => w[0])
+                              .join("")}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-night/70 to-transparent pointer-events-none" />
+                    </div>
+                    <div className="relative flex-1 px-3 py-3 sm:px-4 md:px-5 md:py-4">
+                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-flame via-flame/40 to-transparent" />
+                      <h3 className="font-display text-[13px] sm:text-[15px] md:text-lg lg:text-base leading-tight text-white tracking-wide">
                         {c.fullName}
                       </h3>
-                      <p className="mt-1 text-[10px] md:text-[11px] uppercase tracking-[0.2em] text-flame font-semibold">
+                      <p className="mt-1 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-[0.18em] text-flame font-semibold">
                         {c.role}
                       </p>
                       {c.shortDescription ? (
-                        <p className="mt-1.5 text-[12px] md:text-sm text-white/70 leading-snug line-clamp-2">
+                        <p className="mt-1.5 text-[11px] sm:text-[12px] md:text-sm text-white/70 leading-snug line-clamp-3">
                           {c.shortDescription}
                         </p>
                       ) : null}
@@ -535,19 +522,6 @@ function Coaches({ home }: { home: HomePageContent }) {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="mt-3 flex items-center justify-center md:hidden">
-            {items.map((c, i) => (
-              <button
-                key={c.id}
-                type="button"
-                aria-label={`Слайд ${i + 1}`}
-                onClick={() => embla?.scrollTo(i)}
-                className="flex h-6 min-w-6 items-center justify-center"
-              >
-                <span className={`block h-1 rounded-full transition-all ${i === snapIndex ? "w-5 bg-flame" : "w-1 bg-ink/25"}`} />
-              </button>
-            ))}
           </div>
         </div>
       </div>
