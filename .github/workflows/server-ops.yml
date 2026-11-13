@@ -11,6 +11,8 @@
 #   deploy   — бэкап текущей папки → выкладка ветки → сборка, миграции, перезапуск PM2 → проверка сайта.
 #   admin    — создать/обновить пользователя ADMIN из секретов ADMIN_EMAIL / ADMIN_PASSWORD.
 #   bootstrap — admin + токен бота MAX из секрета MAX_BOT_TOKEN + подписка webhook + диагностика.
+#   media    — забрать файлы из /root/fam-incoming на сервере, сжать видео (MP4/WebM/мобильное/постер)
+#              и фото (WebP) и запушить в ветку media-incoming для разметки и встраивания.
 #   maxdiag  — диагностика уведомлений из БД по SSH (только флаги и счётчики, без персональных данных).
 #   maxcheck — вход в админку, диагностика MAX (только счётчики), тест-сообщение и тестовая заявка через сайт.
 #
@@ -27,7 +29,7 @@ on:
       mode:
         description: "inspect | snapshot | deploy | admin"
         type: choice
-        options: [inspect, snapshot, deploy, admin, maxcheck, maxdiag, bootstrap]
+        options: [inspect, snapshot, deploy, admin, maxcheck, maxdiag, bootstrap, media]
         default: inspect
       branch:
         description: "Ветка для deploy"
@@ -67,7 +69,7 @@ jobs:
           fi
           MODE="${MODE:-inspect}"
           BRANCH="${BRANCH:-${GITHUB_REF_NAME}}"
-          case "$MODE" in inspect|snapshot|deploy|admin|maxcheck|maxdiag|bootstrap) ;; *) echo "Unknown mode $MODE"; exit 1;; esac
+          case "$MODE" in inspect|snapshot|deploy|admin|maxcheck|maxdiag|bootstrap|media) ;; *) echo "Unknown mode $MODE"; exit 1;; esac
           echo "MODE=$MODE" >> "$GITHUB_ENV"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
           echo "mode=$MODE branch=$BRANCH host=$HOST path=$REPO_PATH"
@@ -323,6 +325,50 @@ jobs:
           ELOG=$(sudo -u "$PM2_USER" -H pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="fam-api") | .pm2_env.pm_err_log_path')
           tail -n 4000 "$LOG" "$ELOG" 2>/dev/null | grep -iE "MAX|notif|BullMQ|Redis|Уведомлен|webhook|канал" | grep -viE "parent=|phone=" | sed -E 's/[0-9]{5,}/<num>/g' | tail -40
           EOS
+
+      - name: Media — fetch & optimize
+        if: env.MODE == 'media'
+        run: |
+          set -e
+          ssh prod 'ls -la /root/fam-incoming 2>/dev/null; find /root/fam-incoming -type f | head -100' || true
+          mkdir -p /tmp/in /tmp/out
+          scp -r -q prod:/root/fam-incoming/. /tmp/in/ || { echo "::error::Папка /root/fam-incoming на сервере пуста или отсутствует"; exit 1; }
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg imagemagick libheif1 >/dev/null 2>&1 || sudo apt-get install -y -qq ffmpeg imagemagick >/dev/null
+          slug() { basename "$1" | sed 's/\.[^.]*$//' | iconv -f utf8 -t ascii//TRANSLIT 2>/dev/null | tr 'A-Z' 'a-z' | sed 's/[^a-z0-9]\+/-/g; s/^-//; s/-$//'; }
+          n=0
+          find /tmp/in -type f | sort | while read -r f; do
+            n=$((n+1)); base=$(slug "$f"); [ -n "$base" ] || base="file-$n"
+            ext=$(echo "${f##*.}" | tr 'A-Z' 'a-z')
+            case "$ext" in
+              mp4|mov|m4v|webm|mkv|avi)
+                echo "== video: $(basename "$f") ($(du -h "$f" | cut -f1)) → $base"
+                ffprobe -v error -show_entries format=duration:stream=width,height,codec_name -of compact "$f" | head -3
+                D="${MAX_SECONDS:-20}"
+                ffmpeg -nostdin -loglevel error -y -i "$f" -t "$D" -an -vf "scale=-2:'min(720,ih)':flags=lanczos,fps=30" \
+                  -c:v libx264 -preset slow -crf 27 -profile:v high -pix_fmt yuv420p -movflags +faststart "/tmp/out/$base-720.mp4"
+                ffmpeg -nostdin -loglevel error -y -i "$f" -t "$D" -an -vf "scale=-2:'min(480,ih)':flags=lanczos,fps=30" \
+                  -c:v libx264 -preset slow -crf 29 -profile:v main -pix_fmt yuv420p -movflags +faststart "/tmp/out/$base-mobile.mp4"
+                ffmpeg -nostdin -loglevel error -y -i "$f" -t "$D" -an -vf "scale=-2:'min(720,ih)':flags=lanczos,fps=30" \
+                  -c:v libvpx-vp9 -b:v 0 -crf 40 -row-mt 1 -deadline good -cpu-used 3 "/tmp/out/$base-720.webm"
+                ffmpeg -nostdin -loglevel error -y -ss 0.5 -i "$f" -frames:v 1 -vf "scale=-2:'min(1080,ih)'" "/tmp/out/$base-poster.jpg"
+                ;;
+              jpg|jpeg|png|webp|heic|heif)
+                echo "== image: $(basename "$f") → $base.webp"
+                convert "$f" -auto-orient -resize '1600x1600>' -strip -quality 82 "/tmp/out/$base.webp" || echo "WARN: не удалось конвертировать $f"
+                ;;
+              *) echo "skip: $(basename "$f")";;
+            esac
+          done
+          ls -la /tmp/out
+          # исходные имена → результат (для разметки тренеров)
+          (cd /tmp/in && find . -type f | sort) > /tmp/out/SOURCES.txt
+          git config user.name "server-ops"; git config user.email "server-ops@users.noreply.github.com"
+          git checkout --orphan media-incoming-tmp
+          git rm -rq --cached . ; find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          mkdir -p incoming && cp /tmp/out/* incoming/
+          git add incoming && git commit -qm "media: сжатые файлы из /root/fam-incoming ($(date -u +%F))"
+          git push -f origin HEAD:media-incoming
+          echo "::notice::Готово: ветка media-incoming"
 
       - name: Verify site
         if: always() && env.MODE == 'deploy'
