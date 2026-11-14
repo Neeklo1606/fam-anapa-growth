@@ -6,7 +6,7 @@
 const ASSETS = "/img";
 
 const aboutImg = `${ASSETS}/about-boy.webp`;
-const goalkeeperPoster = `${ASSETS}/p-ballwork.jpg`;
+const goalkeeperPoster = `${ASSETS}/goalkeeper-poster.webp`;
 const fieldImg = `${ASSETS}/fam-training.jpg`;
 const famTraining = `${ASSETS}/fam-training.jpg`;
 const famCupCelebration = `${ASSETS}/fam-cup-celebration.jpg`;
@@ -51,7 +51,7 @@ export const ABOUT = {
 export const GOALKEEPER = {
   title: "Школа вратарей",
   body: "Вратарь — уникальная позиция на футбольном поле, требующая специализированной подготовки. В нашей академии проводятся индивидуальные тренировки под руководством опытных тренеров, которые помогут раскрыть потенциал каждого ученика и добиться высокого мастерства вратарского искусства.",
-  video: { src: "/hero.mp4", poster: goalkeeperPoster },
+  video: { src: "/goalkeeper.mp4", webm: "/goalkeeper.webm", poster: goalkeeperPoster },
 };
 
 export const PRINCIPLES = [

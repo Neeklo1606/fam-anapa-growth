@@ -151,7 +151,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
       title: GOALKEEPER.title,
       body: GOALKEEPER.body,
       videoMp4Src: GOALKEEPER.video.src,
-      videoWebmSrc: "/hero-720.webm",
+      videoWebmSrc: GOALKEEPER.video.webm,
       videoPoster: GOALKEEPER.video.poster,
       overlayEyebrow: "FAM · Goalkeeper",
       overlayTitle: "Школа вратарей",
@@ -241,6 +241,12 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
   if (isPlainObject(out0.hero)) {
     if (out0.hero.videoSrc === "/hero.mp4") delete out0.hero.videoSrc;
     if (out0.hero.posterSrc === "/img/hero-kid.jpg") delete out0.hero.posterSrc;
+  }
+  // Видео «Школы вратарей» (14.11.2026): старые заглушки из кода → новое видео. Своё видео из админки не трогаем.
+  if (isPlainObject(out0.goalkeeper)) {
+    if (out0.goalkeeper.videoMp4Src === "/hero.mp4") delete out0.goalkeeper.videoMp4Src;
+    if (out0.goalkeeper.videoWebmSrc === "/hero-720.webm") delete out0.goalkeeper.videoWebmSrc;
+    if (out0.goalkeeper.videoPoster === "/img/p-ballwork.jpg") delete out0.goalkeeper.videoPoster;
   }
   // 14.11.2026: вопрос «Где проходят тренировки?» убран из FAQ; приём детей — с 5 лет.
   if (isPlainObject(out0.faq) && Array.isArray(out0.faq.items)) {
