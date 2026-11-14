@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { trackSiteEvent } from "@/lib/analytics";
 
+import { forceAutoplay } from "./autoplay";
+
 /** Готовые WebP-варианты для статичных постеров из public/img (обычный <img>, без /_next/image). */
 const POSTER_VARIANTS: Record<string, { webp: string; mobile: string }> = {
   "/img/hero-video.jpg": { webp: "/img/hero-video.webp", mobile: "/img/hero-video-m.webp" },
@@ -40,29 +42,13 @@ export function HeroVideo({
   const videoVariant = VIDEO_VARIANTS[videoSrc] ?? {};
   // Выбираем файл один раз при монтировании видео: телефон — лёгкая версия (≈1,4 МБ).
   const [isMobile, setIsMobile] = useState(false);
-  // Видео монтируем после load + idle, чтобы оно не конкурировало с постером (LCP) и JS.
+  // Видео монтируем сразу после гидрации — автоплей без ожидания полной загрузки страницы
+  // (постер под видео остаётся LCP-элементом).
   const [mountVideo, setMountVideo] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    let idleId: number | undefined;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const start = () => {
-      if (cancelled) return;
-      const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
-      if (w.requestIdleCallback) idleId = w.requestIdleCallback(() => !cancelled && setMountVideo(true), { timeout: 2500 });
-      else timer = setTimeout(() => !cancelled && setMountVideo(true), 800);
-    };
     setIsMobile(window.matchMedia("(max-width: 767px)").matches);
-    if (document.readyState === "complete") start();
-    else window.addEventListener("load", start, { once: true });
-    return () => {
-      cancelled = true;
-      window.removeEventListener("load", start);
-      if (timer) clearTimeout(timer);
-      const w = window as Window & { cancelIdleCallback?: (id: number) => void };
-      if (idleId !== undefined) w.cancelIdleCallback?.(idleId);
-    };
+    setMountVideo(true);
   }, []);
 
   useEffect(() => {
@@ -73,9 +59,10 @@ export function HeroVideo({
     v.addEventListener("canplay", onReady);
     v.addEventListener("loadeddata", onReady);
     v.addEventListener("error", onError);
-    const tryPlay = () => v.play().catch(() => {});
-    tryPlay();
+    if (v.readyState >= 2) setReady(true);
+    const disarm = forceAutoplay(v);
     return () => {
+      disarm();
       v.removeEventListener("canplay", onReady);
       v.removeEventListener("loadeddata", onReady);
       v.removeEventListener("error", onError);
@@ -105,7 +92,7 @@ export function HeroVideo({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           onPlaying={() => {
             if (playTracked.current) return;
             playTracked.current = true;

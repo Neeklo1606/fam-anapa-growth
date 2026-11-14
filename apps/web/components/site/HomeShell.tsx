@@ -10,6 +10,8 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import Link from "next/link";
@@ -17,6 +19,7 @@ import Link from "next/link";
 import { SiteImage, optimizedPosterUrl } from "@/components/site/SiteImage";
 
 import { HeroVideo } from "@/components/site/HeroVideo";
+import { forceAutoplay } from "@/components/site/autoplay";
 import { Reveal } from "@/components/site/Reveal";
 import { ApplyButton, useApply } from "@/components/site/ApplyModal";
 import { useSiteContacts } from "@/components/site/SiteContactsContext";
@@ -262,22 +265,62 @@ function About({ home }: { home: HomePageContent }) {
   );
 }
 
-function GoalkeeperSchool({ home }: { home: HomePageContent }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
+/** Лёгкие версии видео вратарей для телефонов. */
+const GOALKEEPER_MOBILE_VIDEO: Record<string, string> = {
+  "/goalkeeper.mp4": "/goalkeeper-mobile.mp4",
+};
 
-  const togglePlay = () => {
+function GoalkeeperSchool({ home }: { home: HomePageContent }) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // Источники подключаем, когда блок подходит к экрану: видео не грузится, пока до него не долистали.
+  const [load, setLoad] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    const el = boxRef.current;
+    if (!el) return;
+    if (!("IntersectionObserver" in window)) {
+      setLoad(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        const v = videoRef.current;
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            setLoad(true);
+            if (v && v.paused && v.currentSrc) v.play().catch(() => {});
+          } else if (v && !v.paused) {
+            v.pause(); // вне экрана — на паузе, не тратим трафик и батарею
+          }
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !load) return;
+    v.load();
+    return forceAutoplay(v);
+  }, [load, isMobile]);
+
+  const toggleSound = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) {
-      v.muted = false;
-      v.play();
-      setPlaying(true);
-    } else {
-      v.pause();
-      setPlaying(false);
-    }
+    const next = !soundOn;
+    v.muted = !next;
+    if (v.paused) v.play().catch(() => {});
+    setSoundOn(next);
   };
+
+  const mobileSrc = GOALKEEPER_MOBILE_VIDEO[home.goalkeeper.videoMp4Src];
 
   return (
     <section
@@ -305,50 +348,50 @@ function GoalkeeperSchool({ home }: { home: HomePageContent }) {
           </div>
 
           <Reveal y={20} delay={0.1} className="lg:col-span-7">
-            <button
-              type="button"
-              onClick={togglePlay}
-              className="group relative block w-full aspect-video rounded-3xl overflow-hidden border border-ink/10 bg-night shadow-elevated"
+            <div
+              ref={boxRef}
+              className="relative block w-full aspect-video rounded-3xl overflow-hidden border border-ink/10 bg-night shadow-elevated"
             >
               <video
                 ref={videoRef}
                 poster={optimizedPosterUrl(home.goalkeeper.videoPoster)}
-                playsInline
-                loop
+                autoPlay
                 muted
+                loop
+                playsInline
                 preload="none"
+                disablePictureInPicture
                 className="absolute inset-0 w-full h-full object-cover"
               >
-                <source src={home.goalkeeper.videoWebmSrc} type="video/webm" />
-                <source src={home.goalkeeper.videoMp4Src} type="video/mp4" />
+                {load ? (
+                  isMobile && mobileSrc ? (
+                    <source src={mobileSrc} type="video/mp4" />
+                  ) : (
+                    <>
+                      {home.goalkeeper.videoWebmSrc ? (
+                        <source src={home.goalkeeper.videoWebmSrc} type="video/webm" />
+                      ) : null}
+                      <source src={home.goalkeeper.videoMp4Src} type="video/mp4" />
+                    </>
+                  )
+                ) : null}
               </video>
-              <div
-                className={`absolute inset-0 bg-gradient-to-t from-night via-night/30 to-transparent transition-opacity duration-500 ${playing ? "opacity-30" : "opacity-100"}`}
-              />
-              <AnimatePresence>
-                {!playing && (
-                  <m.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="absolute inset-0 flex items-center justify-center"
-                  >
-                    <span className="relative flex items-center justify-center">
-                      <span className="absolute inset-0 rounded-full bg-flame/40 blur-2xl scale-150" />
-                      <span className="relative h-20 w-20 md:h-24 md:w-24 rounded-full bg-flame text-white flex items-center justify-center shadow-flame group-hover:scale-110 transition">
-                        <Play className="h-8 w-8 md:h-10 md:w-10 ml-1" fill="white" />
-                      </span>
-                    </span>
-                  </m.div>
-                )}
-              </AnimatePresence>
-              <div className="absolute bottom-5 left-5 right-5">
+              <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-night/10 to-transparent pointer-events-none" />
+              <button
+                type="button"
+                onClick={toggleSound}
+                aria-label={soundOn ? "Выключить звук" : "Включить звук"}
+                className="absolute top-4 right-4 h-10 w-10 rounded-full bg-night/45 backdrop-blur border border-white/25 text-white flex items-center justify-center hover:bg-night/65 transition"
+              >
+                {soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+              </button>
+              <div className="absolute bottom-5 left-5 right-5 pointer-events-none">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/70">
                   {home.goalkeeper.overlayEyebrow}
                 </div>
                 <div className="font-display text-xl md:text-2xl mt-1 text-white">{home.goalkeeper.overlayTitle}</div>
               </div>
-            </button>
+            </div>
           </Reveal>
         </div>
       </div>
