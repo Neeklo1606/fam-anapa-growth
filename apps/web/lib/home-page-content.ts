@@ -207,7 +207,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
       items: [
         {
           q: "С какого возраста можно записать ребёнка на футбол?",
-          a: "В Футбольную академию Морева в Анапе принимаем детей от 6 до 14 лет. Группу подбираем по возрасту и уровню подготовки.",
+          a: "В Футбольную академию Морева в Анапе принимаем детей от 5 до 14 лет. Группу подбираем по возрасту и уровню подготовки.",
         },
         {
           q: "Нужен ли опыт игры в футбол?",
@@ -216,10 +216,6 @@ export function buildDefaultHomePageContent(): HomePageContent {
         {
           q: "Как записаться на пробное занятие?",
           a: "Оставьте заявку на сайте — займёт меньше минуты. Мы перезвоним, подберём группу и согласуем время первого занятия.",
-        },
-        {
-          q: "Где проходят тренировки?",
-          a: `Тренировки проходят по адресу: ${LOCATION.address.replace(/\s*\n\s*/g, ", ")}.`,
         },
         {
           q: "Есть ли в академии школа вратарей?",
@@ -245,6 +241,16 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
   if (isPlainObject(out0.hero)) {
     if (out0.hero.videoSrc === "/hero.mp4") delete out0.hero.videoSrc;
     if (out0.hero.posterSrc === "/img/hero-kid.jpg") delete out0.hero.posterSrc;
+  }
+  // 14.11.2026: вопрос «Где проходят тренировки?» убран из FAQ; приём детей — с 5 лет.
+  if (isPlainObject(out0.faq) && Array.isArray(out0.faq.items)) {
+    out0.faq.items = out0.faq.items
+      .filter((it) => !(isPlainObject(it) && typeof it.q === "string" && /где проходят тренировки/i.test(it.q)))
+      .map((it) =>
+        isPlainObject(it) && typeof it.a === "string"
+          ? { ...it, a: it.a.replace(/от 6 до 14/g, "от 5 до 14").replace(/6–14/g, "5–14") }
+          : it,
+      );
   }
   // Тренер Строков больше не работает в академии (14.11.2026) — убираем карточку и из сохранённых данных.
   if (isPlainObject(out0.coachesSection) && Array.isArray(out0.coachesSection.staticCoaches)) {

@@ -277,30 +277,6 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
               }
             />
           </Field>
-          <Field label="Подпись на карточке (верх)">
-            <input
-              className={inputCls}
-              value={form.about.cardEyebrow}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  about: { ...f.about, cardEyebrow: e.target.value },
-                }))
-              }
-            />
-          </Field>
-          <Field label="Подпись на карточке">
-            <input
-              className={inputCls}
-              value={form.about.cardTitle}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  about: { ...f.about, cardTitle: e.target.value },
-                }))
-              }
-            />
-          </Field>
           <Field label="Изображение">
             <MediaPicker
               assetKind="IMAGE"

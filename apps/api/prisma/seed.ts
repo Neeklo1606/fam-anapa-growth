@@ -38,7 +38,7 @@ async function main() {
       data: {
         id: 1,
         brandName: "Футбольная академия Морева",
-        brandTagline: "Анапа · футбол для детей 6–14 лет",
+        brandTagline: "Анапа · футбол для детей 5–14 лет",
         phone: "+79180000000",
         whatsapp: "https://wa.me/79180000000",
         telegram: "https://t.me/fam_anapa",
@@ -66,7 +66,7 @@ async function main() {
         fullName: "Тренерский состав",
         role: "Полевые тренеры",
         shortDescription:
-          "Команда тренеров академии работает с детскими группами от 6 до 14 лет.",
+          "Команда тренеров академии работает с детскими группами от 5 до 14 лет.",
         photoUrl: "/img/fam-training.jpg",
         order: 1,
       },

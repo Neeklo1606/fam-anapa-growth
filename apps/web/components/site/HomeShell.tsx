@@ -94,7 +94,7 @@ function VideosStrip({ home }: { home: HomePageContent }) {
             style={{ fontSize: "clamp(1.85rem, 5vw, 3.2rem)", lineHeight: 1.05 }}
           >
             {home.videosSection.titleBefore}{" "}
-            <span className="text-gradient-brand-dark">{home.videosSection.titleAccent}</span>
+            {home.videosSection.titleAccent}
           </h2>
         </Reveal>
 
@@ -233,11 +233,6 @@ function About({ home }: { home: HomePageContent }) {
                   className="object-cover object-center"
                 />
               </div>
-              <figcaption className="relative bg-night px-5 py-4 md:px-6 md:py-5">
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-flame via-flame/40 to-transparent" />
-                <div className="text-[10px] uppercase tracking-[0.25em] text-flame">{home.about.cardEyebrow}</div>
-                <div className="font-display text-xl md:text-2xl mt-1">{home.about.cardTitle}</div>
-              </figcaption>
             </figure>
           </Reveal>
 
@@ -453,8 +448,11 @@ function Coaches({ home }: { home: HomePageContent }) {
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
           <div className="max-w-xl">
-            <h2 className="font-display font-bold tracking-[0.18em] text-deep uppercase text-2xl sm:text-3xl md:text-4xl">
-              Тренерский <span className="text-flame">штаб</span>
+            <h2
+              className="font-display tracking-tight text-deep"
+              style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
+            >
+              Тренерский штаб
             </h2>
             {home.coachesSection.subtitle.trim() ? (
               <p className="mt-2 md:mt-3 text-ink/60 max-w-md text-[13px] md:text-sm leading-snug">
@@ -532,6 +530,18 @@ function Coaches({ home }: { home: HomePageContent }) {
 /** Фото стадиона в блоке локации — фиксированное, без карусели и подписей. */
 const LOCATION_PHOTO = "/img/stadium.webp";
 
+/** Заголовок на тёмном фоне: начало белым, последнее слово — белый → светло-синий (как «Наши принципы»). */
+function GradientTail({ text }: { text: string }) {
+  const t = text.trim();
+  const i = t.lastIndexOf(" ");
+  if (i < 0) return <span className="text-gradient-brand">{t}</span>;
+  return (
+    <>
+      {t.slice(0, i)} <span className="text-gradient-brand">{t.slice(i + 1)}</span>
+    </>
+  );
+}
+
 function Location({ home }: { home: HomePageContent }) {
   const addressText = home.location.address?.trim() ?? "";
   const mapUrl = resolveYandexMapsLink(home.location.mapUrl, addressText);
@@ -558,7 +568,7 @@ function Location({ home }: { home: HomePageContent }) {
                   letterSpacing: "-0.025em",
                 }}
               >
-                {home.location.title}
+                <GradientTail text={home.location.title} />
               </h2>
               <p className="mt-6 text-white/70 text-base md:text-lg leading-relaxed max-w-md">
                 {home.location.body}
@@ -654,7 +664,7 @@ function Faq({ home }: { home: HomePageContent }) {
             className="font-display tracking-tight text-deep"
             style={{ fontSize: "clamp(2rem, 6vw, 4rem)", lineHeight: 0.95 }}
           >
-            {faq.titleBefore} <span className="text-gradient-brand-blue">{faq.titleAccent}</span>
+            {faq.titleBefore} {faq.titleAccent}
           </h2>
         </Reveal>
         <div className="mt-8 md:mt-12 divide-y divide-ink/10 border-y border-ink/10">
@@ -697,7 +707,7 @@ function ApplySection({ home }: { home: HomePageContent }) {
               }}
             >
               {home.contactsSection.titleBefore}{" "}
-              <span className="text-gradient-brand-dark">{home.contactsSection.titleAccent}</span>
+              {home.contactsSection.titleAccent}
             </h2>
             <p className="mt-5 text-ink/70 text-base md:text-lg leading-relaxed max-w-md">{home.contactsSection.intro}</p>
 
