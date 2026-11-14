@@ -505,7 +505,15 @@ function Coaches({ home }: { home: HomePageContent }) {
                     <div className="relative flex-1 px-3 py-3 sm:px-4 md:px-5 md:py-4">
                       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-flame via-flame/40 to-transparent" />
                       <h3 className="font-display text-[13px] sm:text-[15px] md:text-lg lg:text-base leading-tight text-white tracking-wide">
-                        {c.fullName}
+                        {/* Фамилия / имя / отчество — каждое с новой строки: текст во всех карточках на одном уровне. */}
+                        {c.fullName
+                          .trim()
+                          .split(/\s+/)
+                          .map((part, j) => (
+                            <span key={j} className="block">
+                              {part}
+                            </span>
+                          ))}
                       </h3>
                       <p className="mt-1 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-[0.18em] text-flame font-semibold">
                         {c.role}
@@ -672,7 +680,7 @@ function Faq({ home }: { home: HomePageContent }) {
             <details key={item.q} className="group py-5 md:py-6" open={i === 0}>
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
                 <h3 className="font-display text-lg md:text-2xl tracking-tight text-ink">{item.q}</h3>
-                <span className="shrink-0 h-10 w-10 rounded-full border border-ink/15 flex items-center justify-center text-ink/70 transition group-open:rotate-45 group-open:bg-flame group-open:border-flame group-open:text-night">
+                <span className="shrink-0 h-10 w-10 rounded-full border border-ink/15 flex items-center justify-center text-ink/70 transition group-open:rotate-45 group-open:bg-flame group-open:border-flame group-open:text-white">
                   <Plus className="h-4 w-4" />
                 </span>
               </summary>

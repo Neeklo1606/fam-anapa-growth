@@ -218,7 +218,7 @@ export function buildDefaultHomePageContent(): HomePageContent {
           a: "Оставьте заявку на сайте — займёт меньше минуты. Мы перезвоним, подберём группу и согласуем время первого занятия.",
         },
         {
-          q: "Есть ли в академии школа вратарей?",
+          q: "Есть ли в академии индивидуальные тренировки для вратарей?",
           a: `Да. ${GOALKEEPER.body}`,
         },
         {
@@ -249,6 +249,12 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
       .map((it) =>
         isPlainObject(it) && typeof it.a === "string"
           ? { ...it, a: it.a.replace(/от 6 до 14/g, "от 5 до 14").replace(/6–14/g, "5–14") }
+          : it,
+      )
+      // 14.11.2026: формулировка вопроса о вратарях — по просьбе заказчика.
+      .map((it) =>
+        isPlainObject(it) && it.q === "Есть ли в академии школа вратарей?"
+          ? { ...it, q: "Есть ли в академии индивидуальные тренировки для вратарей?" }
           : it,
       );
   }
