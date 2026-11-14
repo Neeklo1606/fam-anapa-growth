@@ -536,7 +536,7 @@ function Coaches({ home }: { home: HomePageContent }) {
 }
 
 /** Фото стадиона в блоке локации — фиксированное, без карусели и подписей. */
-const LOCATION_PHOTO = "/img/stadium.webp";
+const LOCATION_PHOTO = "/img/stadium-field.webp";
 
 /** Заголовок на тёмном фоне: начало белым, последнее слово — белый → светло-синий (как «Наши принципы»). */
 function GradientTail({ text }: { text: string }) {

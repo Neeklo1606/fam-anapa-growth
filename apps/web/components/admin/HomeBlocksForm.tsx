@@ -834,7 +834,7 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
         <p className="text-xs text-ink/50">
-          Фото в блоке локации — фиксированное фото стадиона (/img/stadium.webp).
+          Фото в блоке локации — фиксированное фото стадиона (/img/stadium-field.webp).
         </p>
       </Section>
 
