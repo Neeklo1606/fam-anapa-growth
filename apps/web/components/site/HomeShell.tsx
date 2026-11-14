@@ -551,28 +551,10 @@ function Coaches({ home }: { home: HomePageContent }) {
   );
 }
 
+/** Фото стадиона в блоке локации — фиксированное, без карусели и подписей. */
+const LOCATION_PHOTO = "/img/stadium.webp";
+
 function Location({ home }: { home: HomePageContent }) {
-  const slides: HomeGallerySlide[] = home.location.carouselSlides
-    .filter((s) => s.src.trim())
-    .map((s, i) => ({
-      id: `car-${i}`,
-      src: s.src,
-      label: s.label,
-      alt: s.label,
-    }));
-
-  const [emblaRef, embla] = useEmblaCarousel({ align: "start", loop: false });
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (!embla) return;
-    const onSelect = () => setIndex(embla.selectedScrollSnap());
-    embla.on("select", onSelect);
-    embla.on("reInit", onSelect);
-    onSelect();
-  }, [embla]);
-
-  const slideKeys = slides.map((s) => s.id).join("-");
   const addressText = home.location.address?.trim() ?? "";
   const mapUrl = resolveYandexMapsLink(home.location.mapUrl, addressText);
   const hasAddressLink = Boolean(addressText && mapUrl);
@@ -643,67 +625,15 @@ function Location({ home }: { home: HomePageContent }) {
           </div>
 
           <Reveal y={20} delay={0.1} className="lg:col-span-7">
-            {slides.length > 0 ? (
-              <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-white/10">
-                <div className="overflow-hidden" ref={emblaRef} key={slideKeys}>
-                  <div className="flex">
-                    {slides.map((s) => (
-                      <div
-                        key={s.id}
-                        className="shrink-0 w-full relative aspect-[4/3] md:aspect-[16/10]"
-                      >
-                        <SiteImage
-                          src={s.src}
-                          alt={s.alt}
-                          fill
-                          sizes="(min-width: 1024px) 58vw, 100vw"
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent" />
-                        <div className="absolute bottom-5 left-5 right-5 text-white">
-                          <div className="text-[10px] uppercase tracking-[0.25em] text-flame">
-                            FAM · Поле
-                          </div>
-                          <div className="mt-1 font-display text-xl md:text-2xl">{s.label}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {slides.length > 1 ? (
-                  <>
-                    <div className="absolute top-4 right-4 flex gap-2">
-                      <button
-                        onClick={() => embla?.scrollPrev()}
-                        className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
-                        aria-label="Назад"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => embla?.scrollNext()}
-                        className="h-10 w-10 rounded-full bg-white/15 backdrop-blur border border-white/20 text-white hover:bg-white/25 transition flex items-center justify-center"
-                        aria-label="Далее"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </div>
-
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                      {slides.map((s, i) => (
-                        <button
-                          key={s.id}
-                          onClick={() => embla?.scrollTo(i)}
-                          className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-flame" : "w-1.5 bg-white/40"}`}
-                          aria-label={`Слайд ${i + 1}`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            ) : null}
+            <div className="relative rounded-3xl overflow-hidden bg-night ring-1 ring-white/10 aspect-[4/3] md:aspect-[16/10]">
+              <SiteImage
+                src={LOCATION_PHOTO}
+                alt="Футбольное поле Академии Морева в Анапе"
+                fill
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
 
             {hasMapEmbed ? (
               <div className="mt-4">
