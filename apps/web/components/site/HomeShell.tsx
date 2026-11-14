@@ -490,7 +490,8 @@ function Coaches({ home }: { home: HomePageContent }) {
     <section id="coaches" className="relative bg-background py-10 md:py-24 scroll-mt-20">
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <Reveal>
-          <div className="max-w-xl">
+          {/* С планшета — по центру над карточками; на телефоне слева, как остальные разделы. */}
+          <div className="max-w-3xl md:mx-auto md:text-center">
             <h2
               className="font-display tracking-tight text-deep"
               style={{ fontSize: "clamp(1.9rem, 4.4vw, 3.75rem)", lineHeight: 1, letterSpacing: "-0.025em" }}
@@ -498,7 +499,7 @@ function Coaches({ home }: { home: HomePageContent }) {
               Тренерский штаб
             </h2>
             {home.coachesSection.subtitle.trim() ? (
-              <p className="mt-2 md:mt-3 text-ink/60 max-w-md text-[13px] md:text-sm leading-snug">
+              <p className="mt-2 md:mt-3 text-ink/60 max-w-md md:mx-auto text-[13px] md:text-sm leading-snug">
                 {home.coachesSection.subtitle}
               </p>
             ) : null}
