@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { Loader2, Plus, RotateCcw, Save, Trash2 } from "lucide-react";
 
 import type {
-  GallerySlideCfg,
   HomeCoachCard,
   HomePageContent,
   HomeVideoCardCfg,
@@ -66,10 +65,6 @@ function validateHomeBeforeSave(h: HomePageContent): string[] {
 
   h.coachesSection.staticCoaches.forEach((c, i) => {
     need(isAllowedHomeAssetUrl(c.photoUrl), `Тренеры · карточка ${i + 1}: укажите URL фото.`);
-  });
-
-  h.location.carouselSlides.forEach((s, i) => {
-    need(isAllowedHomeAssetUrl(s.src), `Локация · слайд ${i + 1}: укажите URL изображения.`);
   });
 
   if (h.videosSection.show) {
@@ -135,9 +130,6 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
 
   const setPrinciples = (items: PrincipleItem[]) =>
     setForm((f) => ({ ...f, principles: { ...f.principles, items } }));
-
-  const setSlides = (carouselSlides: GallerySlideCfg[]) =>
-    setForm((f) => ({ ...f, location: { ...f.location, carouselSlides } }));
 
   const setStaticCoaches = (staticCoaches: HomeCoachCard[]) =>
     setForm((f) => ({ ...f, coachesSection: { ...f.coachesSection, staticCoaches } }));
@@ -866,52 +858,8 @@ export function HomeBlocksForm({ initial }: { initial: HomePageContent }) {
           />
         </Field>
         <p className="text-xs text-ink/50">
-          Слайды для карусели локации. Изображения: загрузки, «Сборка» или путь /img/…
+          Фото в блоке локации — фиксированное фото стадиона (/img/stadium.webp).
         </p>
-        {form.location.carouselSlides.map((s, idx) => (
-          <div key={idx} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start border border-line rounded-xl p-4">
-            <div className="flex-1 min-w-[220px]">
-              <MediaPicker
-                assetKind="IMAGE"
-                includeBundles
-                value={null}
-                clearableFallback
-                fallbackPreviewUrl={s.src || null}
-                hint="«Медиа», «Сборка» или путь /img/…"
-                onChange={(v) => {
-                  const next = [...form.location.carouselSlides];
-                  next[idx] = { ...s, src: v?.url ?? "" };
-                  setSlides(next);
-                }}
-              />
-            </div>
-            <input
-              className={`${inputCls} flex-1 min-w-[160px]`}
-              value={s.label}
-              placeholder="Подпись"
-              onChange={(e) => {
-                const next = [...form.location.carouselSlides];
-                next[idx] = { ...s, label: e.target.value };
-                setSlides(next);
-              }}
-            />
-            <button
-              type="button"
-              aria-label="Удалить слайд"
-              className="h-10 w-10 rounded-lg border border-line text-red-600"
-              onClick={() => setSlides(form.location.carouselSlides.filter((_, i) => i !== idx))}
-            >
-              <Trash2 className="h-4 w-4 mx-auto" />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-flame"
-          onClick={() => setSlides([...form.location.carouselSlides, { src: "", label: "" }])}
-        >
-          <Plus className="h-3 w-3" /> Слайд
-        </button>
       </Section>
 
       <Section title="Блок записи">

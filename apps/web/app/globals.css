@@ -126,6 +126,17 @@
   color: transparent;
   text-shadow: 0 0 30px oklch(0.62 0.20 256 / 0.18);
 }
+/* Синий акцент для светлого фона (белые секции) — только фирменные синие, без оранжевого */
+@utility text-gradient-brand-blue {
+  background-image: linear-gradient(120deg,
+    oklch(0.21 0.16 271) 0%,
+    oklch(0.42 0.21 264) 50%,
+    oklch(0.55 0.21 258) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 @utility text-gradient-brand-dark {
   background-image: linear-gradient(120deg,
     oklch(0.22 0.16 268) 0%,

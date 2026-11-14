@@ -38,7 +38,7 @@ export function Footer({ logoSrc, copyrightText }: { logoSrc: string; copyrightT
               />
               <div className="leading-tight">
                 <div className="font-display text-lg tracking-[0.06em] uppercase text-white/95">
-                  Академия <span className="text-flame">Морева</span>
+                  Академия <span className="text-electric">Морева</span>
                 </div>
                 <div className="text-[9px] uppercase tracking-[0.28em] text-white/65 font-mono-pro">
                   ФАМ · Анапа

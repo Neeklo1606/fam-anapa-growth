@@ -246,6 +246,12 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
     if (out0.hero.videoSrc === "/hero.mp4") delete out0.hero.videoSrc;
     if (out0.hero.posterSrc === "/img/hero-kid.jpg") delete out0.hero.posterSrc;
   }
+  // Тренер Строков больше не работает в академии (14.11.2026) — убираем карточку и из сохранённых данных.
+  if (isPlainObject(out0.coachesSection) && Array.isArray(out0.coachesSection.staticCoaches)) {
+    out0.coachesSection.staticCoaches = out0.coachesSection.staticCoaches.filter(
+      (c) => !(isPlainObject(c) && typeof c.fullName === "string" && /строков/i.test(c.fullName)),
+    );
+  }
   stored = out0;
   const version = typeof stored.version === "number" ? stored.version : 1;
   if (version >= HOME_CONTENT_VERSION) return stored;

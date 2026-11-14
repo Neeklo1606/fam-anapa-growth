@@ -68,7 +68,6 @@ export const COACHES = [
   { name: "Макоев Владислав Русланович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-makoev.webp` },
   { name: "Андреев Константин Петрович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-andreev.webp` },
   { name: "Аветисян Грачья Вачаганович", role: "Тренер", info: "", img: `${ASSETS}/coach-avetisyan.webp` },
-  { name: "Строков Никита Игоревич", role: "Тренер", info: "", img: `${ASSETS}/coach-strokov.webp` },
 ];
 
 /** Точка карты около ул. Тбилисская, 1Г, ст. Анапская (виджет Яндекс) */
