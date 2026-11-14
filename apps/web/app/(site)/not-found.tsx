@@ -12,7 +12,7 @@ export default function NotFound() {
         <div className="mt-7">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-full bg-flame px-6 py-3 text-sm font-semibold uppercase tracking-wider shadow-flame"
+            className="inline-flex items-center justify-center rounded-full bg-flame px-6 py-3 text-white text-sm font-semibold uppercase tracking-wider shadow-flame"
           >
             На главную
           </Link>

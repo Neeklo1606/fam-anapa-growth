@@ -67,7 +67,7 @@ export const COACHES = [
   { name: "Губин Алексей Олегович", role: "Главный тренер", info: "Лицензия «С-УЕФА»", img: `${ASSETS}/coach-gubin.webp` },
   { name: "Макоев Владислав Русланович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-makoev.webp` },
   { name: "Андреев Константин Петрович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-andreev.webp` },
-  { name: "Аветисян Грачья Вачаганович", role: "Тренер", info: "", img: `${ASSETS}/coach-avetisyan.webp` },
+  { name: "Аветисян Грачья Вачаганович", role: "Тренер", info: "Высшее спортивное образование", img: `${ASSETS}/coach-avetisyan.webp` },
 ];
 
 /** Точка карты около ул. Тбилисская, 1Г, ст. Анапская (виджет Яндекс) */

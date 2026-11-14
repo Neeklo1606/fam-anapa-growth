@@ -10,7 +10,7 @@ export default function RootNotFound() {
         <div className="mt-6 flex gap-2 justify-center">
           <Link
             href="/"
-            className="inline-flex h-10 items-center rounded-full bg-flame px-5 text-[11px] uppercase tracking-wider font-semibold"
+            className="inline-flex h-10 items-center rounded-full bg-flame px-5 text-white text-[11px] uppercase tracking-wider font-semibold"
           >
             На главную
           </Link>

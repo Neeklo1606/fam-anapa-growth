@@ -252,6 +252,15 @@ function migrateStoredHome(stored: Record<string, unknown>): Record<string, unkn
           : it,
       );
   }
+  // 14.11.2026: у Аветисяна — «Высшее спортивное образование», если в админке пусто.
+  if (isPlainObject(out0.coachesSection) && Array.isArray(out0.coachesSection.staticCoaches)) {
+    out0.coachesSection.staticCoaches = out0.coachesSection.staticCoaches.map((c) =>
+      isPlainObject(c) && typeof c.fullName === "string" && /аветисян/i.test(c.fullName) &&
+      !(typeof c.shortDescription === "string" && c.shortDescription.trim())
+        ? { ...c, shortDescription: "Высшее спортивное образование" }
+        : c,
+    );
+  }
   // Тренер Строков больше не работает в академии (14.11.2026) — убираем карточку и из сохранённых данных.
   if (isPlainObject(out0.coachesSection) && Array.isArray(out0.coachesSection.staticCoaches)) {
     out0.coachesSection.staticCoaches = out0.coachesSection.staticCoaches.filter(

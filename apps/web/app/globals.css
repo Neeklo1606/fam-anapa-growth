@@ -55,7 +55,8 @@
   --brand-deep: oklch(0.21 0.16 271);
   --brand: oklch(0.42 0.21 264);
   --brand-bright: oklch(0.62 0.20 256);
-  --flame: oklch(0.72 0.16 55);
+  /* Акцент (бывший оранжевый) — фирменный синий клуба: цвета академии белый и синий. */
+  --flame: oklch(0.6 0.2 256);
   --surface: oklch(0.975 0.005 250);
   --ink: oklch(0.18 0.04 265);
   --line: oklch(0.92 0.01 255);
@@ -82,7 +83,7 @@
 
   --shadow-soft: 0 1px 2px oklch(0.16 0.06 268 / 0.06), 0 8px 24px oklch(0.16 0.06 268 / 0.08);
   --shadow-elevated: 0 2px 4px oklch(0.16 0.06 268 / 0.08), 0 24px 60px oklch(0.16 0.06 268 / 0.18);
-  --shadow-flame: 0 8px 28px oklch(0.72 0.16 55 / 0.22), 0 2px 8px oklch(0.72 0.16 55 / 0.18);
+  --shadow-flame: 0 8px 28px oklch(0.6 0.2 256 / 0.28), 0 2px 8px oklch(0.6 0.2 256 / 0.2);
   --gradient-brand: linear-gradient(135deg, var(--brand-deep), var(--brand) 55%, var(--brand-bright));
   --gradient-night: linear-gradient(180deg, var(--night) 0%, var(--brand-deep) 100%);
   --gradient-pitch: radial-gradient(ellipse at 50% 100%, oklch(0.42 0.21 264 / 0.45), transparent 60%);
@@ -141,7 +142,7 @@
   background-image: linear-gradient(120deg,
     oklch(0.22 0.16 268) 0%,
     oklch(0.38 0.24 262) 45%,
-    oklch(0.72 0.16 55) 100%);
+    oklch(0.62 0.20 256) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

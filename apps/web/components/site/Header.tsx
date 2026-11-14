@@ -18,7 +18,7 @@ export function Header({ logoSrc }: { logoSrc: string }) {
           className="relative z-10 flex items-center gap-3 min-w-0 group"
           aria-label="Академия Морева · на главную"
         >
-          <span className="relative flex h-11 w-11 shrink-0 items-center justify-center md:h-[52px] md:w-[52px]">
+          <span className="relative flex h-[52px] w-[52px] shrink-0 items-center justify-center md:h-[60px] md:w-[60px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={logoSrc}

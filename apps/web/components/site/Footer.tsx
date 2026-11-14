@@ -45,9 +45,6 @@ export function Footer({ logoSrc, copyrightText }: { logoSrc: string; copyrightT
                 </div>
               </div>
             </div>
-            <p className="mt-4 text-[13px] text-white/[0.62] max-w-sm leading-relaxed">
-              Детская футбольная академия в Анапе. Техника, координация, командная игра и уверенность на поле для детей 5–14 лет.
-            </p>
             <div className="mt-6">
               <ApplyButton />
             </div>

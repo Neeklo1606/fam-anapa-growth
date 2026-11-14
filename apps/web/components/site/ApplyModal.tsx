@@ -161,15 +161,15 @@ export function ApplyButton({
     "group relative inline-flex items-center justify-center gap-3 font-semibold uppercase tracking-[0.18em] transition-all duration-300";
   const styles =
     variant === "primary"
-      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-night text-[11px] shadow-flame hover:brightness-[1.05] active:scale-[0.98]"
+      ? "pl-6 pr-2 h-12 rounded-full bg-flame text-white text-[11px] shadow-flame hover:brightness-[1.05] active:scale-[0.98]"
       : "h-12 px-6 rounded-full border border-white/25 bg-white/5 backdrop-blur text-white text-[11px] hover:bg-white/10 hover:border-white/40 active:scale-[0.98]";
 
   return (
     <button onClick={open} className={`${base} ${styles} ${className}`}>
       <span className="relative z-10">{children ?? "Записать ребёнка"}</span>
       {variant === "primary" && (
-        <span className="relative z-10 h-8 w-8 rounded-full bg-night/10 flex items-center justify-center">
-          <BallIcon className="h-[18px] w-[18px] brightness-0 opacity-85 transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
+        <span className="relative z-10 h-8 w-8 rounded-full bg-white/15 flex items-center justify-center">
+          <BallIcon className="h-[18px] w-[18px] brightness-0 invert opacity-90 transition-transform duration-500 ease-out group-hover:rotate-[140deg] group-active:rotate-[200deg]" />
         </span>
       )}
     </button>

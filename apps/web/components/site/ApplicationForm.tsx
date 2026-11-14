@@ -239,7 +239,7 @@ export function ApplicationForm({ onClose }: { onClose?: () => void }) {
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-flame text-night text-[12px] font-semibold uppercase tracking-[0.18em] shadow-flame hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
+        className="mt-2 inline-flex items-center justify-center gap-2 h-12 rounded-full bg-flame text-white text-[12px] font-semibold uppercase tracking-[0.18em] shadow-flame hover:brightness-105 active:scale-[0.99] transition disabled:opacity-60"
       >
         {loading ? (
           "Отправляем…"

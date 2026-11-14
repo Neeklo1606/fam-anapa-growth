@@ -47,10 +47,22 @@ export function buildSiteMetadata(pub: PublicSite | null): Metadata {
     description,
     keywords,
     alternates: { canonical: SITE_URL },
-    icons: {
-      icon: [{ url: favicon, type: favicon.endsWith(".webp") ? "image/webp" : undefined }],
-      apple: [{ url: favicon, sizes: "180x180" }],
-    },
+    icons:
+      favicon === DEFAULT_FAVICON || favicon === "/img/logo.webp"
+        ? {
+            // Эмблема без полей — крупно во вкладке и в выдаче Google (размеры кратны 48 px).
+            icon: [
+              { url: "/favicon.ico", sizes: "48x48" },
+              { url: "/icon-48.png", type: "image/png", sizes: "48x48" },
+              { url: "/icon-96.png", type: "image/png", sizes: "96x96" },
+              { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+            ],
+            apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+          }
+        : {
+            icon: [{ url: favicon, type: favicon.endsWith(".webp") ? "image/webp" : undefined }],
+            apple: [{ url: favicon, sizes: "180x180" }],
+          },
     openGraph: {
       type: "website",
       locale: "ru_RU",

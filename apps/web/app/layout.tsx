@@ -66,8 +66,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   icons: {
-    icon: [{ url: "/img/logo.webp", type: "image/webp" }],
-    apple: [{ url: "/img/logo.webp", type: "image/webp", sizes: "180x180" }],
+    // Эмблема без полей — крупно во вкладке и в выдаче Google (кратно 48 px).
+    icon: [
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon-48.png", type: "image/png", sizes: "48x48" },
+      { url: "/icon-96.png", type: "image/png", sizes: "96x96" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
   },
   manifest: "/manifest.webmanifest",
   openGraph: {
