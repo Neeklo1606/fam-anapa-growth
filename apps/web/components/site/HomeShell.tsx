@@ -508,11 +508,12 @@ function Coaches({ home }: { home: HomePageContent }) {
         {/* Все тренеры видны сразу: 2 колонки на телефоне, 3 на планшете, 5 на десктопе. */}
         <div className="mt-6 md:mt-10">
           <div>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5 md:gap-5 max-md:[&>*:last-child:nth-child(odd)]:col-span-2 max-md:[&>*:last-child:nth-child(odd)]:mx-auto max-md:[&>*:last-child:nth-child(odd)]:w-[calc(50%-0.375rem)]">
+            {/* Карточки по центру при любом их количестве: ширина колонки как в сетке 2/3/5. */}
+            <div className="flex flex-wrap justify-center gap-3 md:gap-5">
               {items.map((c, i) => (
                 <div
                   key={c.id}
-                  className="min-w-0"
+                  className="min-w-0 w-[calc((100%-0.75rem)/2)] md:w-[calc((100%-2.5rem)/3)] lg:w-[calc((100%-5rem)/5)]"
                 >
                   <m.article
                     initial={{ opacity: 0, y: 12 }}
